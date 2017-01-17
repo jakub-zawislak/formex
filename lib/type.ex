@@ -1,6 +1,7 @@
 defmodule Formex.Type do
   import Ecto
   import Ecto.Query
+  alias Formex.Field
 
   @repo Application.get_env(:formex, :repo)
 
@@ -21,12 +22,15 @@ defmodule Formex.Type do
     |> Kernel.<>("_id")
     |> String.to_atom
 
-    field = %{
+    field = %Field{
       name: name_id,
       type: :select,
       value: Map.get(form.struct, name),
-      select_options: get_options.(),
-      required: Keyword.get(opts, :required, true)
+      label: get_label(name, opts),
+      required: Keyword.get(opts, :required, true),
+      opts: %{
+        select_options: get_options.()
+      }
     }
 
     put_field(form, field)
@@ -34,10 +38,11 @@ defmodule Formex.Type do
 
   def put_field(form, type, name, opts) do
 
-    field = %{
+    field = %Field{
       name: name,
       type: type,
       value: Map.get(form.struct, name),
+      label: get_label(name, opts),
       required: Keyword.get(opts, :required, true)
     }
 
@@ -45,6 +50,14 @@ defmodule Formex.Type do
   end
 
   #
+
+  defp get_label(name, opts) do
+    if opts[:label] do
+      opts[:label]
+    else
+      Atom.to_string name
+    end
+  end
 
   defp put_field(form, field) do
     fields = form.fields ++ [field]

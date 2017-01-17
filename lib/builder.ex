@@ -1,23 +1,32 @@
 defmodule Formex.Builder do
   import Ecto.Changeset
+  alias Formex.Form
+  @repo Application.get_env(:formex, :repo)
 
-  def create_form(type, struct) do
-    %{
+  def create_form(type, struct, params \\ %{}) do
+    %Form{
       type: type,
       struct: struct,
       model: struct.__struct__,
-      fields: [],
-      params: %{},
-      changeset: nil
+      params: params
     }
-  end
-
-  def handle_request(form, params) do
-    form
-    |> Map.put(:params, params)
-    |> form.type.build_form()
+    |> type.build_form()
     |> create_changeset()
     # |> IO.inspect
+  end
+
+  def insert_form(form) do
+    case @repo.insert(form.changeset) do
+      {:ok, schema}       -> {:ok, schema}
+      {:error, changeset} -> {:error, Map.put(form, :changeset, changeset)}
+    end
+  end
+
+  def update_form(form) do
+    case @repo.update(form.changeset) do
+      {:ok, schema}       -> {:ok, schema}
+      {:error, changeset} -> {:error, Map.put(form, :changeset, changeset)}
+    end
   end
 
   #
