@@ -33,17 +33,24 @@ defmodule Formex.Builder do
 
   defp create_changeset(form) do
     changeset = form.struct
-    |> cast(form.params, get_fields_names(form))
+    |> cast(form.params, get_normal_fields_names(form))
     |> validate_required(get_required_fields_names(form))
 
     form
     |> Map.put(:changeset, changeset)
   end
 
-  defp get_fields_names(form) do
+  defp get_normal_fields_names(form) do
     form.fields
+    |> Enum.filter(&(!&1.assoc))
     |> Enum.map(&(&1.name))
   end
+
+  # defp get_assoc_fields_names(form) do
+  #   form.fields
+  #   |> Enum.filter(&(&1.assoc))
+  #   |> Enum.map(&(&1.name))
+  # end
 
   defp get_required_fields_names(form) do
     form.fields

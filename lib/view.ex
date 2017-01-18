@@ -13,16 +13,16 @@ defmodule Formex.View do
 
   end
 
-  @spec form_row(Formex.Form.t, Atom.t, Map.t) :: Phoenix.HTML.safe
-  def form_row(form, field_name, options \\ []) do
+  @spec form_row(Formex.Form.t, Atom.t) :: Phoenix.HTML.safe
+  def form_row(form, field_name) do
 
     field       = get_field(form, field_name)
-    form_field  = generate_form_field(form, field, options)
-    form_label  = generate_form_label(form, field)
+    field_html  = generate_field_html(form, field)
+    label_html  = generate_label_html(form, field)
 
-    form_field = attach_addon(form_field, options)
+    field_html = attach_addon(field_html, field)
 
-    tags = [form_label, form_field]
+    tags = [label_html, field_html]
       |> attach_error(form, field)
 
     wrapper_class = ["form-group"]
@@ -32,16 +32,16 @@ defmodule Formex.View do
 
   end
 
-  @spec form_row_horizontal(Formex.Form.t, Atom.t, Map.t) :: Phoenix.HTML.safe
-  def form_row_horizontal(form, field_name, options \\ []) do
+  @spec form_row_horizontal(Formex.Form.t, Atom.t) :: Phoenix.HTML.safe
+  def form_row_horizontal(form, field_name) do
 
     field       = get_field(form, field_name)
-    form_field  = generate_form_field(form, field, options)
-    form_label  = generate_form_label(form, field, "col-sm-2")
+    field_html  = generate_field_html(form, field)
+    label_html  = generate_label_html(form, field, "col-sm-2")
 
-    form_field = attach_addon(form_field, options)
+    field_html = attach_addon(field_html, field)
 
-    tags = [form_field]
+    tags = [field_html]
       |> attach_error(form, field)
 
     wrapper_class = ["form-group"]
@@ -49,7 +49,7 @@ defmodule Formex.View do
 
     column = content_tag(:div, tags, class: "col-sm-10")
 
-    content_tag(:div, [form_label, column], class: Enum.join(wrapper_class, " "))
+    content_tag(:div, [label_html, column], class: Enum.join(wrapper_class, " "))
 
   end
 
@@ -62,27 +62,29 @@ defmodule Formex.View do
      end)
   end
 
-  @spec generate_form_field(Formex.Form.t, Formex.Field.t, Map.t) :: any
-  defp generate_form_field(form, field, options) do
+  @spec generate_field_html(Formex.Form.t, Formex.Field.t) :: any
+  defp generate_field_html(form, field) do
 
     type = field.type
-    field_options = if options[:field_options], do: options[:field_options], else: []
+    opts = field.opts
+    data = field.data
+    phoenix_opts = if opts[:phoenix_opts], do: opts[:phoenix_opts], else: []
 
-    class = if field_options[:class_add], do: field_options[:class_add], else: ""
+    class = if opts[:class_add], do: opts[:class_add], else: ""
 
     args = [form.phoenix_form, field.name]
     args = args ++ cond do
       Enum.member? [:select, :multiple_select], type ->
-        [options[:options], Keyword.merge([class: class<>" form-control"], field_options) ]
+        [data[:options], Keyword.merge([class: class<>" form-control"], phoenix_opts) ]
 
       Enum.member? [:checkbox], type ->
-        [Keyword.merge([class: class], field_options) ] # dorobić checkboxowy stuff
+        [Keyword.merge([class: class], phoenix_opts) ]
 
       Enum.member? [:file_input], type ->
-        [Keyword.merge([class: class], field_options) ]
+        [Keyword.merge([class: class], phoenix_opts) ]
 
       true ->
-        [Keyword.merge([class: class<>" form-control"], field_options) ]
+        [Keyword.merge([class: class<>" form-control"], phoenix_opts) ]
     end
 
     input = apply(Phoenix.HTML.Form, type, args)
@@ -100,8 +102,8 @@ defmodule Formex.View do
     end
   end
 
-  @spec generate_form_field(Formex.Form.t, Formex.Field.t, String.t) :: Phoenix.HTML.safe
-  defp generate_form_label(form, field, class \\ "") do
+  @spec generate_label_html(Formex.Form.t, Formex.Field.t, String.t) :: Phoenix.HTML.safe
+  defp generate_label_html(form, field, class \\ "") do
     Phoenix.HTML.Form.label(
       form.phoenix_form,
       field.name,
@@ -118,12 +120,12 @@ defmodule Formex.View do
 
   #
 
-  defp attach_addon(form_field, options) do
-    if options[:addon] do
-      addon = content_tag(:div, options[:addon], class: "input-group-addon")
-      content_tag(:div, [form_field, addon], class: "input-group" )
+  defp attach_addon(field_html, field) do
+    if field.opts[:addon] do
+      addon = content_tag(:div, field.opts[:addon], class: "input-group-addon")
+      content_tag(:div, [field_html, addon], class: "input-group" )
     else
-      form_field
+      field_html
     end
   end
 

@@ -28,9 +28,10 @@ defmodule Formex.Type do
       value: Map.get(form.struct, name),
       label: get_label(name, opts),
       required: Keyword.get(opts, :required, true),
-      opts: %{
-        select_options: get_options.()
-      }
+      data: [
+        options: get_options.()
+      ],
+      opts: opts
     }
 
     put_field(form, field)
@@ -43,7 +44,8 @@ defmodule Formex.Type do
       type: type,
       value: Map.get(form.struct, name),
       label: get_label(name, opts),
-      required: Keyword.get(opts, :required, true)
+      required: Keyword.get(opts, :required, true),
+      opts: opts
     }
 
     put_field(form, field)
