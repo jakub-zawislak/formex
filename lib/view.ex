@@ -23,10 +23,11 @@ defmodule Formex.View do
     field_html = attach_addon(field_html, field)
 
     tags = [label_html, field_html]
-      |> attach_error(form, field)
+    |> attach_error(form, field)
 
     wrapper_class = ["form-group"]
-      |> attach_error_class(form, field)
+    |> attach_error_class(form, field)
+    |> attach_required_class(field)
 
     content_tag(:div, tags, class: Enum.join(wrapper_class, " "))
 
@@ -42,10 +43,11 @@ defmodule Formex.View do
     field_html = attach_addon(field_html, field)
 
     tags = [field_html]
-      |> attach_error(form, field)
+    |> attach_error(form, field)
 
     wrapper_class = ["form-group"]
-      |> attach_error_class(form, field)
+    |> attach_error_class(form, field)
+    |> attach_required_class(field)
 
     column = content_tag(:div, tags, class: "col-sm-10")
 
@@ -70,7 +72,7 @@ defmodule Formex.View do
     data = field.data
     phoenix_opts = if opts[:phoenix_opts], do: opts[:phoenix_opts], else: []
 
-    class = if opts[:class_add], do: opts[:class_add], else: ""
+    class = if opts[:class], do: opts[:class], else: ""
 
     args = [form.phoenix_form, field.name]
     args = args ++ cond do
@@ -139,7 +141,15 @@ defmodule Formex.View do
 
   defp attach_error_class(wrapper_class, form, field) do
     if form.phoenix_form.errors[field.name] do
-      ["has-error" | wrapper_class]
+      wrapper_class ++ ["has-error"]
+    else
+      wrapper_class
+    end
+  end
+
+  defp attach_required_class(wrapper_class, field) do
+    if field.required do
+      wrapper_class ++ ["required"]
     else
       wrapper_class
     end
