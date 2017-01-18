@@ -5,7 +5,10 @@ defmodule Formex.Type do
 
   @repo Application.get_env(:formex, :repo)
 
-  def put_field(form, :select, name, opts) do
+  def put_field(form, :select, name_id, opts) do
+
+    name = Regex.replace(~r/_id$/, Atom.to_string(name_id), "")
+    |> String.to_atom
 
     get_options = fn ->
       module = form.model.__schema__(:association, name).queryable
@@ -16,11 +19,6 @@ defmodule Formex.Type do
 
       @repo.all(query)
     end
-
-    name_id = name
-    |> Atom.to_string
-    |> Kernel.<>("_id")
-    |> String.to_atom
 
     field = %Field{
       name: name_id,
