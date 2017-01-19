@@ -13,6 +13,20 @@ defmodule Formex.View do
 
   end
 
+  def generate_fields(form) do
+     Enum.map(form.fields, fn field ->
+       form_row(form, field.name)
+     end)
+  end
+
+  def generate_fields_horizontal(form) do
+     Enum.map(form.fields, fn field ->
+       form_row_horizontal(form, field.name)
+     end)
+  end
+
+  #
+
   @spec form_row(Formex.Form.t, Atom.t) :: Phoenix.HTML.safe
   def form_row(form, field_name) do
 

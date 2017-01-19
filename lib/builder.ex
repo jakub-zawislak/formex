@@ -15,14 +15,14 @@ defmodule Formex.Builder do
     # |> IO.inspect
   end
 
-  def insert_form(form) do
+  def insert_form_data(form) do
     case @repo.insert(form.changeset) do
       {:ok, schema}       -> {:ok, schema}
       {:error, changeset} -> {:error, Map.put(form, :changeset, changeset)}
     end
   end
 
-  def update_form(form) do
+  def update_form_data(form) do
     case @repo.update(form.changeset) do
       {:ok, schema}       -> {:ok, schema}
       {:error, changeset} -> {:error, Map.put(form, :changeset, changeset)}
