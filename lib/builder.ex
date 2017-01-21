@@ -35,7 +35,7 @@ defmodule Formex.Builder do
     changeset = form.struct
     |> cast(form.params, get_normal_fields_names(form))
     |> validate_required(get_required_fields_names(form))
-    |> type.changeset_callback
+    |> type.changeset_after_create_callback
 
     form
     |> Map.put(:changeset, changeset)
