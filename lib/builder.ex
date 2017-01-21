@@ -11,7 +11,7 @@ defmodule Formex.Builder do
       params: params
     }
     |> type.build_form()
-    |> create_changeset()
+    |> create_changeset(type)
     # |> IO.inspect
   end
 
@@ -31,10 +31,11 @@ defmodule Formex.Builder do
 
   #
 
-  defp create_changeset(form) do
+  defp create_changeset(form, type) do
     changeset = form.struct
     |> cast(form.params, get_normal_fields_names(form))
     |> validate_required(get_required_fields_names(form))
+    |> type.changeset_callback
 
     form
     |> Map.put(:changeset, changeset)

@@ -5,7 +5,21 @@ defmodule Formex.Type do
 
   @repo Application.get_env(:formex, :repo)
 
-  def put_field(form, :select_assoc, name_id, opts) do
+  defmacro __using__([]) do
+    quote do
+      def changeset_callback( changeset ) do
+        changeset
+      end
+
+      def add(form, type, name_id, opts) do
+        Formex.Type.add_field(form, type, name_id, opts)
+      end
+
+      defoverridable [changeset_callback: 1]
+    end
+  end
+
+  def add_field(form, :select_assoc, name_id, opts) do
 
     name = Regex.replace(~r/_id$/, Atom.to_string(name_id), "") |> String.to_atom
 
@@ -34,7 +48,7 @@ defmodule Formex.Type do
     put_field(form, field)
   end
 
-  def put_field(form, type, name, opts) do
+  def add_field(form, type, name, opts) do
 
     field = %Field{
       name: name,
