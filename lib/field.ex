@@ -1,5 +1,4 @@
 defmodule Formex.Field do
-  import Ecto
   import Ecto.Query
 
   defstruct name: nil,
@@ -27,7 +26,7 @@ defmodule Formex.Field do
       @repo.all(query)
     end
 
-    field = %__MODULE__{
+    %__MODULE__{
       name: name_id,
       type: :select,
       value: Map.get(form.struct, name),
@@ -43,7 +42,7 @@ defmodule Formex.Field do
 
   def create_field(form, type, name, opts) do
 
-    field = %__MODULE__{
+    %__MODULE__{
       name: name,
       type: type,
       value: Map.get(form.struct, name),

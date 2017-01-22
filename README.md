@@ -125,7 +125,12 @@ end
 ```
 
 template:
+
+In `new.html.eex` and `edit.html.eex` replace `changeset: @changeset` with `form: @form`
+
+`form.html.eex`
 ```html+eex
+# it's formex_for, not form_for
 <%= formex_for @form, @action, fn f -> %>
 
   <%= if @form.changeset.action do %>
