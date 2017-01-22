@@ -3,7 +3,7 @@
 Formex is an abstract layer that helps to build forms in Phoenix and Ecto. With this library you
 don't write changesets, but create form module with list of fields
 (like in [Symfony](https://symfony.com/doc/current/forms.html#creating-form-classes)).
-Formex will build changeset and additional Ecto queries for itself.
+Formex will build changeset and additional Ecto queries (to get options for `<select>`) for itself.
 Formex also comes with helper functions for templating.
 
 ## Installation
@@ -12,13 +12,32 @@ Formex also comes with helper functions for templating.
 def deps do
   [{:formex, "~> 0.1.0"}]
 end
+
+def application do
+  [applications: [:formex]]
+end
 ```
 
-`config.exs`
+`config/config.exs`
 ```elixir
 config :formex,
   repo: App.Repo,
   translate_error: &App.ErrorHelpers.translate_error/1
+```
+
+`web/web.ex`
+```elixir
+def controller do
+  quote do
+    import Formex.Builder
+  end
+end
+
+def view do
+  quote do
+    import Formex.View
+  end
+end
 ```
 
 ## Usage
@@ -27,7 +46,7 @@ We have models Article and Category:
 
 ```elixir
 schema "articles" do
-  field :name, :string
+  field :title, :string
   field :content, :string
   field :hidden, :boolean
 
@@ -37,11 +56,11 @@ end
 
 ```elixir
 schema "categories" do
-  field :title, :string
+  field :name, :string
 end
 ```
 
-Let's create a form for Article:
+Let's create a form for Article using Formex:
 ```elixir
 # /web/form/article_form.ex
 defmodule App.ArticleForm do
@@ -61,8 +80,13 @@ defmodule App.ArticleForm do
 end
 ```
 
-Form usage inside a controller:
+controller:
 ```elixir
+def new(conn, _params) do
+  form = create_form(App.ArticleForm, %Article{})
+  render(conn, "new.html", form: form)
+end
+
 def create(conn, %{"article" => article_params}) do
   App.ArticleForm
   |> create_form(%Article{}, article_params)
@@ -76,9 +100,31 @@ def create(conn, %{"article" => article_params}) do
       render(conn, "new.html", form: form)
   end
 end
+
+def edit(conn, %{"id" => id}) do
+  article = Repo.get!(Article, id)
+  form = create_form(App.ArticleForm, article)
+  render(conn, "edit.html", article: article, form: form)
+end
+
+def update(conn, %{"id" => id, "article" => article_params}) do
+  article = Repo.get!(Article, id)
+
+  App.ArticleForm
+  |> create_form(article, article_params)
+  |> update_form_data
+  |> case do
+    {:ok, article} ->
+      conn
+      |> put_flash(:info, "Article updated successfully.")
+      |> redirect(to: article_path(conn, :show, article))
+    {:error, form} ->
+      render(conn, "edit.html", article: article, form: form)
+  end
+end
 ```
 
-Inside a template:
+template:
 ```html+eex
 <%= formex_for @form, @action, fn f -> %>
 
@@ -99,6 +145,17 @@ Inside a template:
 <% end %>
 ```
 
+CSS (optional):
+```css
+.required .control-label:after {
+  content: '*';
+  margin-right: 3px;
+}
+```
+
+final effect:
+![Example](example.png)
+
 It's very simple, isn't it?
 You don't need to create any changeset, nor write query to get options for a Category select.
 
@@ -108,12 +165,6 @@ If you need to change something in changeset, there is a callback for that:
 
 ```elixir
 defmodule App.ArticleForm do
-  # ...
-
-  def build_form( form ) do
-    # ...
-  end
-
   def changeset_after_create_callback( changeset ) do
     # modify changeset and return it
     changeset
@@ -123,4 +174,4 @@ end
 
 ## Documentation
 
-[https://hexdocs.pm/formex](https://hexdocs.pm/formex).
+[https://hexdocs.pm/formex](https://hexdocs.pm/formex)
