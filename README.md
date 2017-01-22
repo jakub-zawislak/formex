@@ -66,7 +66,7 @@ Let's create a form for Article using Formex:
 defmodule App.ArticleForm do
   use Formex.Form
 
-  def build_form( form ) do
+  def build_form(form) do
     form
     |> add(:text_input, :title, label: "Title")
     |> add(:textarea, :content, label: "Content", phoenix_opts: [
@@ -166,7 +166,7 @@ If you need to change something in changeset, there is a callback for that:
 
 ```elixir
 defmodule App.ArticleForm do
-  def changeset_after_create_callback( changeset ) do
+  def changeset_after_create_callback(changeset) do
     # modify changeset and return it
     changeset
   end
@@ -176,3 +176,9 @@ end
 ## Documentation
 
 [https://hexdocs.pm/formex](https://hexdocs.pm/formex)
+
+### TODO
+
+- [ ] use [phoenix_simple_form](https://github.com/sbrink/phoenix_simple_form) for templating
+- [ ] nested forms
+- [ ] tests
