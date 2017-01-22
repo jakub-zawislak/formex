@@ -155,7 +155,7 @@ CSS (optional):
 
 final effect:
 
-<img src="example.png" style="width: 502px; display: block">
+<img src="example.png" width="502px">
 
 It's very simple, isn't it?
 You don't need to create any changeset, nor write query to get options for a Category select.
