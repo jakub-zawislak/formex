@@ -3,6 +3,9 @@ defmodule Formex.Builder do
   alias Formex.Form
   @repo Application.get_env(:formex, :repo)
 
+  @doc """
+  Creates a form.
+  """
   def create_form(type, struct, params \\ %{}) do
     %Form{
       type: type,

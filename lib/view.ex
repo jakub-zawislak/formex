@@ -1,9 +1,9 @@
 defmodule Formex.View do
   use Phoenix.HTML
 
-  @spec formex_for(Formex.Form.t, String.t, Keyword.t (t::any -> Phoenix.HTML.unsafe))
+  @spec formex_form_for(Formex.Form.t, String.t, Keyword.t (t::any -> Phoenix.HTML.unsafe))
                    :: Phoenix.HTML.safe
-  def formex_for(form, action, options \\ [], fun) do
+  def formex_form_for(form, action, options \\ [], fun) do
 
     Phoenix.HTML.Form.form_for(form.changeset, action, options, fn f ->
       form
@@ -13,22 +13,22 @@ defmodule Formex.View do
 
   end
 
-  def generate_fields(form) do
+  def formex_rows(form) do
      Enum.map(form.fields, fn field ->
-       form_row(form, field.name)
+       formex_row(form, field.name)
      end)
   end
 
-  def generate_fields_horizontal(form) do
+  def formex_rows_horizontal(form) do
      Enum.map(form.fields, fn field ->
-       form_row_horizontal(form, field.name)
+       formex_row_horizontal(form, field.name)
      end)
   end
 
   #
 
-  @spec form_row(Formex.Form.t, Atom.t) :: Phoenix.HTML.safe
-  def form_row(form, field_name) do
+  @spec formex_row(Formex.Form.t, Atom.t) :: Phoenix.HTML.safe
+  def formex_row(form, field_name) do
 
     field       = get_field(form, field_name)
     field_html  = generate_field_html(form, field)
@@ -47,8 +47,8 @@ defmodule Formex.View do
 
   end
 
-  @spec form_row_horizontal(Formex.Form.t, Atom.t) :: Phoenix.HTML.safe
-  def form_row_horizontal(form, field_name) do
+  @spec formex_row_horizontal(Formex.Form.t, Atom.t) :: Phoenix.HTML.safe
+  def formex_row_horizontal(form, field_name) do
 
     field       = get_field(form, field_name)
     field_html  = generate_field_html(form, field)
