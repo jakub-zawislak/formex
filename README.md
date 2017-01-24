@@ -64,7 +64,7 @@ Let's create a form for Article using Formex:
 ```elixir
 # /web/form/article_type.ex
 defmodule App.ArticleType do
-  use Formex.Form
+  use Formex.Type
 
   def build_form(form) do
     form
