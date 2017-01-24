@@ -1,14 +1,29 @@
 defmodule Formex.Field do
   import Ecto.Query
+  alias __MODULE__
 
+  @doc """
+  Defines the Formex.Field struct.
+
+    * `:name` - a field name, for example: `:title`
+    * `:type` - type of field that in most cases will be name of function from `Phoenix.HTML.Form`
+    * `:value` - the value from struct/params
+    * `:required` - is field required?
+    * `:label` - the text label
+    * `:data` - additional data used by particular field type (eg. `:select_assoc` stores here data
+      for `<option>`'s)
+    * `:opts` - options
+  """
   defstruct name: nil,
-    assoc: false,
+    # assoc: false,
     type: nil,
     value: nil,
     required: true,
     label: "",
     data: [],
     opts: []
+
+  @type t :: %Field{}
 
   @repo Application.get_env(:formex, :repo)
 
@@ -26,7 +41,7 @@ defmodule Formex.Field do
       @repo.all(query)
     end
 
-    %__MODULE__{
+    %Field{
       name: name_id,
       type: :select,
       value: Map.get(form.struct, name),
@@ -42,7 +57,7 @@ defmodule Formex.Field do
 
   def create_field(form, type, name, opts) do
 
-    %__MODULE__{
+    %Field{
       name: name,
       type: type,
       value: Map.get(form.struct, name),
