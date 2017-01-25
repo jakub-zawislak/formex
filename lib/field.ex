@@ -27,8 +27,43 @@ defmodule Formex.Field do
 
   @repo Application.get_env(:formex, :repo)
 
-  def create_field(form, :select_assoc, name_id, opts) do
+  @doc """
+  Creates a new field.
 
+  `type` is, in most cases, the name of function from `Phoenix.HTML.Form`. For now the only
+  exception is the `:select_assoc`
+
+  ## Custom types
+
+    * `:select_assoc` - creates standard `:select`, but also downloads list of options from Repo.
+      Example of use for Article with one Category:
+      ```
+      schema "articles" do
+        belongs_to :category, App.Category
+      end
+      ```
+      ```
+      form
+      |> add(:select_assoc, :category_id, label: "Category")
+      ```
+      Formex will find out that `:category_id` refers to App.Category schema and download all rows
+      from Repo ordered by name. It assumes that Category has field called `name`
+
+  ## Options
+
+    * `:label`
+    * `:required` - defaults to true
+    * `:phoenix_opts` - options that will be passed to `Phoenix.HTML.Form`, for example:
+      ```
+      form
+      |> add(:textarea, :content, phoenix_opts: [
+        rows: 4
+      ])
+      ```
+  """
+  def create_field(form, :select_assoc, name, opts) do
+
+    name_id = name
     name = Regex.replace(~r/_id$/, Atom.to_string(name_id), "") |> String.to_atom
 
     get_options = fn ->

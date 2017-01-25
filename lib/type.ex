@@ -8,8 +8,8 @@ defmodule Formex.Type do
         changeset
       end
 
-      def add(form, type, name_id, opts) do
-        field = Formex.Field.create_field(form, type, name_id, opts)
+      def add(form, type, name, opts) do
+        field = Formex.Field.create_field(form, type, name, opts)
 
         Formex.Form.put_field(form, field)
       end
@@ -18,8 +18,13 @@ defmodule Formex.Type do
     end
   end
 
-  @callback build_form(Formex.Form.t) :: Formex.Form.t
+  @callback build_form(form :: Formex.Form.t) :: Formex.Form.t
 
-  @callback changeset_after_create_callback(Ecto.Changeset.t) :: Ecto.Changeset.t
+  @callback changeset_after_create_callback(changeset :: Ecto.Changeset.t) :: Ecto.Changeset.t
+
+  @doc """
+  Adds field to form. More: `Formex.Field.create_field/4`
+  """
+  @callback add(form :: Form.t, type :: Atom.t, name :: Atom.t, opts :: Map.t) :: Form.t
 
 end

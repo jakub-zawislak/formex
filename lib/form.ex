@@ -23,6 +23,9 @@ defmodule Formex.Form do
 
   @type t :: %Form{}
 
+  @doc """
+  Adds field to form. More: `Formex.Field.create_field/4`
+  """
   @spec put_field(t, Field.t) :: t
   def put_field(form, field) do
     fields = form.fields ++ [field]

@@ -4,8 +4,15 @@ defmodule Formex.Builder do
   @repo Application.get_env(:formex, :repo)
 
   @doc """
-  Creates a form.
+  Creates a form struct.
+
+  ## Arguments
+
+    * `type` - the module that implements `Formex.Type`, for example: `App.ArticleType`
+    * `struct` - the struct that will be used in `Ecto.Changeset.cast`, for example: `%App.Article{}`
+    * `params` - params that will be used in `Ecto.Changeset.cast`
   """
+  @spec create_form(module, Ecto.Schema.t, Map.t) :: Form.t
   def create_form(type, struct, params \\ %{}) do
     %Form{
       type: type,
@@ -18,6 +25,11 @@ defmodule Formex.Builder do
     # |> IO.inspect
   end
 
+  @doc """
+  Invokes `Repo.insert`. In case of `:error` returns `{:error, form}` (with new `form.changeset`
+  value) instead of `{:error, changeset}` (as Ecto does)
+  """
+  @spec insert_form_data(Form.t) :: {:ok, Ecto.Schema.t} | {:error, Form.t}
   def insert_form_data(form) do
     case @repo.insert(form.changeset) do
       {:ok, schema}       -> {:ok, schema}
@@ -25,6 +37,11 @@ defmodule Formex.Builder do
     end
   end
 
+  @doc """
+  Invokes `Repo.update`. In case of `:error` returns `{:error, form}` (with new `form.changeset`
+  value) instead of `{:error, changeset}` (as Ecto does)
+  """
+  @spec update_form_data(Form.t) :: {:ok, Ecto.Schema.t} | {:error, Form.t}
   def update_form_data(form) do
     case @repo.update(form.changeset) do
       {:ok, schema}       -> {:ok, schema}
@@ -46,7 +63,7 @@ defmodule Formex.Builder do
 
   defp get_normal_fields_names(form) do
     form.fields
-    |> Enum.filter(&(!&1.assoc))
+    # |> Enum.filter(&(!&1.assoc))
     |> Enum.map(&(&1.name))
   end
 
