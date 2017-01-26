@@ -1,24 +1,57 @@
 defmodule Formex.View do
   use Phoenix.HTML
+  alias Formex.Form
 
-  @spec formex_form_for(Formex.Form.t, String.t, Keyword.t (t::any -> Phoenix.HTML.unsafe))
+  @moduledoc """
+  Helper functions for templating.
+
+  Example of use:
+
+      <%= formex_form_for @form, @action, fn f -> %>
+        <%= if @form.changeset.action do %>
+          <div class="alert alert-danger">
+            <p>Oops, something went wrong! Please check the errors below.</p>
+          </div>
+        <% end %>
+
+        <%= formex_rows f %>
+
+        <div class="form-group">
+          <%= submit "Submit", class: "btn btn-primary" %>
+        </div>
+      <% end %>
+
+  """
+
+  @doc """
+  Works similar to `Phoenix.HTML.Form.form_for/4`
+
+  In callback first argument is `t:Formex.Form.t/0` instead of `t:Phoenix.HTML.Form.t/0`.
+  This argument contains a `t:Phoenix.HTML.Form.t/0` under `:phoenix_form` key
+  """
+  @spec formex_form_for(Form.t, String.t, Keyword.t (Formex.t -> Phoenix.HTML.unsafe))
                    :: Phoenix.HTML.safe
   def formex_form_for(form, action, options \\ [], fun) do
-
     Phoenix.HTML.Form.form_for(form.changeset, action, options, fn f ->
       form
       |> Map.put(:phoenix_form, f)
       |> fun.()
     end)
-
   end
 
+  @doc """
+  Generates all rows at once
+  """
   def formex_rows(form) do
      Enum.map(form.fields, fn field ->
        formex_row(form, field.name)
      end)
   end
 
+
+  @doc """
+  Generates all rows at once
+  """
   def formex_rows_horizontal(form) do
      Enum.map(form.fields, fn field ->
        formex_row_horizontal(form, field.name)
@@ -27,7 +60,14 @@ defmodule Formex.View do
 
   #
 
-  @spec formex_row(Formex.Form.t, Atom.t) :: Phoenix.HTML.safe
+  @doc """
+  Generates a row with Bootstraps's `.form-group` class. Example os use:
+
+      <%= formex_row f, :title %>
+      <%= formex_row f, :content %>
+      <%= formex_row f, :category_id %>
+  """
+  @spec formex_row(Form.t, Atom.t) :: Phoenix.HTML.safe
   def formex_row(form, field_name) do
 
     field       = get_field(form, field_name)
@@ -47,7 +87,16 @@ defmodule Formex.View do
 
   end
 
-  @spec formex_row_horizontal(Formex.Form.t, Atom.t) :: Phoenix.HTML.safe
+  @doc """
+  Generates a row with Bootstraps's `.form-group` class. Should be used with `.form-horizontal` class.
+
+      <div class="form-horizontal">
+        <%= formex_row_horizontal f, :title %>
+        <%= formex_row_horizontal f, :content %>
+        <%= formex_row_horizontal f, :category_id %>
+      </div>
+  """
+  @spec formex_row_horizontal(Form.t, Atom.t) :: Phoenix.HTML.safe
   def formex_row_horizontal(form, field_name) do
 
     field       = get_field(form, field_name)
@@ -71,14 +120,14 @@ defmodule Formex.View do
 
   #
 
-  @spec get_field(Formex.Form.t, Atom.t) :: Formex.Field.t
+  @spec get_field(Form.t, Atom.t) :: Formex.Field.t
   defp get_field(form, field_name) do
      Enum.find(form.fields, fn field ->
        field.name == field_name
      end)
   end
 
-  @spec generate_field_html(Formex.Form.t, Formex.Field.t) :: any
+  @spec generate_field_html(Form.t, Formex.Field.t) :: any
   defp generate_field_html(form, field) do
 
     type = field.type
@@ -118,7 +167,7 @@ defmodule Formex.View do
     end
   end
 
-  @spec generate_label_html(Formex.Form.t, Formex.Field.t, String.t) :: Phoenix.HTML.safe
+  @spec generate_label_html(Form.t, Formex.Field.t, String.t) :: Phoenix.HTML.safe
   defp generate_label_html(form, field, class \\ "") do
     Phoenix.HTML.Form.label(
       form.phoenix_form,

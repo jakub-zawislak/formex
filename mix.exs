@@ -3,13 +3,15 @@ defmodule Formex.Mixfile do
 
   def project do
     [app: :formex,
-     version: "0.1.3",
+     version: "0.1.4",
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps(),
      package: package(),
-     description: description()]
+     description: description(),
+     docs: [main: "readme",
+          extras: ["README.md"]]]
   end
 
   def application do

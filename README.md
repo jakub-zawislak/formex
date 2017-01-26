@@ -4,7 +4,8 @@ Formex is an abstract layer that helps to build forms in Phoenix and Ecto. With 
 don't write changeset, but a separate module that declares fields of form
 (like in [Symfony](https://symfony.com/doc/current/forms.html#creating-form-classes)).
 Formex will build changeset and additional Ecto queries (to get options for `<select>`) for itself.
-Formex also comes with helper functions for templating.
+
+Formex also comes with helper functions for templating. For now it only supports Bootstrap.
 
 ## Installation
 `mix.exs`
@@ -102,9 +103,10 @@ def create(conn, %{"article" => article_params}) do
 end
 ```
 
-template:
+Template:
+
 `form.html.eex`
-```html+eex
+```
 <%= formex_form_for @form, @action, fn f -> %>
   <%= if @form.changeset.action do %>...<% end %>
 
@@ -117,9 +119,10 @@ template:
   ...
 <% end %>
 ```
+
 Also replace `changeset: @changeset` with `form: @form` in `new.html.eex`
 
-optional CSS:
+Optional CSS:
 ```css
 .required .control-label:after {
   content: '*';
@@ -129,24 +132,11 @@ optional CSS:
 
 final effect:
 
-<img src="example.png" width="502px">
+<img src="https://github.com/jakub-zawislak/formex/blob/master/example.png" width="502px">
 
 It's very simple, isn't it?
 You don't need to create any changeset nor write a query to get options for a Category select.
 Furthermore, the form code is separated from the template.
-
-## Advanced
-
-If you need to change something in changeset, there is a callback for that:
-
-```elixir
-defmodule App.ArticleType do
-  def changeset_after_create_callback(changeset) do
-    # modify changeset and return it
-    changeset
-  end
-end
-```
 
 ## Documentation
 
@@ -154,7 +144,7 @@ end
 
 ### TODO
 
-- [ ] use [phoenix_simple_form](https://github.com/sbrink/phoenix_simple_form) for templating
 - [ ] nested forms
+- [ ] more options for `select_assoc`
+- [ ] use [phoenix_simple_form](https://github.com/sbrink/phoenix_simple_form) for templating
 - [ ] tests
-- [ ] docs

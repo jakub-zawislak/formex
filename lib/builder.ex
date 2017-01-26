@@ -3,6 +3,29 @@ defmodule Formex.Builder do
   alias Formex.Form
   @repo Application.get_env(:formex, :repo)
 
+  @moduledoc """
+  The form builder.
+
+  Example:
+
+  ```
+  form = create_form(App.ArticleType, %Article{})
+  render(conn, "new.html", form: form)
+  ```
+
+  ```
+  App.ArticleType
+  |> create_form(%Article{}, article_params)
+  |> insert_form_data
+  |> case do
+    {:ok, _article} ->
+      # ...
+    {:error, form} ->
+      # ...
+  end
+  ```
+  """
+
   @doc """
   Creates a form struct.
 
