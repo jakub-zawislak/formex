@@ -140,7 +140,7 @@ defmodule Formex.View do
     args = [form.phoenix_form, field.name]
     args = args ++ cond do
       Enum.member? [:select, :multiple_select], type ->
-        [data[:options], Keyword.merge([class: class<>" form-control"], phoenix_opts) ]
+        [data[:choices], Keyword.merge([class: class<>" form-control"], phoenix_opts) ]
 
       Enum.member? [:checkbox], type ->
         [Keyword.merge([class: class], phoenix_opts) ]
