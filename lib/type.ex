@@ -10,6 +10,7 @@ defmodule Formex.Type do
   ```
   defmodule App.ArticleType do
     use Formex.Type
+    alias Formex.CustomField.SelectAssoc
 
     def build_form(form) do
       form
@@ -18,7 +19,7 @@ defmodule Formex.Type do
         rows: 4
       ])
       |> add(:checkbox, :hidden, label: "Is hidden", required: false)
-      |> add(:select_assoc, :category_id, label: "Category", phoenix_opts: [
+      |> add(SelectAssoc, :category_id, label: "Category", phoenix_opts: [
         prompt: "Choose category"
       ])
     end
@@ -40,8 +41,14 @@ defmodule Formex.Type do
         changeset
       end
 
-      def add(form, type, name, opts) do
-        field = Formex.Field.create_field(form, type, name, opts)
+      def add(form, type_or_module, name, opts) do
+
+        # check if type_or_module is atom or module
+        field = if :erlang.function_exported(type_or_module, :module_info, 0) do
+          type_or_module.create_field(form, name, opts)
+        else
+          Formex.Field.create_field(form, type_or_module, name, opts)
+        end
 
         Formex.Form.put_field(form, field)
       end

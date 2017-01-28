@@ -11,7 +11,7 @@ Formex also comes with helper functions for templating. For now it only supports
 `mix.exs`
 ```elixir
 def deps do
-  [{:formex, "~> 0.1.0"}]
+  [{:formex, "~> 0.2.0"}]
 end
 
 def application do
@@ -66,6 +66,7 @@ Let's create a form for Article using Formex:
 # /web/form/article_type.ex
 defmodule App.ArticleType do
   use Formex.Type
+  alias Formex.CustomField.SelectAssoc
 
   def build_form(form) do
     form
@@ -74,8 +75,8 @@ defmodule App.ArticleType do
       rows: 4
     ])
     |> add(:checkbox, :hidden, label: "Is hidden", required: false)
-    |> add(:select_assoc, :category_id, label: "Category", phoenix_opts: [
-      prompt: "Choose category"
+    |> add(SelectAssoc, :category_id, label: "Category", phoenix_opts: [
+      prompt: "Choose a category"
     ])
   end
 end
@@ -145,6 +146,6 @@ Furthermore, the form code is separated from the template.
 ### TODO
 
 - [ ] nested forms
-- [ ] more options for `select_assoc`
+- [ ] more options for `Formex.CustomField.SelectAssoc`
 - [ ] use [phoenix_simple_form](https://github.com/sbrink/phoenix_simple_form) for templating
 - [ ] tests

@@ -61,7 +61,7 @@ defmodule Formex.View do
   #
 
   @doc """
-  Generates a row with Bootstraps's `.form-group` class. Example os use:
+  Generates a row with Bootstraps's `.form-group` class. Example of use:
 
       <%= formex_row f, :title %>
       <%= formex_row f, :content %>
