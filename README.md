@@ -145,7 +145,11 @@ Furthermore, the form code is separated from the template.
 
 ### TODO
 
-- [ ] nested forms
 - [ ] more options for `Formex.CustomField.SelectAssoc`
-- [ ] use [phoenix_simple_form](https://github.com/sbrink/phoenix_simple_form) for templating
+  - [x] `choice_name`
+  - [ ] `choice_query`
+  - [ ] `GROUP BY`
+- [ ] validate if sent `<option>` exists in generated `:select`
+- [ ] nested forms
+- [ ] templating
 - [ ] tests

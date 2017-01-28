@@ -23,8 +23,8 @@ defmodule Formex.CustomField.SelectAssoc do
 
   ## Options
 
-    * `choice_name` - controls what text will used as an `<option>` content. May be the name of
-      field or function. Example of use:
+    * `choice_name` - controls the content of `<option>`. May be the name of field or function.
+      Example of use:
 
       ```
       form
