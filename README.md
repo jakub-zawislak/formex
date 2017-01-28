@@ -133,7 +133,7 @@ Optional CSS:
 
 final effect:
 
-<img src="https://github.com/jakub-zawislak/formex/blob/master/example.png" width="502px">
+<img src="http://i.imgur.com/Hi1YE5b.png" width="502px">
 
 It's very simple, isn't it?
 You don't need to create any changeset nor write a query to get options for a Category select.
@@ -146,9 +146,9 @@ Furthermore, the form code is separated from the template.
 ### TODO
 
 - [ ] more options for `Formex.CustomField.SelectAssoc`
-  - [x] `choice_name`
-  - [ ] `choice_query`
-  - [ ] `GROUP BY`
+    - [x] `choice_name`
+    - [ ] `choice_query`
+    - [ ] `GROUP BY`
 - [ ] validate if sent `<option>` exists in generated `:select`
 - [ ] nested forms
 - [ ] templating
