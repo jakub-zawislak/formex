@@ -31,9 +31,9 @@ defmodule Formex.Builder do
 
   ## Arguments
 
-    * `type` - the module that implements `Formex.Type`, for example: `App.ArticleType`
-    * `struct` - the struct that will be used in `Ecto.Changeset.cast`, for example: `%App.Article{}`
-    * `params` - params that will be used in `Ecto.Changeset.cast`
+    * `type` - the module that implements `Formex.Type` behaviour, for example: `App.ArticleType`
+    * `struct` - the struct that will be used in `Ecto.Changeset.cast/3`, for example: `%App.Article{}`
+    * `params` - the parameters that will be used in `Ecto.Changeset.cast/3`
   """
   @spec create_form(module, Ecto.Schema.t, Map.t) :: Form.t
   def create_form(type, struct, params \\ %{}) do
@@ -49,7 +49,7 @@ defmodule Formex.Builder do
   end
 
   @doc """
-  Invokes `Repo.insert`. In case of `:error` returns `{:error, form}` (with new `form.changeset`
+  Invokes `Repo.insert`. In case of `:error`, returns `{:error, form}` (with new `form.changeset`
   value) instead of `{:error, changeset}` (as Ecto does)
   """
   @spec insert_form_data(Form.t) :: {:ok, Ecto.Schema.t} | {:error, Form.t}
@@ -61,7 +61,7 @@ defmodule Formex.Builder do
   end
 
   @doc """
-  Invokes `Repo.update`. In case of `:error` returns `{:error, form}` (with new `form.changeset`
+  Invokes `Repo.update`. In case of `:error`, returns `{:error, form}` (with new `form.changeset`
   value) instead of `{:error, changeset}` (as Ecto does)
   """
   @spec update_form_data(Form.t) :: {:ok, Ecto.Schema.t} | {:error, Form.t}

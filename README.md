@@ -104,7 +104,7 @@ def create(conn, %{"article" => article_params}) do
 end
 ```
 
-Template:
+A template:
 
 `form.html.eex`
 ```
@@ -123,7 +123,7 @@ Template:
 
 Also replace `changeset: @changeset` with `form: @form` in `new.html.eex`
 
-Optional CSS:
+Put an asterisk to required fields:
 ```css
 .required .control-label:after {
   content: '*';
@@ -131,7 +131,7 @@ Optional CSS:
 }
 ```
 
-final effect:
+The final effect:
 
 <img src="http://i.imgur.com/Hi1YE5b.png" width="502px">
 

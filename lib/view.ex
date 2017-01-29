@@ -24,10 +24,11 @@ defmodule Formex.View do
   """
 
   @doc """
-  Works similar to `Phoenix.HTML.Form.form_for/4`
+  Works similar to a `Phoenix.HTML.Form.form_for/4`
 
-  In callback first argument is `t:Formex.Form.t/0` instead of `t:Phoenix.HTML.Form.t/0`.
-  This argument contains a `t:Phoenix.HTML.Form.t/0` under `:phoenix_form` key
+  In the callback function the first argument is `t:Formex.Form.t/0` instead of a
+  `t:Phoenix.HTML.Form.t/0`.
+  This argument contains the `t:Phoenix.HTML.Form.t/0` under a `:phoenix_form` key
   """
   @spec formex_form_for(Form.t, String.t, Keyword.t (Formex.t -> Phoenix.HTML.unsafe))
                    :: Phoenix.HTML.safe
@@ -40,7 +41,7 @@ defmodule Formex.View do
   end
 
   @doc """
-  Generates all rows at once
+  Generates all `formex_row/2`s at once
   """
   def formex_rows(form) do
      Enum.map(form.fields, fn field ->
@@ -50,7 +51,7 @@ defmodule Formex.View do
 
 
   @doc """
-  Generates all rows at once
+  Generates all `formex_row_horizontal/2`s at once
   """
   def formex_rows_horizontal(form) do
      Enum.map(form.fields, fn field ->
@@ -61,7 +62,7 @@ defmodule Formex.View do
   #
 
   @doc """
-  Generates a row with Bootstraps's `.form-group` class. Example of use:
+  Generates a row with Bootstrap's `.form-group` class. Example of use:
 
       <%= formex_row f, :title %>
       <%= formex_row f, :content %>
@@ -88,7 +89,7 @@ defmodule Formex.View do
   end
 
   @doc """
-  Generates a row with Bootstraps's `.form-group` class. Should be used with `.form-horizontal` class.
+  Generates a row with Bootstrap's `.form-group` class. Should be used with `.form-horizontal` class.
 
       <div class="form-horizontal">
         <%= formex_row_horizontal f, :title %>

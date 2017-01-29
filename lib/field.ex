@@ -34,11 +34,11 @@ defmodule Formex.Field do
     * `:label`
     * `:required` - defaults to true. If set, it will be validated by the
       `Ecto.Changeset.validate_required/4`. Also, the template helper will it use to generate
-      additional `.required` CSS class.
+      an additional `.required` CSS class.
     * `:choices` - list of `<option>`s for `:select` and `:multiple_select`
       ```
       form
-      |> add(:select, :field, options: ["Option 1": 1, "Options 2": 2])
+      |> add(:select, :field, choices: ["Option 1": 1, "Options 2": 2])
       ```
     * `:phoenix_opts` - options that will be passed to `Phoenix.HTML.Form`, for example:
       ```

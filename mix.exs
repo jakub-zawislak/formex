@@ -11,7 +11,9 @@ defmodule Formex.Mixfile do
      package: package(),
      description: description(),
      docs: [main: "readme",
-          extras: ["README.md"]]]
+          extras: ["README.md"]],
+     source_url: "https://github.com/jakub-zawislak/formex"
+   ]
   end
 
   def application do

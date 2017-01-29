@@ -26,7 +26,7 @@ defmodule Formex.Type do
 
     # optional
     def changeset_after_create_callback(changeset) do
-      # do extra validation and return a new changeset
+      # do an extra validation
       changeset
     end
   end
@@ -58,22 +58,22 @@ defmodule Formex.Type do
   end
 
   @doc """
-  In this callback you have to add fields to a Form.
-  """
-  @callback build_form(form :: Formex.Form.t) :: Formex.Form.t
-
-  @doc """
-  Callback that will be called after changeset creation. In this function you can
-  for example add extra validation to your changeset.
-  """
-  @callback changeset_after_create_callback(changeset :: Ecto.Changeset.t) :: Ecto.Changeset.t
-
-  @doc """
-  Adds a field to a form.
+  Adds a field to the form.
 
   If the `type_or_module` is an atom, then this function invokes `Formex.Field.create_field/4`.
   Otherwise, the `c:Formex.CustomField.create_field/3` is called.
   """
   @callback add(form :: Form.t, type_or_module :: Atom.t, name :: Atom.t, opts :: Map.t) :: Form.t
+
+  @doc """
+  In this callback you have to add fields to the form.
+  """
+  @callback build_form(form :: Formex.Form.t) :: Formex.Form.t
+
+  @doc """
+  Callback that will be called after changeset creation. In this function you can
+  for example add an extra validation to your changeset.
+  """
+  @callback changeset_after_create_callback(changeset :: Ecto.Changeset.t) :: Ecto.Changeset.t
 
 end

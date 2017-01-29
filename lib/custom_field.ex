@@ -1,9 +1,11 @@
 defmodule Formex.CustomField do
 
   @moduledoc """
-  Module used in custom fields
+  A behaviour module for implementing the custom field.
 
-  Check `Formex.CustomField.SelectAssoc` for example of use
+  Check the source of
+  [SelectAssoc](https://github.com/jakub-zawislak/formex/blob/master/lib/custom_fields/select_assoc.ex)
+  for example of use
   """
 
   @doc """
