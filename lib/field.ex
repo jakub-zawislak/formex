@@ -5,7 +5,7 @@ defmodule Formex.Field do
   Defines the Formex.Field struct.
 
     * `:name` - a field name, for example: `:title`
-    * `:type` - type of field that in most cases will be name of function from `Phoenix.HTML.Form`
+    * `:type` - a type of a field that in most cases will be the name of a function from `Phoenix.HTML.Form`
     * `:value` - the value from struct/params
     * `:required` - is field required?
     * `:label` - the text label
@@ -33,7 +33,7 @@ defmodule Formex.Field do
 
     * `:label`
     * `:required` - defaults to true. If set, it will be validated by the
-      `Ecto.Changeset.validate_required/4`. Also, the template helper will it use to generate
+      `Ecto.Changeset.validate_required/4`. Also, the template helper will use it to generate
       an additional `.required` CSS class.
     * `:choices` - list of `<option>`s for `:select` and `:multiple_select`
       ```

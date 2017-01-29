@@ -5,7 +5,7 @@ defmodule Formex.CustomField do
 
   Check the source of
   [SelectAssoc](https://github.com/jakub-zawislak/formex/blob/master/lib/custom_fields/select_assoc.ex)
-  for example of use
+  for an example of use
   """
 
   @doc """
