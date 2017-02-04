@@ -82,7 +82,7 @@ defmodule App.ArticleType do
 end
 ```
 
-We need to modify slightly a controller:
+We need to slightly modify a controller:
 ```elixir
 def new(conn, _params) do
   form = create_form(App.ArticleType, %Article{})
