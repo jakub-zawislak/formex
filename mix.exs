@@ -10,9 +10,12 @@ defmodule Formex.Mixfile do
      deps: deps(),
      package: package(),
      description: description(),
+
      docs: [main: "readme",
           extras: ["README.md"]],
-     source_url: "https://github.com/jakub-zawislak/formex"
+     source_url: "https://github.com/jakub-zawislak/formex",
+     elixirc_paths: elixirc_paths(Mix.env),
+     aliases: aliases()
    ]
   end
 
@@ -23,7 +26,9 @@ defmodule Formex.Mixfile do
   defp deps do
     [{:phoenix_html, "~> 2.0"},
      {:ecto, "~> 2.0"},
-     {:ex_doc, ">= 0.0.0", only: :dev}]
+     {:ex_doc, ">= 0.0.0", only: :dev},
+     {:mariaex, "~> 0.8.1", only: [:dev, :test]} # without a :dev the jakub-zawislak/phoenix-forms won't start. maybe should be removed
+    ]
   end
 
   defp description do
@@ -36,5 +41,12 @@ defmodule Formex.Mixfile do
     [maintainers: ["Jakub Zawiślak"],
      licenses: ["MIT"],
      links: %{github: "https://github.com/jakub-zawislak/formex"}]
+  end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
+  defp aliases do
+    ["test": ["ecto.create --quiet", "ecto.migrate", "test"]]
   end
 end
