@@ -12,7 +12,8 @@ config :formex, Formex.TestRepo,
 config :formex, ecto_repos: [Formex.TestRepo]
 
 config :formex,
-  repo: Formex.TestRepo
+  repo: Formex.TestRepo,
+  translate_error: &Formex.TestErrorHelpers.translate_error/1
 
 config :logger, :console,
   level: :info

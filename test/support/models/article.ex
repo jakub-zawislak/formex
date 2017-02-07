@@ -6,7 +6,7 @@ defmodule Formex.TestModel.Article do
     field :content, :string
     field :visible, :boolean
 
-    belongs_to :category, App.Category
+    belongs_to :category, Formex.TestModel.Category
 
     timestamps()
   end
