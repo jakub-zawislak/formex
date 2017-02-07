@@ -48,7 +48,10 @@ defmodule Formex.Field do
       ])
       ```
   """
-  def create_field(form, type, name, opts) do
+  def create_field(form, type, name, opts \\ []) do
+
+    data = []
+    data = if opts[:choices], do: Keyword.merge(data, [choices: opts[:choices]]), else: data
 
     %Field{
       name: name,
@@ -56,9 +59,7 @@ defmodule Formex.Field do
       value: Map.get(form.struct, name),
       label: get_label(name, opts),
       required: Keyword.get(opts, :required, true),
-      data: [
-        choices: opts[:choices]
-      ],
+      data: data,
       opts: opts
     }
 

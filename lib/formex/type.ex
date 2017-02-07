@@ -41,7 +41,7 @@ defmodule Formex.Type do
         changeset
       end
 
-      def add(form, type_or_module, name, opts) do
+      def add(form, type_or_module, name, opts \\ []) do
 
         # check if type_or_module is atom or module
         field = if :erlang.function_exported(type_or_module, :module_info, 0) do

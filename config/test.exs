@@ -13,3 +13,6 @@ config :formex, ecto_repos: [Formex.TestRepo]
 
 config :formex,
   repo: Formex.TestRepo
+
+config :logger, :console,
+  level: :info

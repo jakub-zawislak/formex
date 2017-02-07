@@ -47,6 +47,6 @@ defmodule Formex.Mixfile do
   defp elixirc_paths(_), do: ["lib"]
 
   defp aliases do
-    ["test": ["ecto.create --quiet", "ecto.migrate", "test"]]
+    ["test": ["ecto.migrate", "test"]]
   end
 end
