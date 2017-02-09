@@ -23,17 +23,17 @@ defmodule Formex.CustomField.SelectAssoc do
 
   ## Options
 
-    * `choice_name` - controls the content of `<option>`. May be the name of a field or a function.
+    * `choice_label` - controls the content of `<option>`. May be the name of a field or a function.
       Example of use:
 
       ```
       form
-      |> add(SelectAssoc, :article_id, label: "Article", choice_name: :title)
+      |> add(SelectAssoc, :article_id, label: "Article", choice_label: :title)
       ```
       ```
       form
-      |> add(SelectAssoc, :user_id, label: "User", choice_name: fn article ->
-        article.first_name<>" "<>article.last_name
+      |> add(SelectAssoc, :user_id, label: "User", choice_label: fn user ->
+        user.first_name<>" "<>user.last_name
       end)
       ```
 
@@ -56,7 +56,7 @@ defmodule Formex.CustomField.SelectAssoc do
 
     choices = module
     |> apply_query(opts[:query])
-    |> get_choices(opts[:choice_name])
+    |> get_choices(opts[:choice_label])
 
     %Field{
       name: name_id,
@@ -80,12 +80,12 @@ defmodule Formex.CustomField.SelectAssoc do
     query
   end
 
-  defp get_choices(module, choice_name) when is_function(choice_name) do
+  defp get_choices(module, choice_label) when is_function(choice_label) do
 
     module
     |> @repo.all
     |> Enum.map(fn row ->
-      name = choice_name.(row)
+      name = choice_label.(row)
       {name, row.id}
     end)
     |> Enum.sort(fn {name1, _}, {name2, _} ->
@@ -94,13 +94,13 @@ defmodule Formex.CustomField.SelectAssoc do
 
   end
 
-  defp get_choices(module, choice_name) do
+  defp get_choices(module, choice_label) do
 
-    choice_name = if choice_name, do: choice_name, else: :name
+    choice_label = if choice_label, do: choice_label, else: :name
 
     query = from e in module,
-      select: {field(e, ^choice_name), e.id},
-      order_by: field(e, ^choice_name)
+      select: {field(e, ^choice_label), e.id},
+      order_by: field(e, ^choice_label)
 
     @repo.all(query)
 

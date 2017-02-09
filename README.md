@@ -146,7 +146,7 @@ Furthermore, the form code is separated from the template.
 ### TODO
 
 - [ ] more options for `Formex.CustomField.SelectAssoc`
-    - [x] `choice_name`
+    - [x] `choice_label`
     - [x] `query`
     - [ ] `GROUP BY`
 - [ ] validate if sent `<option>` exists in generated `:select`

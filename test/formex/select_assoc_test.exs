@@ -16,7 +16,7 @@ defmodule Formex.SelectAssocChoiceNameAtomTestType do
 
   def build_form(form) do
     form
-    |> add(Formex.CustomField.SelectAssoc, :category_id, choice_name: :id)
+    |> add(Formex.CustomField.SelectAssoc, :category_id, choice_label: :id)
   end
 end
 
@@ -26,7 +26,7 @@ defmodule Formex.SelectAssocChoiceNameFunctionTestType do
 
   def build_form(form) do
     form
-    |> add(Formex.CustomField.SelectAssoc, :category_id, choice_name: fn category ->
+    |> add(Formex.CustomField.SelectAssoc, :category_id, choice_label: fn category ->
       category.name <> category.name
     end)
   end
@@ -84,8 +84,8 @@ defmodule Formex.SelectAssocTest do
 
     choices = Enum.at(form.fields, 0).data[:choices]
     choice  = Enum.at(choices, 0)
-    {choice_name, _} = choice
-    assert is_number(choice_name)
+    {choice_label, _} = choice
+    assert is_number(choice_label)
   end
 
   test "choice name function" do
@@ -95,8 +95,8 @@ defmodule Formex.SelectAssocTest do
 
     choices = Enum.at(form.fields, 0).data[:choices]
     choice  = Enum.at(choices, 0)
-    {choice_name, _} = choice
-    assert choice_name == "asdasd"
+    {choice_label, _} = choice
+    assert choice_label == "asdasd"
   end
 
   test "choice query" do
