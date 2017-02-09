@@ -147,9 +147,9 @@ Furthermore, the form code is separated from the template.
 
 - [ ] more options for `Formex.CustomField.SelectAssoc`
     - [x] `choice_name`
-    - [ ] `choice_query`
+    - [x] `query`
     - [ ] `GROUP BY`
 - [ ] validate if sent `<option>` exists in generated `:select`
 - [ ] nested forms
 - [ ] templating
-- [ ] tests
+- [x] tests
