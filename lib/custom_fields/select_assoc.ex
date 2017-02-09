@@ -23,7 +23,7 @@ defmodule Formex.CustomField.SelectAssoc do
 
   ## Options
 
-    * `choice_name` - controls the content of `<option>`. May be the name of field or function.
+    * `choice_name` - controls the content of `<option>`. May be the name of a field or a function.
       Example of use:
 
       ```
@@ -32,8 +32,18 @@ defmodule Formex.CustomField.SelectAssoc do
       ```
       ```
       form
-      |> add(SelectAssoc, :article_id, label: "Article", choice_name: fn article ->
-        article.title
+      |> add(SelectAssoc, :user_id, label: "User", choice_name: fn article ->
+        article.first_name<>" "<>article.last_name
+      end)
+      ```
+
+    * `query` - an additional query that filters the choices list. Example of use:
+
+      ```
+      form
+      |> add(SelectAssoc, :user_id, query: fn query ->
+        from e in query,
+          where: e.fired == false
       end)
       ```
   """
@@ -42,11 +52,11 @@ defmodule Formex.CustomField.SelectAssoc do
 
     name = Regex.replace(~r/_id$/, Atom.to_string(name_id), "") |> String.to_atom
 
-    # option_name
-
     module = form.model.__schema__(:association, name).queryable
 
-    choices = get_choices(module, opts[:choice_name])
+    choices = module
+    |> apply_query(opts[:query])
+    |> get_choices(opts[:choice_name])
 
     %Field{
       name: name_id,
@@ -60,6 +70,14 @@ defmodule Formex.CustomField.SelectAssoc do
       opts: opts
     }
 
+  end
+
+  defp apply_query(query, custom_query) when is_function(custom_query) do
+    custom_query.(query)
+  end
+
+  defp apply_query(query, _)do
+    query
   end
 
   defp get_choices(module, choice_name) when is_function(choice_name) do
