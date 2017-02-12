@@ -145,10 +145,10 @@ Furthermore, the form code is separated from the template.
 
 ### TODO
 
-- [ ] more options for `Formex.CustomField.SelectAssoc`
+- [x] more options for `Formex.CustomField.SelectAssoc`
     - [x] `choice_label`
     - [x] `query`
-    - [ ] `GROUP BY`
+    - [x] `GROUP BY`
 - [ ] validate if sent `<option>` exists in generated `:select`
 - [ ] nested forms
 - [ ] templating

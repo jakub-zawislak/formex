@@ -7,6 +7,7 @@ defmodule Formex.TestModel.Article do
     field :visible, :boolean
 
     belongs_to :category, Formex.TestModel.Category
+    belongs_to :user, Formex.TestModel.User
 
     timestamps()
   end

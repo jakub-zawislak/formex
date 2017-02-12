@@ -46,6 +46,44 @@ defmodule Formex.CustomField.SelectAssoc do
           where: e.fired == false
       end)
       ```
+
+    * `group_by` - wraps `<option>`'s in `<optgroup>`'s. May be `:field_name`,
+      `:assoc_name` or `[:assoc_name, :field_name]`
+
+      Example of use:
+
+      ```
+      schema "users" do
+        field :first_name, :string
+        field :last_name, :string
+        belongs_to :department, App.Department
+      end
+      ```
+
+      ```
+      schema "departments" do
+        field :name, :string
+        field :description, :string
+      end
+      ```
+
+      Group by last name of user:
+      ```
+      form
+      |> add(SelectAssoc, :user_id, group_by: :last_name)
+      ```
+
+      Group by department, by `:name` (default) field:
+      ```
+      form
+      |> add(SelectAssoc, :user_id, group_by: :department)
+      ```
+
+      Group by department, but by another field
+      ```
+      form
+      |> add(SelectAssoc, :user_id, group_by: [:department, :description])
+      ```
   """
 
   def create_field(form, name_id, opts) do
@@ -54,9 +92,14 @@ defmodule Formex.CustomField.SelectAssoc do
 
     module = form.model.__schema__(:association, name).queryable
 
+    opts = parse_opts(module, opts)
+
     choices = module
     |> apply_query(opts[:query])
-    |> get_choices(opts[:choice_label])
+    |> apply_group_by_assoc(opts[:group_by])
+    |> @repo.all
+    |> group_rows(opts[:group_by])
+    |> generate_choices(opts[:choice_label])
 
     %Field{
       name: name_id,
@@ -72,38 +115,71 @@ defmodule Formex.CustomField.SelectAssoc do
 
   end
 
+  defp parse_opts(module, opts) do
+    opts
+    |> Keyword.update(:group_by, nil, fn(property_path) ->
+
+      cond do
+        is_list(property_path) -> property_path
+        is_atom(property_path) ->
+          cond do
+            module.__schema__(:association, property_path) -> [property_path, :name]
+            true -> [property_path]
+          end
+        true -> nil
+      end
+
+    end)
+  end
+
   defp apply_query(query, custom_query) when is_function(custom_query) do
     custom_query.(query)
   end
 
-  defp apply_query(query, _)do
-    query
+  defp apply_query(query, _) do query end
+
+  defp apply_group_by_assoc(query, [assoc|t]) do
+    if Enum.count(t) > 0 do
+      from(query, preload: [^assoc])
+    else
+      query
+    end
   end
 
-  defp get_choices(module, choice_label) when is_function(choice_label) do
+  defp apply_group_by_assoc(query, _) do query end
 
-    module
-    |> @repo.all
+  defp group_rows(rows, property_path) when is_list(property_path) do
+    rows
+    |> Enum.group_by(&(Formex.Utils.Map.get_property(&1, property_path)))
+  end
+
+  defp group_rows(rows, _) do rows end
+
+  defp generate_choices(rows, choice_label) when is_list(rows) do
+    rows
     |> Enum.map(fn row ->
-      name = choice_label.(row)
-      {name, row.id}
+      label = cond do
+        is_function(choice_label) ->
+          choice_label.(row)
+        !is_nil(choice_label) ->
+          Map.get(row, choice_label)
+        true ->
+          row.name
+      end
+
+      {label, row.id}
     end)
     |> Enum.sort(fn {name1, _}, {name2, _} ->
       name1 < name2
     end)
-
   end
 
-  defp get_choices(module, choice_label) do
-
-    choice_label = if choice_label, do: choice_label, else: :name
-
-    query = from e in module,
-      select: {field(e, ^choice_label), e.id},
-      order_by: field(e, ^choice_label)
-
-    @repo.all(query)
-
+  defp generate_choices(grouped_rows, choice_label) when is_map(grouped_rows) do
+    grouped_rows
+    |> Enum.map(fn {group_label, rows} ->
+      {group_label, generate_choices(rows, choice_label)}
+    end)
+    |> Map.new(&(&1))
   end
 
 end
