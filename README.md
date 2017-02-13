@@ -7,6 +7,8 @@ Formex will build changeset and additional Ecto queries (to get options for `<se
 
 Formex also comes with helper functions for templating. For now it only supports Bootstrap.
 
+## TL;DR
+
 <img src="http://i.imgur.com/6mE1xLj.png" width="800px">
 
 ## Installation
