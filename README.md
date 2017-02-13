@@ -9,7 +9,7 @@ Formex also comes with helper functions for templating. For now it only supports
 
 ## TL;DR
 
-<img src="http://i.imgur.com/6mE1xLj.png" width="800px">
+<img src="http://i.imgur.com/xIuaT88.png" width="800px">
 
 ## Installation
 `mix.exs`
