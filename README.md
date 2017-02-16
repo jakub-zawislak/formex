@@ -5,7 +5,8 @@ don't write changeset, but a separate module that declares fields of form
 (like in [Symfony](https://symfony.com/doc/current/forms.html#creating-form-classes)).
 Formex will build changeset and additional Ecto queries (to get options for `<select>`) for itself.
 
-Formex also comes with helper functions for templating. For now it only supports Bootstrap.
+Formex also comes with helper functions for templating. For now there is only a Bootstrap 3
+template, but you can easily create your own templates.
 
 ## TL;DR
 
@@ -15,7 +16,7 @@ Formex also comes with helper functions for templating. For now it only supports
 `mix.exs`
 ```elixir
 def deps do
-  [{:formex, "~> 0.2.0"}]
+  [{:formex, "~> 0.3.0"}]
 end
 
 def application do
@@ -27,7 +28,8 @@ end
 ```elixir
 config :formex,
   repo: App.Repo,
-  translate_error: &App.ErrorHelpers.translate_error/1
+  translate_error: &App.ErrorHelpers.translate_error/1,
+  template: Formex.Template.BootstrapVertical # you can override it inside a .eex template
 ```
 
 `web/web.ex`
@@ -155,5 +157,6 @@ Furthermore, the form code is separated from the template.
     - [x] `GROUP BY`
 - [ ] validate if sent `<option>` exists in generated `:select`
 - [ ] nested forms
-- [ ] templating
+- [x] templating
 - [x] tests
+- [ ] submit button

@@ -12,6 +12,8 @@ defmodule Formex.Form do
     * `:params` - params that will be used in `Ecto.Changeset.cast`
     * `:changeset` - `%Ecto.Changeset{}`
     * `:phoenix_form` - `%Phoenix.HTML.Form{}`
+    * `:template` - the module that implements `Formex.Template`, for example:
+      `Formex.Template.BootstrapHorizontal`. Can be set via a `Formex.View.formex_form_for` options
   """
   defstruct type: nil,
     struct: nil,
@@ -19,7 +21,9 @@ defmodule Formex.Form do
     fields: [],
     params: %{},
     changeset: nil,
-    phoenix_form: nil
+    phoenix_form: nil,
+    template: nil,
+    template_options: nil
 
   @type t :: %Form{}
 
