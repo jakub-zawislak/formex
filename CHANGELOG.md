@@ -1,3 +1,14 @@
+## v0.3.0 (2017-02-17)
+* Added
+  * Ability to create a custom templates
+  * Templates
+    * Bootstrap horizontal
+    * Bootstrap vertical
+
+* Removed
+  * `formex_row_horizontal` and `formex_rows_horizontal`.
+    You have to use a horizontal template from now on.
+
 ## v0.2.3 (2017-02-12)
 
 * Added

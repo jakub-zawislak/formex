@@ -21,6 +21,41 @@ defmodule Formex.View do
         </div>
       <% end %>
 
+  ## Changing a form template
+
+    You can change the template globally or in the specific form/field.
+
+    * config
+      ```
+      config :formex,
+        template: Formex.Template.BootstrapHorizontal
+        template_options: [ # options used by this template
+          left_column: "col-xs-2",
+          right_column: "col-xs-10"
+        ]
+      ```
+
+    * `formex_form_for/4`:
+      ```
+      <%= formex_form_for @form, @action, [
+          class: "form-horizontal",
+          template: Formex.Template.BootstrapHorizontal
+        ], fn f -> %>
+        ...
+      <% end %>
+      ```
+
+    * `formex_rows/2`:
+      ```
+      <%= formex_rows f, template: Formex.Template.BootstrapHorizontal %>
+      ```
+
+    * `formex_row/3`:
+      ```
+      <%= formex_row f, :name, template: Formex.Template.BootstrapHorizontal %>
+      ```
+
+
   """
 
   @doc """
@@ -29,6 +64,13 @@ defmodule Formex.View do
   In the callback function the first argument is `t:Formex.Form.t/0` instead of a
   `t:Phoenix.HTML.Form.t/0`.
   This argument contains the `t:Phoenix.HTML.Form.t/0` under a `:phoenix_form` key
+
+  ## Options
+
+    * `template` - a form template that implements `Formex.Template`, for example:
+      `Formex.Template.BootstrapHorizontal`
+    * `template_options` - additional options, supported by the template
+
   """
   @spec formex_form_for(Form.t, String.t, Keyword.t (Formex.t -> Phoenix.HTML.unsafe))
                    :: Phoenix.HTML.safe
@@ -49,6 +91,12 @@ defmodule Formex.View do
 
   @doc """
   Generates all `formex_row/2`s at once
+
+  ## Options
+
+    * `template` - a form template that implements `Formex.Template`, for example:
+      `Formex.Template.BootstrapHorizontal`
+    * `template_options` - additional options, supported by the template
   """
   @spec formex_rows(Form.t, Keyword.t) :: Phoenix.HTML.safe
   def formex_rows(form, options \\ []) do
@@ -63,6 +111,12 @@ defmodule Formex.View do
       <%= formex_row f, :title %>
       <%= formex_row f, :content %>
       <%= formex_row f, :category_id %>
+
+  ## Options
+
+    * `template` - a form template that implements `Formex.Template`, for example:
+      `Formex.Template.BootstrapHorizontal`
+    * `template_options` - additional options, supported by the template
   """
   @spec formex_row(Form.t, Atom.t, Keyword.t) :: Phoenix.HTML.safe
   def formex_row(form, field_name, options \\ []) do
@@ -75,7 +129,7 @@ defmodule Formex.View do
   end
 
   defp get_template(form, row_options) do
-    row_options[:template] 
+    row_options[:template]
       || form.template
       || Application.get_env(:formex, :template)
       || Formex.Template.BootstrapVertical
@@ -83,6 +137,7 @@ defmodule Formex.View do
 
   defp get_template_options(form, row_options) do
     []
+    |> Keyword.merge(Application.get_env(:formex, :template_options) || [])
     |> Keyword.merge(form.template_options || [])
     |> Keyword.merge(row_options[:template_options] || [])
   end

@@ -1,6 +1,8 @@
 defmodule Formex.Template.Bootstrap do
   use Formex.Template, :helper
 
+  @moduledoc false
+
   @spec generate_field_html(Form.t, Field.t) :: any
   def generate_field_html(form, field) do
 
@@ -26,7 +28,7 @@ defmodule Formex.Template.Bootstrap do
         [Keyword.merge([class: class<>" form-control"], phoenix_opts) ]
     end
 
-    input = render_phoenix_input(type, args)
+    input = render_phoenix_input(field, args)
 
     cond do
       Enum.member? [:checkbox], type ->

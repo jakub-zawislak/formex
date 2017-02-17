@@ -5,7 +5,7 @@ don't write changeset, but a separate module that declares fields of form
 (like in [Symfony](https://symfony.com/doc/current/forms.html#creating-form-classes)).
 Formex will build changeset and additional Ecto queries (to get options for `<select>`) for itself.
 
-Formex also comes with helper functions for templating. For now there is only a Bootstrap 3
+Formex also comes with helper functions for templating. For now there is only a Bootstrap 3 form
 template, but you can easily create your own templates.
 
 ## TL;DR
@@ -29,7 +29,11 @@ end
 config :formex,
   repo: App.Repo,
   translate_error: &App.ErrorHelpers.translate_error/1,
-  template: Formex.Template.BootstrapVertical # you can override it inside a .eex template
+  template: Formex.Template.BootstrapHorizontal, # optional, can be overridden in a .eex template
+  template_options: [ # optional, also can be overridden in the template
+    left_column: "col-sm-2",
+    right_column: "col-sm-10"
+  ]
 ```
 
 `web/web.ex`
@@ -148,6 +152,21 @@ Furthermore, the form code is separated from the template.
 ## Documentation
 
 [https://hexdocs.pm/formex](https://hexdocs.pm/formex)
+
+### Basic usage
+* [Creating forms](https://hexdocs.pm/formex/Formex.Type.html)
+* [Usage in a controller](https://hexdocs.pm/formex/Formex.Builder.html)
+* [Usage in a template](https://hexdocs.pm/formex/Formex.View.html)
+
+### Custom fields
+* [SelectAssoc](https://hexdocs.pm/formex/Formex.CustomField.SelectAssoc.html)
+* [Creating a custom field](https://hexdocs.pm/formex/Formex.CustomField.html)
+
+### Templating
+* [Changing a template](https://hexdocs.pm/formex/Formex.View.html#module-changing-a-form-template)
+* [Creating own template](https://hexdocs.pm/formex/Formex.Template.html)
+* [Bootstrap Vertical](https://hexdocs.pm/formex/Formex.Template.BootstrapVertical.html)
+* [Bootstrap Horizontal](https://hexdocs.pm/formex/Formex.Template.BootstrapHorizontal.html)
 
 ### TODO
 

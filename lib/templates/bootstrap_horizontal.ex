@@ -2,10 +2,19 @@ defmodule Formex.Template.BootstrapHorizontal do
   use Formex.Template, :main
   import Formex.Template.Bootstrap
 
-  def generate_row(form, field, template_options \\ []) do
+  @moduledoc """
+  The Bootstrap 3 [horizontal](http://getbootstrap.com/css/#forms-horizontal) template
 
-    left_column   = Keyword.get(template_options, :left_column, "col-sm-2")
-    right_column  = Keyword.get(template_options, :right_column, "col-sm-10")
+  ## Options
+
+    * `left_column` - left column class, defaults to `col-sm-2`
+    * `right_column` - left column class, defaults to `col-sm-10`
+  """
+
+  def generate_row(form, field, options \\ []) do
+
+    left_column   = Keyword.get(options, :left_column, "col-sm-2")
+    right_column  = Keyword.get(options, :right_column, "col-sm-10")
 
     field_html  = generate_field_html(form, field)
     label_html  = generate_label_html(form, field, left_column)
