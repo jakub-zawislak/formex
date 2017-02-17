@@ -11,7 +11,7 @@ end
 
 defmodule Formex.BuilderTest do
   use Formex.TestCase
-  import Formex.Builder
+  use Formex.Controller
   alias Formex.BuilderTestType
   alias Formex.TestModel.Article
   alias Formex.TestRepo

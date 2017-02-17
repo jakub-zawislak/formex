@@ -10,7 +10,7 @@ template, but you can easily create your own templates.
 
 ## TL;DR
 
-<img src="http://i.imgur.com/xIuaT88.png" width="800px">
+<img src="http://i.imgur.com/ZwJr3JI.png" width="800px">
 
 ## Installation
 `mix.exs`
@@ -40,7 +40,7 @@ config :formex,
 ```elixir
 def controller do
   quote do
-    import Formex.Builder
+    use Formex.Controller
   end
 end
 
@@ -155,7 +155,7 @@ Furthermore, the form code is separated from the template.
 
 ### Basic usage
 * [Creating forms](https://hexdocs.pm/formex/Formex.Type.html)
-* [Usage in a controller](https://hexdocs.pm/formex/Formex.Builder.html)
+* [Usage in a controller](https://hexdocs.pm/formex/Formex.Controller.html)
 * [Usage in a template](https://hexdocs.pm/formex/Formex.View.html)
 
 ### Custom fields

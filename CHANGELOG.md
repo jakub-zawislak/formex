@@ -4,6 +4,10 @@
   * Templates
     * Bootstrap horizontal
     * Bootstrap vertical
+* Changed
+  * Extracted repo functions from a `Formex.Builder` to a `Formex.Repo`.
+  * `web/web.ex` - You have to `use Formex.Controller` instead of
+    `import Formex.Builder` from now on.
 
 * Removed
   * `formex_row_horizontal` and `formex_rows_horizontal`.
