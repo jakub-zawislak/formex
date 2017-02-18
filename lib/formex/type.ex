@@ -75,12 +75,12 @@ defmodule Formex.Type do
   Adds a button to the form.
 
   The `type` may be either `:submit` or `:reset`.
-  This function invokes `Formex.Button.create_button/4`.
+  This function invokes `Formex.Button.create_button/3`.
   """
   @spec add_button(form :: Form.t, type :: Atom.t, label :: String.t, opts :: Map.t) :: Form.t
   def add_button(form, type, label, opts \\ []) do
 
-    button = Formex.Button.create_button(form, type, label, opts)
+    button = Formex.Button.create_button(type, label, opts)
 
     Formex.Form.put_item(form, button)
   end

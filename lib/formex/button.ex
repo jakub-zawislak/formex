@@ -51,7 +51,7 @@ defmodule Formex.Button do
       <%= formex_row f, :special_submit %>
       ```
   """
-  def create_button(form, type, label, opts \\ []) do
+  def create_button(type, label, opts \\ []) do
     %Button{
       name: get_name(type, opts),
       type: type,

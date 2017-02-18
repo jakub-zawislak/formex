@@ -29,7 +29,7 @@ defmodule Formex.Form do
   @type t :: %Form{}
 
   @doc """
-  Adds field to the form. More: `Formex.Field.create_field/4`, `Formex.Button.create_button/4`
+  Adds field to the form. More: `Formex.Field.create_field/4`, `Formex.Button.create_button/3`
   """
   @spec put_item(form :: t, item :: any) :: t
   def put_item(form, item) do
