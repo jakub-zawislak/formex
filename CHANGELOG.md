@@ -1,3 +1,7 @@
+## v0.3.0 (2017-02-18)
+* Added
+  * `Formex.Template.add_class`
+
 ## v0.3.0 (2017-02-17)
 * Added
   * Ability to create a custom templates

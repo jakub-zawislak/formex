@@ -1,6 +1,7 @@
 defmodule Formex.Form do
   alias __MODULE__
   alias Formex.Field
+  alias Formex.Button
 
   @doc """
   Defines the Formex.Form struct.
@@ -8,7 +9,7 @@ defmodule Formex.Form do
     * `:type` - the module that implements `Formex.Type`, for example: `App.ArticleType`
     * `:struct` - the struct that will be used in `Ecto.Changeset.cast`, for example: `%App.Article{}`
     * `:model` - `struct.__struct__`, for example: `App.Article`
-    * `:fields` - list of `Formex.Field` structs
+    * `:items` - list of `Formex.Field` and `Formex.Button` structs
     * `:params` - params that will be used in `Ecto.Changeset.cast`
     * `:changeset` - `%Ecto.Changeset{}`
     * `:phoenix_form` - `%Phoenix.HTML.Form{}`
@@ -18,7 +19,7 @@ defmodule Formex.Form do
   defstruct type: nil,
     struct: nil,
     model: nil,
-    fields: [],
+    items: [],
     params: %{},
     changeset: nil,
     phoenix_form: nil,
@@ -28,13 +29,13 @@ defmodule Formex.Form do
   @type t :: %Form{}
 
   @doc """
-  Adds field to form. More: `Formex.Field.create_field/4`
+  Adds field to the form. More: `Formex.Field.create_field/4`, `Formex.Button.create_button/4`
   """
-  @spec put_field(t, Field.t) :: t
-  def put_field(form, field) do
-    fields = form.fields ++ [field]
+  @spec put_item(form :: t, item :: any) :: t
+  def put_item(form, item) do
+    items = form.items ++ [item]
 
-    Map.put(form, :fields, fields)
+    Map.put(form, :items, items)
   end
 
 end

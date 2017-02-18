@@ -21,7 +21,7 @@ defmodule Formex.SelectAssoc.QueryTest do
 
     form = create_form(SelectAssocChoiceQueryTestType, %Article{})
 
-    choices = Enum.at(form.fields, 0).data[:choices]
+    choices = Enum.at(form.items, 0).data[:choices]
 
     assert Enum.count(choices) == 2
 

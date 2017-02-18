@@ -88,6 +88,9 @@ defmodule App.ArticleType do
     |> add(SelectAssoc, :category_id, label: "Category", phoenix_opts: [
       prompt: "Choose a category"
     ])
+    |> add_button(:submit, "Submit", phoenix_opts: [
+      class: "btn-primary"
+    ])
   end
 end
 ```
@@ -124,6 +127,7 @@ A template:
   <%= formex_row f, :name %>
   <%= formex_row f, :content %>
   <%= formex_row f, :category_id %>
+  <%= formex_row f, :submit %>
 
   <%# or generate all fields at once: formex_rows f %>
 
@@ -178,4 +182,4 @@ Furthermore, the form code is separated from the template.
 - [ ] nested forms
 - [x] templating
 - [x] tests
-- [ ] submit button
+- [x] submit button

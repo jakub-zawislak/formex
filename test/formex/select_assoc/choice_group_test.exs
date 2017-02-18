@@ -48,7 +48,7 @@ defmodule Formex.SelectAssoc.ChoiceGroupTest do
 
     form = create_form(GroupFieldTestType, %Article{})
 
-    choice_groups = Enum.at(form.fields, 0).data[:choices]
+    choice_groups = Enum.at(form.items, 0).data[:choices]
     choice_group  = Enum.at(choice_groups, 0)
 
     {group_label, choices} = choice_group
@@ -63,7 +63,7 @@ defmodule Formex.SelectAssoc.ChoiceGroupTest do
 
     form = create_form(GroupAssocTestType, %Article{})
 
-    choice_groups = Enum.at(form.fields, 0).data[:choices]
+    choice_groups = Enum.at(form.items, 0).data[:choices]
     choice_group  = Enum.at(choice_groups, 0)
 
     {group_label, choices} = choice_group
@@ -78,7 +78,7 @@ defmodule Formex.SelectAssoc.ChoiceGroupTest do
 
     form = create_form(GroupAssocFieldTestType, %Article{})
 
-    choice_groups = Enum.at(form.fields, 0).data[:choices]
+    choice_groups = Enum.at(form.items, 0).data[:choices]
     choice_group  = Enum.at(choice_groups, 0)
 
     {group_label, _} = choice_group

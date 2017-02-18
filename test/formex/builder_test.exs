@@ -6,6 +6,7 @@ defmodule Formex.BuilderTestType do
     |> add(:text_input, :title)
     |> add(:textarea, :content)
     |> add(:checkbox, :visible, required: false)
+    |> add_button(:submit, "Submit")
   end
 end
 
@@ -18,7 +19,7 @@ defmodule Formex.BuilderTest do
 
   test "create a form" do
     form = create_form(BuilderTestType, %Article{})
-    assert Enum.at(form.fields, 0).name == :title
+    assert Enum.at(form.items, 0).name == :title
   end
 
   test "field not required" do

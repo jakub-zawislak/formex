@@ -12,6 +12,7 @@ defmodule Formex.Field do
     * `:data` - additional data used by particular field type (eg. `:select` stores here data
       for `<option>`'s)
     * `:opts` - options
+    * `:phoenix_opts` - options that will be passed to `Phoenix.HTML.Form`
   """
   defstruct name: nil,
     # assoc: false,
@@ -20,7 +21,8 @@ defmodule Formex.Field do
     required: true,
     label: "",
     data: [],
-    opts: []
+    opts: [],
+    phoenix_opts: []
 
   @type t :: %Field{}
 
@@ -60,9 +62,9 @@ defmodule Formex.Field do
       label: get_label(name, opts),
       required: Keyword.get(opts, :required, true),
       data: data,
-      opts: opts
+      opts: prepare_opts(opts),
+      phoenix_opts: prepare_phoenix_opts(opts)
     }
-
   end
 
   @doc false
@@ -71,6 +73,20 @@ defmodule Formex.Field do
       opts[:label]
     else
       Atom.to_string name
+    end
+  end
+
+  def prepare_opts(opts) do
+    Keyword.delete(opts, :phoenix_opts)
+  end
+
+  def prepare_phoenix_opts(opts) do
+    phoenix_opts = if opts[:phoenix_opts], do: opts[:phoenix_opts], else: []
+
+    if phoenix_opts[:class] do
+      phoenix_opts
+    else
+      Keyword.put(phoenix_opts, :class, "")
     end
   end
 

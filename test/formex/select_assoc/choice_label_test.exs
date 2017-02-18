@@ -30,7 +30,7 @@ defmodule Formex.SelectAssoc.ChoiceLabelTest do
 
     form = create_form(SelectAssocChoiceLabelAtomTestType, %Article{})
 
-    choices = Enum.at(form.fields, 0).data[:choices]
+    choices = Enum.at(form.items, 0).data[:choices]
     choice  = Enum.at(choices, 0)
     {choice_label, _} = choice
     assert is_number(choice_label)
@@ -41,7 +41,7 @@ defmodule Formex.SelectAssoc.ChoiceLabelTest do
 
     form = create_form(SelectAssocChoiceLabelFunctionTestType, %Article{})
 
-    choices = Enum.at(form.fields, 0).data[:choices]
+    choices = Enum.at(form.items, 0).data[:choices]
     choice  = Enum.at(choices, 0)
     {choice_label, _} = choice
     assert choice_label == "asdasd"

@@ -65,6 +65,7 @@ defmodule Formex.Template do
       use Phoenix.HTML
       alias Formex.Form
       alias Formex.Field
+      alias Formex.Button
 
       @behaviour Formex.Template
     end
@@ -76,6 +77,7 @@ defmodule Formex.Template do
       use Phoenix.HTML
       alias Formex.Form
       alias Formex.Field
+      alias Formex.Button
       import Formex.Template
     end
   end
@@ -102,11 +104,11 @@ defmodule Formex.Template do
   #
 
   @doc """
-  Runs function from `Phoenix.HTML.Form` defined in a `field.type`
+  Runs function from `Phoenix.HTML.Form` defined in a `Field.type` or `Button.type`
   """
-  @spec render_phoenix_input(Field.t, Keyword.t) :: any
-  def render_phoenix_input(field, args) do
-    apply(Phoenix.HTML.Form, field.type, args)
+  @spec render_phoenix_input(item :: any, args :: Keyword.t) :: any
+  def render_phoenix_input(item, args) do
+    apply(Phoenix.HTML.Form, item.type, args)
   end
 
   @doc """
@@ -123,6 +125,14 @@ defmodule Formex.Template do
   @spec has_error(Form.t, Field.t) :: any
   def has_error(form, field) do
     form.phoenix_form.errors[field.name]
+  end
+
+  @doc """
+  Adds a CSS class to a `:phoenix_opts` keyword
+  """
+  @spec add_class(phoenix_opts :: Keyword.t, class :: String.t) :: Keyword.t
+  def add_class(phoenix_opts, class) do
+    Keyword.merge(phoenix_opts, [class: class<>" "<>phoenix_opts[:class]])
   end
 
 end

@@ -54,8 +54,6 @@ defmodule Formex.View do
       ```
       <%= formex_row f, :name, template: Formex.Template.BootstrapHorizontal %>
       ```
-
-
   """
 
   @doc """
@@ -72,8 +70,8 @@ defmodule Formex.View do
     * `template_options` - additional options, supported by the template
 
   """
-  @spec formex_form_for(Form.t, String.t, Keyword.t (Formex.t -> Phoenix.HTML.unsafe))
-                   :: Phoenix.HTML.safe
+  @spec formex_form_for(form :: Form.t, action :: String.t, options :: Keyword.t,
+                        fun :: (Formex.t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
   def formex_form_for(form, action, options \\ [], fun) do
 
     phoenix_options = options
@@ -100,8 +98,8 @@ defmodule Formex.View do
   """
   @spec formex_rows(Form.t, Keyword.t) :: Phoenix.HTML.safe
   def formex_rows(form, options \\ []) do
-     Enum.map(form.fields, fn field ->
-       formex_row(form, field.name, options)
+     Enum.map(form.items, fn item ->
+       formex_row(form, item.name, options)
      end)
   end
 
@@ -119,13 +117,13 @@ defmodule Formex.View do
     * `template_options` - additional options, supported by the template
   """
   @spec formex_row(Form.t, Atom.t, Keyword.t) :: Phoenix.HTML.safe
-  def formex_row(form, field_name, options \\ []) do
+  def formex_row(form, item_name, options \\ []) do
 
-    field            = Enum.find(form.fields, &(&1.name == field_name))
+    item             = Enum.find(form.items, &(&1.name == item_name))
     template         = get_template(form, options)
     template_options = get_template_options(form, options)
 
-    apply(template, :generate_row, [form, field, template_options])
+    template.generate_row(form, item, template_options)
   end
 
   defp get_template(form, row_options) do

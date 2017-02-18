@@ -110,7 +110,8 @@ defmodule Formex.CustomField.SelectAssoc do
       data: [
         choices: choices
       ],
-      opts: opts
+      opts: Field.prepare_opts(opts),
+      phoenix_opts: Field.prepare_phoenix_opts(opts)
     }
 
   end

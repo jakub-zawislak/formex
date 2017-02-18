@@ -3,48 +3,52 @@ defmodule Formex.Template.Bootstrap do
 
   @moduledoc false
 
-  @spec generate_field_html(Form.t, Field.t) :: any
-  def generate_field_html(form, field) do
+  @spec generate_input(form :: Form.t, field :: Field.t) :: Phoenix.HTML.safe
+  def generate_input(form, field = %Field{}) do
 
     type = field.type
-    opts = field.opts
     data = field.data
-    phoenix_opts = if opts[:phoenix_opts], do: opts[:phoenix_opts], else: []
-
-    class = if opts[:class], do: opts[:class], else: ""
+    phoenix_opts = field.phoenix_opts
 
     args = [form.phoenix_form, field.name]
+
     args = args ++ cond do
-      Enum.member? [:select, :multiple_select], type ->
-        [data[:choices], Keyword.merge([class: class<>" form-control"], phoenix_opts) ]
-
-      Enum.member? [:checkbox], type ->
-        [Keyword.merge([class: class], phoenix_opts) ]
-
-      Enum.member? [:file_input], type ->
-        [Keyword.merge([class: class], phoenix_opts) ]
-
+      Enum.member?([:select, :multiple_select], type) ->
+        [data[:choices]]
       true ->
-        [Keyword.merge([class: class<>" form-control"], phoenix_opts) ]
+        []
+    end
+
+    args = args ++ cond do
+      Enum.member?([:checkbox, :file_input], type) ->
+        [phoenix_opts]
+      true ->
+        [add_class(phoenix_opts, "form-control")]
     end
 
     input = render_phoenix_input(field, args)
 
     cond do
-      Enum.member? [:checkbox], type ->
+      Enum.member?([:checkbox], type) ->
         content_tag(:div, [
           content_tag(:label, [
             input
             ])
           ], class: "checkbox")
-
       true ->
         input
     end
   end
 
-  @spec generate_label_html(Form.t, Field.t, String.t) :: Phoenix.HTML.safe
-  def generate_label_html(form, field, class \\ "") do
+  @spec generate_input(_form :: Form.t, button :: Button.t) :: Phoenix.HTML.safe
+  def generate_input(_form, button = %Button{}) do
+    phoenix_opts = add_class(button.phoenix_opts, "btn")
+
+    render_phoenix_input(button, [button.label, phoenix_opts])
+  end
+
+  @spec generate_label(form :: Form.t, field :: Field.t, class :: String.t) :: Phoenix.HTML.safe
+  def generate_label(form, field, class \\ "") do
     Phoenix.HTML.Form.label(
       form.phoenix_form,
       field.name,

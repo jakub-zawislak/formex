@@ -3,17 +3,18 @@ defmodule Formex.Template.BootstrapVertical do
   import Formex.Template.Bootstrap
 
   @moduledoc """
-  The Bootstrap 3 [basic](http://getbootstrap.com/css/#forms-example) template. 
+  The Bootstrap 3 [basic](http://getbootstrap.com/css/#forms-example) template.
   """
 
-  def generate_row(form, field, _options \\ []) do
+  def generate_row(form, item, options \\ [])
 
-    field_html  = generate_field_html(form, field)
-    label_html  = generate_label_html(form, field)
+  def generate_row(form, field = %Field{}, _options) do
+    input = generate_input(form, field)
+    label = generate_label(form, field)
 
-    field_html = attach_addon(field_html, field)
+    input = attach_addon(input, field)
 
-    tags = [label_html, field_html]
+    tags = [label, input]
     |> attach_error(form, field)
 
     wrapper_class = ["form-group"]
@@ -21,7 +22,10 @@ defmodule Formex.Template.BootstrapVertical do
     |> attach_required_class(field)
 
     content_tag(:div, tags, class: Enum.join(wrapper_class, " "))
+  end
 
+  def generate_row(form, button = %Button{}, _options) do
+    generate_input(form, button)
   end
 
 end

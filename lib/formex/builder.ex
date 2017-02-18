@@ -48,21 +48,27 @@ defmodule Formex.Builder do
   end
 
   defp get_normal_fields_names(form) do
-    form.fields
+    form.items
+    |> filter_fields
     # |> Enum.filter(&(!&1.assoc))
     |> Enum.map(&(&1.name))
   end
 
   # defp get_assoc_fields_names(form) do
-  #   form.fields
+  #   form.items
   #   |> Enum.filter(&(&1.assoc))
   #   |> Enum.map(&(&1.name))
   # end
 
   defp get_required_fields_names(form) do
-    form.fields
+    form.items
+    |> filter_fields
     |> Enum.filter(&(&1.required))
     |> Enum.map(&(&1.name))
+  end
+
+  defp filter_fields(items) do
+    Enum.filter(items, &(&1.__struct__ == Formex.Field))
   end
 
 end

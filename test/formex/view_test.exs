@@ -4,11 +4,16 @@ defmodule Formex.ViewTestType do
 
   def build_form(form) do
     form
-    |> add(:text_input, :title)
+    |> add(:text_input, :title, phoenix_opts: [
+      class: "some-class"
+    ])
     |> add(:textarea, :content)
     |> add(:checkbox, :visible, required: false)
     |> add(Formex.CustomField.SelectAssoc, :category_id, phoenix_opts: [
       prompt: "Choose category"
+    ])
+    |> add_button(:submit, "Submit form", phoenix_opts: [
+      class: "btn-success"
     ])
   end
 end
@@ -29,7 +34,19 @@ defmodule Formex.ViewTest do
 
     assert form_html
     |> to_string
+    |> String.match?(~r/some-class/)
+
+    assert form_html
+    |> to_string
     |> String.match?(~r/Choose category/)
+
+    assert form_html
+    |> to_string
+    |> String.match?(~r/Submit form/)
+
+    assert form_html
+    |> to_string
+    |> String.match?(~r/btn-success/)
 
   end
 
