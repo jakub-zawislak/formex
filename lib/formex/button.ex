@@ -19,14 +19,15 @@ defmodule Formex.Button do
   @type t :: %Button{}
 
   @doc """
-  Creates a new field.
+  Creates a new button.
 
-  `type` is the name of function from `Phoenix.HTML.Form`.
+  `type` is the name of function from `Phoenix.HTML.Form`. May be either `:submit` or `:reset`.
 
   ## Options
 
-    * `:name` - optional name of button
-      For example: if you added a button this way
+    * `:name` - optional name of the button.
+
+      If you added the button this way:
 
       ```
       form
@@ -38,7 +39,7 @@ defmodule Formex.Button do
       <%= formex_row f, :submit %>
       ```
 
-      But if you will pass the `:name` option
+      But if you pass the `:name` option:
 
       ```
       form

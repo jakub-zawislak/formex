@@ -104,7 +104,9 @@ defmodule Formex.View do
   end
 
   @doc """
-  Generates a row. Example of use:
+  Generates a row
+
+  Example of use:
 
       <%= formex_row f, :title %>
       <%= formex_row f, :content %>
