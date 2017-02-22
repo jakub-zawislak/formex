@@ -62,6 +62,7 @@ schema "articles" do
   field :hidden, :boolean
 
   belongs_to :category, App.Category
+  many_to_many :tags, App.Tag, join_through: "articles_tags" #...
 end
 ```
 
@@ -84,10 +85,11 @@ defmodule App.ArticleType do
     |> add(:textarea, :content, label: "Content", phoenix_opts: [
       rows: 4
     ])
-    |> add(:checkbox, :hidden, label: "Is hidden", required: false)
     |> add(SelectAssoc, :category_id, label: "Category", phoenix_opts: [
       prompt: "Choose a category"
     ])
+    |> add(SelectAssoc, :tags, label: "Tags")
+    |> add(:checkbox, :hidden, label: "Is hidden?", required: false)
     |> add_button(:submit, "Submit", phoenix_opts: [
       class: "btn-primary"
     ])
@@ -122,7 +124,7 @@ A template:
 `form.html.eex`
 ```
 <%= formex_form_for @form, @action, fn f -> %>
-  <%= if @form.changeset.action do %>...<% end %>
+  <%= if @form.changeset.action do %>Error message<% end %>
 
   <%= formex_row f, :name %>
   <%= formex_row f, :content %>
@@ -130,8 +132,6 @@ A template:
   <%= formex_row f, :submit %>
 
   <%# or generate all fields at once: formex_rows f %>
-
-  ...
 <% end %>
 ```
 
@@ -147,7 +147,7 @@ Put an asterisk to required fields:
 
 The final effect:
 
-<img src="http://i.imgur.com/Hi1YE5b.png" width="502px">
+<img src="http://i.imgur.com/ojyrWJA.png" width="511px">
 
 It's very simple, isn't it?
 You don't need to create any changeset nor write a query to get options for a Category select.
@@ -178,7 +178,8 @@ Furthermore, the form code is separated from the template.
     - [x] `choice_label`
     - [x] `query`
     - [x] `GROUP BY`
-- [ ] validate if sent `<option>` exists in generated `:select`
+    - [x] multiple_select
+- [x] validate if sent `<option>` exists in generated `:select`
 - [ ] nested forms
 - [x] templating
 - [x] tests

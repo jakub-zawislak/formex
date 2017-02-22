@@ -1,4 +1,11 @@
-## v0.3.0 (2017-02-18)
+## v0.3.2 (2017-02-22)
+* Added
+  * SelectAssoc
+    * multiple_select support
+  * Select
+    * Validation if value sent by user exists in the generated select
+
+## v0.3.1 (2017-02-18)
 * Added
   * `Formex.Template.add_class`
 

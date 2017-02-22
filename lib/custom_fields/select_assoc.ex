@@ -86,20 +86,21 @@ defmodule Formex.CustomField.SelectAssoc do
       ```
   """
 
-  def create_field(form, name_id, opts) do
+  def create_field(form, name, opts) do
+    if form.model.__schema__(:association, name) == nil do
+      create_field_single(form, name, opts)
+    else
+      create_field_multiple(form, name, opts)
+    end
+  end
 
-    name = Regex.replace(~r/_id$/, Atom.to_string(name_id), "") |> String.to_atom
+  defp create_field_single(form, name_id, opts) do
+    name = Regex.replace(~r/_id$/, Atom.to_string(name_id), "")
+    |> String.to_atom
 
-    module = form.model.__schema__(:association, name).queryable
-
-    opts = parse_opts(module, opts)
-
-    choices = module
-    |> apply_query(opts[:query])
-    |> apply_group_by_assoc(opts[:group_by])
-    |> @repo.all
-    |> group_rows(opts[:group_by])
-    |> generate_choices(opts[:choice_label])
+    module  = form.model.__schema__(:association, name).queryable
+    opts    = parse_opts(module, opts)
+    choices = get_choices(module, opts)
 
     %Field{
       name: name_id,
@@ -113,7 +114,46 @@ defmodule Formex.CustomField.SelectAssoc do
       opts: Field.prepare_opts(opts),
       phoenix_opts: Field.prepare_phoenix_opts(opts)
     }
+  end
 
+  defp create_field_multiple(form, name, opts) do
+    module  = form.model.__schema__(:association, name).queryable
+    opts    = parse_opts(module, opts)
+    choices = get_choices(module, opts)
+
+    selected = if form.struct.id do
+      form.struct
+      |> @repo.preload(name)
+      |> Map.get(name)
+      |> Enum.map(&(&1.id))
+    else
+      []
+    end
+
+    %Field{
+      name: name,
+      type: :multiple_select,
+      value: Map.get(form.struct, name),
+      label: Field.get_label(name, opts),
+      required: Keyword.get(opts, :required, true),
+      data: [
+        choices: choices
+      ],
+      opts: Field.prepare_opts(opts),
+      phoenix_opts: Keyword.merge(
+        Field.prepare_phoenix_opts(opts),
+        selected: selected
+      )
+    }
+  end
+
+  defp get_choices(module, opts) do
+    module
+    |> apply_query(opts[:query])
+    |> apply_group_by_assoc(opts[:group_by])
+    |> @repo.all
+    |> group_rows(opts[:group_by])
+    |> generate_choices(opts[:choice_label])
   end
 
   defp parse_opts(module, opts) do

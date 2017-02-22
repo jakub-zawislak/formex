@@ -38,4 +38,12 @@ defmodule Formex.Form do
     Map.put(form, :items, items)
   end
 
+  @doc """
+  Returns list of `t:Formex.Field.t/0`
+  """
+  @spec get_fields(form :: t) :: list
+  def get_fields(form) do
+    Enum.filter(form.items, &(&1.__struct__ == Formex.Field))
+  end
+
 end
