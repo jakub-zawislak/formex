@@ -135,6 +135,8 @@ A template:
   <%= formex_row f, :name %>
   <%= formex_row f, :content %>
   <%= formex_row f, :category_id %>
+  <%= formex_row f, :tags %>
+  <%= formex_row f, :hidden %>
   <%= formex_row f, :submit %>
 
   <%# or generate all fields at once: formex_rows f %>
