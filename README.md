@@ -53,7 +53,7 @@ end
 
 ## Usage
 
-We have models Article and Category:
+We have models Article, Category and Tag:
 
 ```elixir
 schema "articles" do
@@ -68,6 +68,12 @@ end
 
 ```elixir
 schema "categories" do
+  field :name, :string
+end
+```
+
+```elixir
+schema "tags" do
   field :name, :string
 end
 ```
@@ -124,7 +130,7 @@ A template:
 `form.html.eex`
 ```
 <%= formex_form_for @form, @action, fn f -> %>
-  <%= if @form.changeset.action do %>Error message<% end %>
+  <%= if @form.changeset.action do %>Oops, something went wrong!<% end %>
 
   <%= formex_row f, :name %>
   <%= formex_row f, :content %>
