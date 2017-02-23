@@ -7,6 +7,9 @@ defmodule Formex.SelectAssocBasicTestType do
     |> add(Formex.CustomField.SelectAssoc, :category_id, phoenix_opts: [
       prompt: "Choose category"
     ])
+    |> add(Formex.CustomField.SelectAssoc, :tags, phoenix_opts: [
+      prompt: "Choose tag"
+    ])
   end
 end
 
@@ -16,6 +19,7 @@ defmodule Formex.SelectAssoc.BasicTest do
 
   test "basic" do
     insert_categories()
+    insert_tags()
 
     form = create_form(SelectAssocBasicTestType, %Article{})
 
@@ -23,9 +27,11 @@ defmodule Formex.SelectAssoc.BasicTest do
       Formex.View.formex_rows(f)
     end)
 
-    assert form_html
-    |> to_string
-    |> String.match?(~r/asd/)
+    form_str = form_html |> to_string
+
+    assert String.match?(form_str, ~r/asd/)
+    assert String.match?(form_str, ~r/tag1/)
+    assert String.match?(form_str, ~r/multiple/)
   end
 
 end

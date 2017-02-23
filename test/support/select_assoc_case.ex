@@ -15,6 +15,12 @@ defmodule Formex.SelectAssocCase do
         TestRepo.insert(%Category{name: "cfg"})
       end
 
+      def insert_tags() do
+        TestRepo.insert(%Category{name: "tag1"})
+        TestRepo.insert(%Category{name: "tag2"})
+        TestRepo.insert(%Category{name: "tag3"})
+      end
+
       def insert_users() do
         dep1 = TestRepo.insert!(%Department{name: "Administration"})
         dep2 = TestRepo.insert!(%Department{name: "Sales"})
