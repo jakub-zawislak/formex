@@ -1,4 +1,5 @@
 defmodule Formex.Type do
+  @repo Application.get_env(:formex, :repo)
 
   @moduledoc """
   In order to create a form, you need to create the Type file. It's similar to
@@ -61,8 +62,7 @@ defmodule Formex.Type do
   @spec add(form :: Form.t, type_or_module :: Atom.t, name :: Atom.t, opts :: Map.t) :: Form.t
   def add(form, type_or_module, name, opts \\ []) do
 
-    # check if type_or_module is atom or module
-    field = if :erlang.function_exported(type_or_module, :module_info, 0) do
+    field = if Formex.Utils.is_module(type_or_module) do
       type_or_module.create_field(form, name, opts)
     else
       Formex.Field.create_field(form, type_or_module, name, opts)
@@ -83,6 +83,42 @@ defmodule Formex.Type do
     button = Formex.Button.create_button(type, label, opts)
 
     Formex.Form.put_item(form, button)
+  end
+
+  @doc """
+  Embeds a form of assoc to the main form.
+
+  If a struct of this form is not preloaded, it will be loaded.
+  If it's a `one_to_one` association and the loaded struct is `nil`, a new struct will be created.
+  """
+  @spec add_form(form :: Form.t, type :: any, name :: Atom.t) :: Form.t
+  def add_form(form, type, name) do
+
+    sub_struct = Map.get(form.struct, name)
+
+    {form, sub_struct} = if Ecto.assoc_loaded? sub_struct do
+      {form, sub_struct}
+    else
+      struct     = @repo.preload(form.struct, name)
+      sub_struct = Map.get(struct, name)
+
+      sub_struct = if !is_nil(sub_struct) do
+        sub_struct
+      else
+        sub_module = form.model.__schema__(:association, name).queryable
+        struct(sub_module)
+      end
+
+      struct = Map.put(struct, name, sub_struct)
+      form   = Map.put(form, :struct, struct)
+
+      {form, sub_struct}
+    end
+
+    subform = Formex.Builder.create_form(type, sub_struct, form.params[to_string(name)] || %{})
+    field   = Formex.Field.create_field(form, subform, name)
+
+    Formex.Form.put_item(form, field)
   end
 
   @doc """

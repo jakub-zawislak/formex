@@ -52,10 +52,13 @@ defmodule Formex.Builder do
     end)
   end
 
+  #
+
   defp create_changeset(form, type) do
     changeset = form.struct
     |> cast(form.params, get_normal_fields_names(form))
     |> cast_multiple_selects(form)
+    |> cast_embedded_forms(form)
     |> validate_required(get_required_fields_names(form))
     |> validate_selects(form)
     |> type.changeset_after_create_callback
@@ -67,7 +70,7 @@ defmodule Formex.Builder do
   defp cast_multiple_selects(changeset, form) do
     Form.get_fields(form)
     |> Enum.filter(&(&1.type == :multiple_select))
-    |> Enum.reduce(changeset, fn field, _changeset ->
+    |> Enum.reduce(changeset, fn field, changeset ->
       module = form.model.__schema__(:association, field.name).queryable
       ids    = form.params[to_string(field.name)] || []
 
@@ -80,6 +83,31 @@ defmodule Formex.Builder do
       |> put_assoc(field.name, associated)
     end)
   end
+
+  defp cast_embedded_forms(changeset, form) do
+    Form.get_fields(form)
+    |> Enum.filter(&(!is_atom(&1.type)))
+    |> Enum.reduce(changeset, fn field, changeset ->
+
+      changeset
+      |> cast_assoc(field.name, with: fn substruct, _params ->
+        subform      = field.type
+        subchangeset = create_changeset(subform, subform.type).changeset
+
+        # If a `substruct` is not `nil`, Ecto assumes that it's an update operation.
+        # But it isn't. Struct was created earlier by Formex. So we have to fix changeset.
+        subchangeset = if substruct.id do
+          subchangeset
+        else
+          put_in(subchangeset.action, :insert)
+        end
+
+      end)
+
+    end)
+  end
+
+  #
 
   defp get_normal_fields_names(form) do
     Form.get_fields(form)

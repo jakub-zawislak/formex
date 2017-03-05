@@ -125,7 +125,17 @@ defmodule Formex.View do
     template         = get_template(form, options)
     template_options = get_template_options(form, options)
 
-    template.generate_row(form, item, template_options)
+    if is_atom(item.type) do
+      template.generate_row(form, item, template_options)
+    else
+      Phoenix.HTML.Form.inputs_for(form.phoenix_form, item.name, fn f ->
+        item.type
+        |> Map.put(:phoenix_form, f)
+        |> Map.put(:template, template)
+        |> Map.put(:template_options, template_options)
+        |> formex_rows()
+      end)
+    end
   end
 
   defp get_template(form, row_options) do

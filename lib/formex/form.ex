@@ -39,7 +39,7 @@ defmodule Formex.Form do
   end
 
   @doc """
-  Returns list of `t:Formex.Field.t/0`
+  Returns list of `t:Formex.Field.t/0` and `t:Formex.Form.t/0` (embeded forms)
   """
   @spec get_fields(form :: t) :: list
   def get_fields(form) do

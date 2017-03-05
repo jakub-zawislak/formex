@@ -37,6 +37,9 @@ defmodule Formex.Repo do
   """
   @spec update_form_data(Form.t) :: {:ok, Ecto.Schema.t} | {:error, Form.t}
   def update_form_data(form) do
+
+    # form = put_in(form.changeset.changes[:user_info].action, :insert)
+
     case @repo.update(form.changeset) do
       {:ok, schema}       -> {:ok, schema}
       {:error, changeset} -> {:error, Map.put(form, :changeset, changeset)}
