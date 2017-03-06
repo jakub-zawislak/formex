@@ -39,6 +39,87 @@ defmodule Formex.Type do
     end
   end
   ```
+
+  ## Nested forms
+
+  ### *_to_one
+
+  We have models `User`, and `UserInfo`. The `UserInfo` contains extra information that we don't
+  want, for some reason, store in the `User` model.
+
+  ```
+  schema "users" do
+    field :first_name, :string
+    field :last_name, :string
+    belongs_to :user_info, App.UserInfo
+  end
+  ```
+
+  ```
+  schema "user_infos" do
+    field :section, :string
+    field :organisation_cell, :string
+    has_one :user, App.User
+  end
+  ```
+
+  Note: `belongs_to` can also be placed in `UserInfo` and so on, it doesn't matter in this example.
+
+  Our form will consist of two modules:
+
+  `user_type.ex`
+  ```
+  defmodule App.UserType do
+    use Formex.Type
+
+    def build_form(form) do
+      form
+      |> add(:text_input, :first_name)
+      |> add(:text_input, :last_name)
+      |> add_form(App.UserInfoType, :user_info)
+    end
+  end
+  ```
+
+  `user_info_type.ex`
+  ```
+  defmodule App.UserInfoType do
+    use Formex.Type
+
+    def build_form( form ) do
+      form
+      |> add(:text_input, :section)
+      |> add(:text_input, :organisation_cell)
+    end
+  end
+  ```
+
+  Our form can be displayed in various ways:
+  * Print whole form, with nested form, at once
+      ```
+      <%= formex_rows f %>
+      ```
+  * Standard
+      ```
+      <%= formex_row f, :first_name %>
+      <%= formex_row f, :last_name %>
+      <%= formex_row f, :user_info %>
+      ```
+  * Set a form template for nested form
+      ```
+      <%= formex_row f, :first_name %>
+      <%= formex_row f, :last_name %>
+      <div class="form-horizontal">
+        <%= formex_row f, :user_info, template: Formex.Template.BootstrapHorizontal %>
+      </div>
+      ```
+
+  At the moment it is not possible to write more sophisticated template for subform.
+
+  ### *_to_many
+
+  Work in progress
+
   """
 
   defmacro __using__([]) do
