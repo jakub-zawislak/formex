@@ -1,5 +1,6 @@
 defmodule Formex.Type do
   @repo Application.get_env(:formex, :repo)
+  alias Formex.Field
 
   @moduledoc """
   In order to create a form, you need to create the Type file. It's similar to
@@ -88,35 +89,41 @@ defmodule Formex.Type do
   @doc """
   Embeds a form of assoc to the main form.
 
-  If a struct of this form is not preloaded, it will be loaded.
-  If it's a `one_to_one` association and the loaded struct is `nil`, a new struct will be created.
+  If a struct of this form is not already preloaded, it will be loaded.
+
+  ## Options
+
+    * `required` - is the subform required.
+
+      Defaults to `true`. This option will be passed to `Ecto.Changeset.cast_assoc/3`
   """
-  @spec add_form(form :: Form.t, type :: any, name :: Atom.t) :: Form.t
-  def add_form(form, type, name) do
+  @spec add_form(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
+  def add_form(form, type, name, opts \\ []) do
 
-    sub_struct = Map.get(form.struct, name)
+    substruct = Field.get_value(form, name)
 
-    {form, sub_struct} = if Ecto.assoc_loaded? sub_struct do
-      {form, sub_struct}
+    {form, substruct} = if Ecto.assoc_loaded? substruct do
+      {form, substruct}
     else
       struct     = @repo.preload(form.struct, name)
-      sub_struct = Map.get(struct, name)
+      substruct = Map.get(struct, name)
 
-      sub_struct = if !is_nil(sub_struct) do
-        sub_struct
-      else
-        sub_module = form.model.__schema__(:association, name).queryable
-        struct(sub_module)
-      end
-
-      struct = Map.put(struct, name, sub_struct)
+      struct = Map.put(struct, name, substruct)
       form   = Map.put(form, :struct, struct)
 
-      {form, sub_struct}
+      {form, substruct}
     end
 
-    subform = Formex.Builder.create_form(type, sub_struct, form.params[to_string(name)] || %{})
-    field   = Formex.Field.create_field(form, subform, name)
+    submodule = if substruct do
+      substruct.__struct__
+    else
+      form.model.__schema__(:association, name).queryable
+    end
+
+    params = form.params[to_string(name)] || %{}
+
+    subform = Formex.Builder.create_form(type, substruct, params, submodule)
+    field   = Formex.Field.create_field(form, subform, name, opts)
 
     Formex.Form.put_item(form, field)
   end

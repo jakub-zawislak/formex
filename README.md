@@ -180,6 +180,14 @@ Furthermore, the form code is separated from the template.
 * [Bootstrap Vertical](https://hexdocs.pm/formex/Formex.Template.BootstrapVertical.html)
 * [Bootstrap Horizontal](https://hexdocs.pm/formex/Formex.Template.BootstrapHorizontal.html)
 
+### Tests
+
+Run this command to migrate:
+```bash
+MIX_ENV=test mix ecto.migrate -r Formex.TestRepo
+```
+Now you can use tests via `mix test`.
+
 ### TODO
 
 - [x] more options for `Formex.CustomField.SelectAssoc`

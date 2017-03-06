@@ -105,7 +105,7 @@ defmodule Formex.CustomField.SelectAssoc do
     %Field{
       name: name_id,
       type: :select,
-      value: Map.get(form.struct, name),
+      value: Field.get_value(form, name),
       label: Field.get_label(name, opts),
       required: Keyword.get(opts, :required, true),
       data: [
@@ -133,7 +133,7 @@ defmodule Formex.CustomField.SelectAssoc do
     %Field{
       name: name,
       type: :multiple_select,
-      value: Map.get(form.struct, name),
+      value: Field.get_value(form, name),
       label: Field.get_label(name, opts),
       required: Keyword.get(opts, :required, true),
       data: [

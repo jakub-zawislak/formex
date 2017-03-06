@@ -58,7 +58,7 @@ defmodule Formex.Field do
     %Field{
       name: name,
       type: type,
-      value: Map.get(form.struct, name),
+      value: get_value(form, name),
       label: get_label(name, opts),
       required: Keyword.get(opts, :required, true),
       data: data,
@@ -73,6 +73,15 @@ defmodule Formex.Field do
       opts[:label]
     else
       Atom.to_string name
+    end
+  end
+
+  @doc false
+  def get_value(form, name) do
+    if form.struct do
+      Map.get(form.struct, name)
+    else
+      nil
     end
   end
 

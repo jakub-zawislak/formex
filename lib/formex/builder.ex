@@ -24,14 +24,15 @@ defmodule Formex.Builder do
     * `type` - the module that implements `Formex.Type` behaviour, for example: `App.ArticleType`
     * `struct` - the struct that will be used in `Ecto.Changeset.cast/3`, for example: `%App.Article{}`
     * `params` - the parameters that will be used in `Ecto.Changeset.cast/3`
+    * `model` - optional model in case if `struct` is nil. Used by `Formex.Type.add_form/4`
   """
   @spec create_form(module, Ecto.Schema.t, Map.t) :: Form.t
-  def create_form(type, struct, params \\ %{}) do
+  def create_form(type, struct, params \\ %{}, model \\ nil) do
 
     form = %Form{
       type: type,
       struct: struct,
-      model: struct.__struct__,
+      model: if(model, do: model, else: struct.__struct__),
       params: params
     }
     |> type.build_form()
@@ -55,7 +56,9 @@ defmodule Formex.Builder do
   #
 
   defp create_changeset(form, type) do
-    changeset = form.struct
+    struct = if form.struct, do: form.struct, else: struct(form.model)
+
+    changeset = struct
     |> cast(form.params, get_normal_fields_names(form))
     |> cast_multiple_selects(form)
     |> cast_embedded_forms(form)
@@ -88,22 +91,11 @@ defmodule Formex.Builder do
     Form.get_fields(form)
     |> Enum.filter(&(!is_atom(&1.type)))
     |> Enum.reduce(changeset, fn field, changeset ->
-
       changeset
-      |> cast_assoc(field.name, with: fn substruct, _params ->
+      |> cast_assoc(field.name, required: field.required, with: fn substruct, _params ->
         subform      = field.type
         subchangeset = create_changeset(subform, subform.type).changeset
-
-        # If a `substruct` is not `nil`, Ecto assumes that it's an update operation.
-        # But it isn't. Struct was created earlier by Formex. So we have to fix changeset.
-        subchangeset = if substruct.id do
-          subchangeset
-        else
-          put_in(subchangeset.action, :insert)
-        end
-
       end)
-
     end)
   end
 
