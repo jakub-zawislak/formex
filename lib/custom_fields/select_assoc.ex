@@ -16,7 +16,7 @@ defmodule Formex.CustomField.SelectAssoc do
   ```
   ```
   form
-  |> add(Formex.CustomField.SelectAssoc, :category_id, label: "Category")
+  |> add(:category_id, Formex.CustomField.SelectAssoc, label: "Category")
   ```
   Formex will find out that `:category_id` refers to App.Category schema and download all rows
   from Repo ordered by name.
@@ -28,11 +28,11 @@ defmodule Formex.CustomField.SelectAssoc do
 
       ```
       form
-      |> add(SelectAssoc, :article_id, label: "Article", choice_label: :title)
+      |> add(:article_id, SelectAssoc, label: "Article", choice_label: :title)
       ```
       ```
       form
-      |> add(SelectAssoc, :user_id, label: "User", choice_label: fn user ->
+      |> add(:user_id, SelectAssoc, label: "User", choice_label: fn user ->
         user.first_name<>" "<>user.last_name
       end)
       ```
@@ -41,7 +41,7 @@ defmodule Formex.CustomField.SelectAssoc do
 
       ```
       form
-      |> add(SelectAssoc, :user_id, query: fn query ->
+      |> add(:user_id, SelectAssoc, query: fn query ->
         from e in query,
           where: e.fired == false
       end)
@@ -70,19 +70,19 @@ defmodule Formex.CustomField.SelectAssoc do
       Group by last name of user:
       ```
       form
-      |> add(SelectAssoc, :user_id, group_by: :last_name)
+      |> add(:user_id, SelectAssoc, group_by: :last_name)
       ```
 
       Group by department, by `:name` (default) field:
       ```
       form
-      |> add(SelectAssoc, :user_id, group_by: :department)
+      |> add(:user_id, SelectAssoc, group_by: :department)
       ```
 
       Group by department, but by another field
       ```
       form
-      |> add(SelectAssoc, :user_id, group_by: [:department, :description])
+      |> add(:user_id, SelectAssoc, group_by: [:department, :description])
       ```
   """
 

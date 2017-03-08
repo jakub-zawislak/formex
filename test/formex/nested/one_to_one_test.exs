@@ -3,7 +3,7 @@ defmodule Formex.Nested.OneToOne.UserInfoType do
 
   def build_form(form) do
     form
-    |> add(:text_input, :section, label: "Sekcja")
+    |> add(:section, :text_input, label: "Sekcja")
   end
 end
 
@@ -12,9 +12,9 @@ defmodule Formex.Nested.OneToOne.UserType do
 
   def build_form(form) do
     form
-    |> add(:text_input, :first_name, label: "Imię")
-    |> add(:text_input, :last_name, label: "Nazwisko")
-    |> add_form(Formex.Nested.OneToOne.UserInfoType, :user_info, required: false)
+    |> add(:first_name, :text_input, label: "Imię")
+    |> add(:last_name, :text_input, label: "Nazwisko")
+    |> add(:user_info, Formex.Nested.OneToOne.UserInfoType, required: false)
   end
 end
 
@@ -23,9 +23,9 @@ defmodule Formex.Nested.OneToOne.UserRequiredType do
 
   def build_form(form) do
     form
-    |> add(:text_input, :first_name, label: "Imię")
-    |> add(:text_input, :last_name, label: "Nazwisko")
-    |> add_form(Formex.Nested.OneToOne.UserInfoType, :user_info)
+    |> add(:first_name, :text_input, label: "Imię")
+    |> add(:last_name, :text_input, label: "Nazwisko")
+    |> add(:user_info, Formex.Nested.OneToOne.UserInfoType)
   end
 end
 

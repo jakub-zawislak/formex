@@ -5,7 +5,7 @@ defmodule Formex.SelectAssocChoiceQueryTestType do
 
   def build_form(form) do
     form
-    |> add(Formex.CustomField.SelectAssoc, :category_id, query: fn query ->
+    |> add(:category_id, Formex.CustomField.SelectAssoc, query: fn query ->
       from e in query,
         where: e.name != "bcd"
     end)

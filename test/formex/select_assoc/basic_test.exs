@@ -4,10 +4,10 @@ defmodule Formex.SelectAssocBasicTestType do
 
   def build_form(form) do
     form
-    |> add(Formex.CustomField.SelectAssoc, :category_id, phoenix_opts: [
+    |> add(:category_id, Formex.CustomField.SelectAssoc, phoenix_opts: [
       prompt: "Choose category"
     ])
-    |> add(Formex.CustomField.SelectAssoc, :tags, phoenix_opts: [
+    |> add(:tags, Formex.CustomField.SelectAssoc, phoenix_opts: [
       prompt: "Choose tag"
     ])
   end

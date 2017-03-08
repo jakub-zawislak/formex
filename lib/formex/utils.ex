@@ -14,8 +14,12 @@ end
 defmodule Formex.Utils do
   @moduledoc false
 
-  def is_module(module) do
+  def module?(module) do
     :erlang.function_exported(module, :module_info, 0)
+  end
+
+  def implements?(module, behaviour) do
+    Enum.member?(module.module_info[:attributes][:behaviour], behaviour)
   end
 
 end

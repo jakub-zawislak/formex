@@ -40,12 +40,12 @@ defmodule Formex.Field do
     * `:choices` - list of `<option>`s for `:select` and `:multiple_select`
       ```
       form
-      |> add(:select, :field, choices: ["Option 1": 1, "Options 2": 2])
+      |> add(:field, :select, choices: ["Option 1": 1, "Options 2": 2])
       ```
     * `:phoenix_opts` - options that will be passed to `Phoenix.HTML.Form`, for example:
       ```
       form
-      |> add(:textarea, :content, phoenix_opts: [
+      |> add(:content, :textarea, phoenix_opts: [
         rows: 4
       ])
       ```

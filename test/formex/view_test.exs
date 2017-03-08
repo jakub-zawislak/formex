@@ -4,15 +4,15 @@ defmodule Formex.ViewTestType do
 
   def build_form(form) do
     form
-    |> add(:text_input, :title, phoenix_opts: [
+    |> add(:title, :text_input, phoenix_opts: [
       class: "some-class"
     ])
-    |> add(:textarea, :content)
-    |> add(:checkbox, :visible, required: false)
-    |> add(Formex.CustomField.SelectAssoc, :category_id, phoenix_opts: [
+    |> add(:content, :textarea)
+    |> add(:visible, :checkbox, required: false)
+    |> add(:category_id, Formex.CustomField.SelectAssoc, phoenix_opts: [
       prompt: "Choose category"
     ])
-    |> add_button(:submit, "Submit form", phoenix_opts: [
+    |> add(:save, :submit, label: "Submit form", phoenix_opts: [
       class: "btn-success"
     ])
   end

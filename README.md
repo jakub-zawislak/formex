@@ -16,7 +16,7 @@ template, but you can easily create your own templates.
 `mix.exs`
 ```elixir
 def deps do
-  [{:formex, "~> 0.3.0"}]
+  [{:formex, "~> 0.4.0"}]
 end
 
 def application do
@@ -87,16 +87,16 @@ defmodule App.ArticleType do
 
   def build_form(form) do
     form
-    |> add(:text_input, :title, label: "Title")
-    |> add(:textarea, :content, label: "Content", phoenix_opts: [
+    |> add(:title, :text_input, label: "Title")
+    |> add(:content, :textarea, label: "Content", phoenix_opts: [
       rows: 4
     ])
-    |> add(SelectAssoc, :category_id, label: "Category", phoenix_opts: [
+    |> add(:category_id, SelectAssoc, label: "Category", phoenix_opts: [
       prompt: "Choose a category"
     ])
-    |> add(SelectAssoc, :tags, label: "Tags")
-    |> add(:checkbox, :hidden, label: "Is hidden?", required: false)
-    |> add_button(:submit, "Submit", phoenix_opts: [
+    |> add(:tags, SelectAssoc, label: "Tags")
+    |> add(:hidden, :checkbox, label: "Is hidden?", required: false)
+    |> add(:save, :submit, label: "Submit", phoenix_opts: [
       class: "btn-primary"
     ])
   end

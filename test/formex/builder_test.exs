@@ -3,10 +3,10 @@ defmodule Formex.BuilderTestType do
 
   def build_form(form) do
     form
-    |> add(:text_input, :title)
-    |> add(:textarea, :content)
-    |> add(:checkbox, :visible, required: false)
-    |> add_button(:submit, "Submit")
+    |> add(:title, :text_input)
+    |> add(:content, :textarea)
+    |> add(:visible, :checkbox, required: false)
+    |> add(:save, :submit)
   end
 end
 

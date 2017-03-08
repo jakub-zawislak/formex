@@ -4,7 +4,7 @@ defmodule Formex.SelectAssoc.GroupFieldTestType do
 
   def build_form(form) do
     form
-    |> add(Formex.CustomField.SelectAssoc, :user_id,
+    |> add(:user_id, Formex.CustomField.SelectAssoc,
       choice_label: fn user -> user.last_name<>" "<>user.first_name end,
       group_by: :last_name
     )
@@ -17,7 +17,7 @@ defmodule Formex.SelectAssoc.GroupAssocTestType do
 
   def build_form(form) do
     form
-    |> add(Formex.CustomField.SelectAssoc, :user_id,
+    |> add(:user_id, Formex.CustomField.SelectAssoc,
       choice_label: fn user -> user.last_name<>" "<>user.first_name end,
       group_by: :department
     )
@@ -30,7 +30,7 @@ defmodule Formex.SelectAssoc.GroupAssocFieldTestType do
 
   def build_form(form) do
     form
-    |> add(Formex.CustomField.SelectAssoc, :user_id,
+    |> add(:user_id, Formex.CustomField.SelectAssoc,
       choice_label: fn user -> user.last_name<>" "<>user.first_name end,
       group_by: [:department, :id]
     )

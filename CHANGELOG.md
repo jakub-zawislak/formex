@@ -1,3 +1,23 @@
+## v0.4.0 (2017-06-08)
+* Changed API of `Formex.Type`
+  * swapped second and third argument of `Formex.Type.add\4`.
+
+    Instead of:
+    ```elixir
+    |> add(:text_input, :title)
+    ```
+    write:
+    ```elixir
+    |> add(:title, :text_input)
+    ```
+    The order of arguments is now the same as in Symfony.
+  * removed `Formex.Type.add_button\4`. Use `Formex.Type.add\4` instead.
+  * removed `Formex.Type.add_form\4`. Use `Formex.Type.add\4` instead.
+
+## v0.3.3 (2017-06-06)
+* Added
+  * Nested forms with `_to_one` relation
+
 ## v0.3.2 (2017-02-22)
 * Added
   * SelectAssoc

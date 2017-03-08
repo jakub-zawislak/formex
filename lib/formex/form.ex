@@ -1,4 +1,5 @@
 defmodule Formex.Form do
+  @repo Application.get_env(:formex, :repo)
   alias __MODULE__
   alias Formex.Field
   alias Formex.Button
@@ -44,6 +45,54 @@ defmodule Formex.Form do
   @spec get_fields(form :: t) :: list
   def get_fields(form) do
     Enum.filter(form.items, &(&1.__struct__ == Formex.Field))
+  end
+
+  @doc """
+  Creates a form for assoc.
+
+  Example:
+
+  ```
+  form
+  |> add_form(:user_info, App.UserInfoType)
+  ```
+
+  ## Options
+
+    * `required` - is the subform required.
+
+      Defaults to `true`. This option will be passed to `Ecto.Changeset.cast_assoc/3`
+  """
+  @spec create_subform(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
+  def create_subform(form, type, name, opts \\ []) do
+
+    substruct = Field.get_value(form, name)
+
+    {form, substruct} = if Ecto.assoc_loaded? substruct do
+      {form, substruct}
+    else
+      struct     = @repo.preload(form.struct, name)
+      substruct = Map.get(struct, name)
+
+      struct = Map.put(struct, name, substruct)
+      form   = Map.put(form, :struct, struct)
+
+      {form, substruct}
+    end
+
+    submodule = if substruct do
+      substruct.__struct__
+    else
+      form.model.__schema__(:association, name).queryable
+    end
+
+    params = form.params[to_string(name)] || %{}
+
+    subform = Formex.Builder.create_form(type, substruct, params, submodule)
+
+    item = Formex.Field.create_field(form, subform, name, opts)
+
+    {form, item}
   end
 
 end

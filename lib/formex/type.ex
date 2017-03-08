@@ -16,18 +16,15 @@ defmodule Formex.Type do
 
     def build_form(form) do
       form
-      |> add(:text_input, :title, label: "Title")
-      |> add(:textarea, :content, label: "Content", phoenix_opts: [
+      |> add(:title, :text_input, label: "Title")
+      |> add(:content, :textarea, label: "Content", phoenix_opts: [
         rows: 4
       ])
-      |> add(:checkbox, :hidden, label: "Is hidden", required: false)
-      |> add(SelectAssoc, :category_id, label: "Category", phoenix_opts: [
+      |> add(:hidden, :checkbox, label: "Is hidden", required: false)
+      |> add(:category_id, SelectAssoc, label: "Category", phoenix_opts: [
         prompt: "Choose category"
       ])
-      |> add_button(:reset, "Reset form", phoenix_opts: [
-        class: "btn-default"
-      ])
-      |> add_button(:submit, if(form.struct.id, do: "Edit", else: "Add"), phoenix_opts: [
+      |> add(:save, :submit, label: if(form.struct.id, do: "Edit", else: "Add"), phoenix_opts: [
         class: "btn-primary"
       ])
     end
@@ -74,9 +71,9 @@ defmodule Formex.Type do
 
     def build_form(form) do
       form
-      |> add(:text_input, :first_name)
-      |> add(:text_input, :last_name)
-      |> add_form(App.UserInfoType, :user_info)
+      |> add(:first_name, :text_input)
+      |> add(:last_name, :text_input)
+      |> add(:user_info, App.UserInfoType)
     end
   end
   ```
@@ -88,8 +85,8 @@ defmodule Formex.Type do
 
     def build_form( form ) do
       form
-      |> add(:text_input, :section)
-      |> add(:text_input, :organisation_cell)
+      |> add(:section, :text_input)
+      |> add(:organisation_cell, :text_input)
     end
   end
   ```
@@ -135,78 +132,36 @@ defmodule Formex.Type do
     end
   end
 
-  @doc """
-  Adds a field to the form.
-
-  If the `type_or_module` is an atom, then this function invokes `Formex.Field.create_field/4`.
-  Otherwise, the `c:Formex.CustomField.create_field/3` is called.
-  """
-  @spec add(form :: Form.t, type_or_module :: Atom.t, name :: Atom.t, opts :: Map.t) :: Form.t
-  def add(form, type_or_module, name, opts \\ []) do
-
-    field = if Formex.Utils.is_module(type_or_module) do
-      type_or_module.create_field(form, name, opts)
-    else
-      Formex.Field.create_field(form, type_or_module, name, opts)
-    end
-
-    Formex.Form.put_item(form, field)
-  end
+  # * an `*_to_many` assoc, the `Formex.Field.add_collection/4` is called
 
   @doc """
-  Adds a button to the form.
+  Adds an form item to the form. May be a field, custom field, button, or subform.
 
-  The `type` may be either `:submit` or `:reset`.
-  This function invokes `Formex.Button.create_button/3`.
+  Behaviour depends on `type_or_module` argument:
+    * if it's a module and
+      * implements Formex.CustomField, the `c:Formex.CustomField.create_field/3` is called
+      * implements Formex.Type, the `Formex.Form.create_subform/4` is called
+    * if it's `:submit` or `:reset`, the `Formex.Button.create_button/3` is called
+    * otherwise, the `Formex.Field.create_field/4` is called.
   """
-  @spec add_button(form :: Form.t, type :: Atom.t, label :: String.t, opts :: Map.t) :: Form.t
-  def add_button(form, type, label, opts \\ []) do
+  @spec add(form :: Form.t, name :: Atom.t, type_or_module :: Atom.t, opts :: Map.t) :: Form.t
+  def add(form, name, type_or_module, opts \\ []) do
 
-    button = Formex.Button.create_button(type, label, opts)
-
-    Formex.Form.put_item(form, button)
-  end
-
-  @doc """
-  Embeds a form of assoc to the main form.
-
-  If a struct of this form is not already preloaded, it will be loaded.
-
-  ## Options
-
-    * `required` - is the subform required.
-
-      Defaults to `true`. This option will be passed to `Ecto.Changeset.cast_assoc/3`
-  """
-  @spec add_form(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
-  def add_form(form, type, name, opts \\ []) do
-
-    substruct = Field.get_value(form, name)
-
-    {form, substruct} = if Ecto.assoc_loaded? substruct do
-      {form, substruct}
+    {form, item} = item = if Formex.Utils.module?(type_or_module) do
+      if Formex.Utils.implements?(type_or_module, Formex.CustomField) do
+        {form, type_or_module.create_field(form, name, opts)}
+      else
+        Formex.Form.create_subform(form, type_or_module, name, opts)
+      end
     else
-      struct     = @repo.preload(form.struct, name)
-      substruct = Map.get(struct, name)
-
-      struct = Map.put(struct, name, substruct)
-      form   = Map.put(form, :struct, struct)
-
-      {form, substruct}
+      if Enum.member?([:submit, :reset], type_or_module) do
+        {form, Formex.Button.create_button(type_or_module, name, opts)}
+      else
+        {form, Formex.Field.create_field(form, type_or_module, name, opts)}
+      end
     end
 
-    submodule = if substruct do
-      substruct.__struct__
-    else
-      form.model.__schema__(:association, name).queryable
-    end
-
-    params = form.params[to_string(name)] || %{}
-
-    subform = Formex.Builder.create_form(type, substruct, params, submodule)
-    field   = Formex.Field.create_field(form, subform, name, opts)
-
-    Formex.Form.put_item(form, field)
+    Formex.Form.put_item(form, item)
   end
 
   @doc """

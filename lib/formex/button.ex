@@ -23,50 +23,26 @@ defmodule Formex.Button do
 
   `type` is the name of function from `Phoenix.HTML.Form`. May be either `:submit` or `:reset`.
 
-  ## Options
+  Example:
+  ```
+  form
+  |> add(:save, :submit, label: "Save it!", phoenix_opts: [
+    class: "btn-primary"
+  ])
+  ```
 
-    * `:name` - optional name of the button.
-
-      If you added the button this way:
-
-      ```
-      form
-      |> add_button(:submit, "Save")
-      ```
-
-      you can access it in the template by calling:
-      ```
-      <%= formex_row f, :submit %>
-      ```
-
-      But if you pass the `:name` option:
-
-      ```
-      form
-      |> add_button(:submit, "Save", name: :special_submit)
-      ```
-
-      you can access it by this name:
-      ```
-      <%= formex_row f, :special_submit %>
-      ```
+  ```
+  <%= formex_row f, :save %>
+  ```
   """
-  def create_button(type, label, opts \\ []) do
+  def create_button(type, name, opts \\ []) do
     %Button{
-      name: get_name(type, opts),
+      name: name,
       type: type,
-      label: label,
+      label: Field.get_label(name, opts),
       opts: Field.prepare_opts(opts),
       phoenix_opts: Field.prepare_phoenix_opts(opts)
     }
-  end
-
-  defp get_name(type, opts) do
-    if opts[:name] do
-      opts[:opts]
-    else
-      type
-    end
   end
 
 end

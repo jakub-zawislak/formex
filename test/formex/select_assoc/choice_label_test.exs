@@ -4,7 +4,7 @@ defmodule Formex.SelectAssocChoiceLabelAtomTestType do
 
   def build_form(form) do
     form
-    |> add(Formex.CustomField.SelectAssoc, :category_id, choice_label: :id)
+    |> add(:category_id, Formex.CustomField.SelectAssoc, choice_label: :id)
   end
 end
 
@@ -14,7 +14,7 @@ defmodule Formex.SelectAssocChoiceLabelFunctionTestType do
 
   def build_form(form) do
     form
-    |> add(Formex.CustomField.SelectAssoc, :category_id, choice_label: fn category ->
+    |> add(:category_id, Formex.CustomField.SelectAssoc, choice_label: fn category ->
       category.name <> category.name
     end)
   end
