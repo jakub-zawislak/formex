@@ -1,6 +1,11 @@
 defmodule Formex.View do
   use Phoenix.HTML
   alias Formex.Form
+  alias Formex.Field
+  alias Formex.FormCollection
+  alias Formex.FormNested
+  alias Formex.Button
+  alias Formex.Utils.Counter
 
   @moduledoc """
   Helper functions for templating.
@@ -98,9 +103,9 @@ defmodule Formex.View do
   """
   @spec formex_rows(Form.t, Keyword.t) :: Phoenix.HTML.safe
   def formex_rows(form, options \\ []) do
-     Enum.map(form.items, fn item ->
-       formex_row(form, item.name, options)
-     end)
+    Enum.map(form.items, fn item ->
+      formex_row(form, item.name, options)
+    end)
   end
 
   @doc """
@@ -125,16 +130,35 @@ defmodule Formex.View do
     template         = get_template(form, options)
     template_options = get_template_options(form, options)
 
-    if is_atom(item.type) do
-      template.generate_row(form, item, template_options)
-    else
-      Phoenix.HTML.Form.inputs_for(form.phoenix_form, item.name, fn f ->
-        item.type
-        |> Map.put(:phoenix_form, f)
-        |> Map.put(:template, template)
-        |> Map.put(:template_options, template_options)
-        |> formex_rows()
-      end)
+    if !item do
+      throw("Key :"<>to_string(item_name)<>" not found in form "<>to_string(form.type))
+    end
+
+    case item do
+      %Field{} ->
+        template.generate_row(form, item, template_options)
+      %Button{} ->
+        template.generate_row(form, item, template_options)
+      %FormNested{} ->
+        Phoenix.HTML.Form.inputs_for(form.phoenix_form, item.name, fn f ->
+          item.form
+          |> Map.put(:phoenix_form, f)
+          |> Map.put(:template, template)
+          |> Map.put(:template_options, template_options)
+          |> formex_rows()
+        end)
+      %FormCollection{} ->
+        {:ok, pid} = Counter.start_link # does anyone has a better idea?
+
+        Phoenix.HTML.Form.inputs_for(form.phoenix_form, item.name, fn f ->
+          item.forms
+          |> Enum.at(Counter.increment(pid))
+          |> Map.get(:form)
+          |> Map.put(:phoenix_form, f)
+          |> Map.put(:template, template)
+          |> Map.put(:template_options, template_options)
+          |> formex_rows()
+        end)
     end
   end
 

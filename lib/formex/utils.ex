@@ -23,3 +23,19 @@ defmodule Formex.Utils do
   end
 
 end
+
+defmodule Formex.Utils.Counter do
+  use GenServer
+
+  def start_link do
+    GenServer.start_link(__MODULE__, 0)
+  end
+
+  def increment(pid) do
+    GenServer.call(pid, :increment)
+  end
+
+  def handle_call(:increment, _from, state) do
+    {:reply, state, state + 1}
+  end
+end
