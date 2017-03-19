@@ -42,7 +42,14 @@ defmodule Formex.Template.Bootstrap do
 
   @spec generate_input(_form :: Form.t, button :: Button.t) :: Phoenix.HTML.safe
   def generate_input(_form, button = %Button{}) do
-    phoenix_opts = add_class(button.phoenix_opts, "btn")
+
+    class = if String.match?(button.phoenix_opts[:class], ~r/btn\-/) do
+      "btn"
+    else
+      "btn btn-default"
+    end
+
+    phoenix_opts = add_class(button.phoenix_opts, class)
 
     render_phoenix_input(button, [button.label, phoenix_opts])
   end

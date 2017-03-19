@@ -150,15 +150,32 @@ defmodule Formex.View do
       %FormCollection{} ->
         {:ok, pid} = Counter.start_link # does anyone has a better idea?
 
-        Phoenix.HTML.Form.inputs_for(form.phoenix_form, item.name, fn f ->
-          item.forms
+        prototype = if !options[:without_prototype] do
+          generate_collection_prototype(form, item_name, item)
+        end
+
+        form_html = Phoenix.HTML.Form.inputs_for(form.phoenix_form, item.name, fn f ->
+          html = item.forms
           |> Enum.at(Counter.increment(pid))
           |> Map.get(:form)
           |> Map.put(:phoenix_form, f)
           |> Map.put(:template, template)
           |> Map.put(:template_options, template_options)
           |> formex_rows()
+
+          content_tag :div, html, class: "formex-collection-item"
         end)
+
+        if prototype do
+          add_button = template.generate_row(form, item.add_button, template_options)
+          form_html  = content_tag :div, form_html,
+            class: "formex-collection",
+            data: [prototype: prototype |> elem(1) |> to_string]
+
+          [form_html, add_button]
+        else
+          form_html
+        end
     end
   end
 
@@ -174,6 +191,20 @@ defmodule Formex.View do
     |> Keyword.merge(Application.get_env(:formex, :template_options) || [])
     |> Keyword.merge(form.template_options || [])
     |> Keyword.merge(row_options[:template_options] || [])
+  end
+
+  defp generate_collection_prototype(form, item_name, item) do
+    struct = form.model
+    |> struct
+    |> Map.put(item_name, [struct(item.model)])
+
+    prot_form = Formex.Builder.create_form(form.type, struct)
+
+    {:safe, prot_html} = formex_form_for(prot_form, "", fn f ->
+      formex_row(f, item_name, without_prototype: true)
+    end)
+
+    {:safe, Enum.at(prot_html, 1)}
   end
 
 end

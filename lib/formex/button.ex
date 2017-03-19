@@ -21,7 +21,7 @@ defmodule Formex.Button do
   @doc """
   Creates a new button.
 
-  `type` is the name of function from `Phoenix.HTML.Form`. May be either `:submit` or `:reset`.
+  `type` - may be `:submit`, `:button` or `:reset`.
 
   Example:
   ```
@@ -36,12 +36,20 @@ defmodule Formex.Button do
   ```
   """
   def create_button(type, name, opts \\ []) do
+    phoenix_opts = Field.prepare_phoenix_opts(opts)
+
+    {type, phoenix_opts} = if type == :button do
+      {:submit, Keyword.put(phoenix_opts, :type, :button)}
+    else
+      {type, phoenix_opts}
+    end
+
     %Button{
       name: name,
       type: type,
       label: Field.get_label(name, opts),
       opts: Field.prepare_opts(opts),
-      phoenix_opts: Field.prepare_phoenix_opts(opts)
+      phoenix_opts: phoenix_opts
     }
   end
 
