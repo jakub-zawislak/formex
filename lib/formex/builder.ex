@@ -102,14 +102,28 @@ defmodule Formex.Builder do
         %Formex.FormCollection{} ->
           {:ok, pid} = Counter.start_link # does anyone has a better idea?
 
-          changeset
+          changeset = changeset
           |> cast_assoc(item.name, required: item.required, with: fn _substruct, _params ->
             subform = item.forms
             |> Enum.at(Counter.increment(pid))
             |> Map.get(:form)
 
-            create_changeset(subform, subform.type).changeset
+            changeset = create_changeset(subform, subform.type).changeset
+            |> cast(subform.params, [:formex_delete])
+
+            if get_change(changeset, :formex_delete) do
+              %{changeset | action: :delete}
+            else
+              changeset
+            end
           end)
+
+          Counter.reset(pid) # Ecto can run once again above callback so we need to reset counter.
+          # the weirdest hackish thing I ever wrote. it should be changed.
+          # maybe add an unique ID for every struct and in this way identify it. or make pull request
+          # to Ecto.Changeset with another callback - (struct, params, *key*) - key is all I need
+
+          changeset
       end
     end)
   end

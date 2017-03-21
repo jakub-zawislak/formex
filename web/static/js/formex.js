@@ -5,7 +5,7 @@ export class Collection {
   static run(callback) {
     Collection.resetIndexes()
     Collection.replacePrototypeNames()
-    Collection.listenForEvents();
+    Collection.listenDOM();
 
     $(document).on('formex-collection-change', callback)
   }
@@ -43,7 +43,7 @@ export class Collection {
     // })
   }
 
-  static listenForEvents() {
+  static listenDOM() {
     $(document).on('click', '.formex-collection-add', function (e) {
       e.preventDefault()
 
@@ -62,12 +62,8 @@ export class Collection {
 
       collectionHolder.trigger('formex-collection-remove-item', item)
 
-      if (item.find('.formex-collection-item-removeCheckbox').length) {
-        item.find('.formex-collection-item-removeCheckbox input').click()
-        item.hide()
-      } else {
-        item.remove()
-      }
+      item.find('.formex-collection-item-remove-checkbox').click()
+      item.hide()
 
       collectionHolder.trigger('formex-collection-removed-item')
       collectionHolder.trigger('formex-collection-change')

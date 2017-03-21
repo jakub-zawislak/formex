@@ -1,6 +1,4 @@
 defmodule Formex.Type do
-  @repo Application.get_env(:formex, :repo)
-  alias Formex.Field
 
   @moduledoc """
   In order to create a form, you need to create the Type file. It's similar to
@@ -147,7 +145,7 @@ defmodule Formex.Type do
   @spec add(form :: Form.t, name :: Atom.t, type_or_module :: Atom.t, opts :: Map.t) :: Form.t
   def add(form, name, type_or_module, opts \\ []) do
 
-    {form, item} = item = if Formex.Utils.module?(type_or_module) do
+    {form, item} = if Formex.Utils.module?(type_or_module) do
       if Formex.Utils.implements?(type_or_module, Formex.CustomField) do
         {form, type_or_module.create_field(form, name, opts)}
       else

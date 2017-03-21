@@ -34,7 +34,7 @@ defmodule Formex.FormCollection do
 
     params = form.params[to_string(name)] || []
 
-    subforms_old = create_subforms_from_repo(name, substructs, params, type, submodule, opts)
+    subforms_old = create_existing_subforms(name, substructs, params, type, submodule, opts)
     subforms_new = create_new_subforms(name, params, type, submodule, opts)
 
     form_collection = %FormCollection{
@@ -49,7 +49,7 @@ defmodule Formex.FormCollection do
     {form, form_collection}
   end
 
-  defp create_subforms_from_repo(name, substructs, params, type, submodule, opts) do
+  defp create_existing_subforms(name, substructs, params, type, submodule, opts) do
     substructs
     |> Enum.map(fn substruct ->
       {_, subparams} = Enum.find(params, {nil, %{}}, fn {k, v} ->

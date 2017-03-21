@@ -163,7 +163,17 @@ defmodule Formex.View do
           |> Map.put(:template_options, template_options)
           |> formex_rows()
 
-          content_tag :div, html, class: "formex-collection-item"
+          delete = Phoenix.HTML.Form.checkbox f, :formex_delete,
+            class: "formex-collection-item-remove-checkbox",
+            style: "display: none;"
+
+          content_tag(:div, [
+            content_tag(:div, [
+              content_tag(:a, "x")
+              ], class: "formex-collection-item-remove"),
+            html,
+            delete
+          ], class: "formex-collection-item")
         end)
 
         if prototype do
