@@ -5,7 +5,6 @@ defmodule Formex.View do
   alias Formex.FormCollection
   alias Formex.FormNested
   alias Formex.Button
-  alias Formex.Utils.Counter
 
   @moduledoc """
   Helper functions for templating.
@@ -140,70 +139,129 @@ defmodule Formex.View do
       %Button{} ->
         template.generate_row(form, item, template_options)
       %FormNested{} ->
-        Phoenix.HTML.Form.inputs_for(form.phoenix_form, item.name, fn f ->
-          item.form
-          |> Map.put(:phoenix_form, f)
-          |> Map.put(:template, template)
-          |> Map.put(:template_options, template_options)
-          |> formex_rows()
-        end)
-      %FormCollection{} ->
-        {:ok, pid} = Counter.start_link # does anyone has a better idea?
-
-        prototype = if !options[:without_prototype] do
-          generate_collection_prototype(form, item_name, item)
-        end
-
-        form_html = Phoenix.HTML.Form.inputs_for(form.phoenix_form, item.name, fn f ->
-          html = item.forms
-          |> Enum.at(Counter.increment(pid))
-          |> Map.get(:form)
-          |> Map.put(:phoenix_form, f)
-          |> Map.put(:template, template)
-          |> Map.put(:template_options, template_options)
-          |> formex_rows()
-
-          delete = Phoenix.HTML.Form.checkbox f, :formex_delete,
-            class: "formex-collection-item-remove-checkbox",
-            style: "display: none;"
-
-          content_tag(:div, [
-            content_tag(:div, [
-              content_tag(:a, "x")
-              ], class: "formex-collection-item-remove"),
-            html,
-            delete
-          ], class: "formex-collection-item")
-        end)
-
-        if prototype do
-          add_button = template.generate_row(form, item.add_button, template_options)
-          form_html  = content_tag :div, form_html,
-            class: "formex-collection",
-            data: [prototype: prototype |> elem(1) |> to_string]
-
-          [form_html, add_button]
-        else
-          form_html
-        end
+        Formex.View.Nested.generate(form, item, template, template_options)
     end
   end
 
-  defp get_template(form, row_options) do
+  def get_template(form, row_options) do
     row_options[:template]
       || form.template
       || Application.get_env(:formex, :template)
       || Formex.Template.BootstrapVertical
   end
 
-  defp get_template_options(form, row_options) do
+  def get_template_options(form, row_options) do
     []
     |> Keyword.merge(Application.get_env(:formex, :template_options) || [])
     |> Keyword.merge(form.template_options || [])
     |> Keyword.merge(row_options[:template_options] || [])
   end
 
-  defp generate_collection_prototype(form, item_name, item) do
+end
+
+defmodule Formex.View.Nested do
+  def generate(form, item, template, template_options) do
+    Phoenix.HTML.Form.inputs_for(form.phoenix_form, item.name, fn f ->
+      item.form
+      |> Map.put(:phoenix_form, f)
+      |> Map.put(:template, template)
+      |> Map.put(:template_options, template_options)
+      |> Formex.View.formex_rows()
+    end)
+  end
+end
+
+defmodule Formex.View.Collection do
+  use Phoenix.HTML
+  import Formex.View
+  alias Formex.Utils.Counter
+
+  defstruct [:form, :item, :template, :template_options, :fun_item]
+  @type t :: %Formex.View.Collection{}
+
+  def formex_collection(form, item_name, fun, fun_item, options \\ []) do
+    item             = Enum.find(form.items, &(&1.name == item_name))
+    template         = Formex.View.get_template(form, options)
+    template_options = Formex.View.get_template_options(form, options)
+
+    if !item do
+      throw("Key :"<>to_string(item_name)<>" not found in form "<>to_string(form.type))
+    end
+
+    prototype = if !options[:without_prototype] do
+      generate_collection_prototype(form, item_name, item, fun_item)
+    end
+
+    html = fun.(%Formex.View.Collection{
+      form: form,
+      item: item,
+      template: template,
+      template_options: template_options,
+      fun_item: fun_item
+    })
+
+    if prototype do
+      content_tag :div, html,
+        class: "formex-collection",
+        data: [prototype: prototype |> elem(1) |> to_string]
+    else
+      html
+    end
+  end
+
+  @spec formex_collection_items(t) :: Phoenix.HTML.safe
+  def formex_collection_items(collection) do
+    {:ok, pid} = Counter.start_link # does anyone has a better idea?
+
+    form = collection.form
+    item = collection.item
+    template = collection.template
+    template_options = collection.template_options
+
+    html = Phoenix.HTML.Form.inputs_for(form.phoenix_form, item.name, fn f ->
+      subform = item.forms
+      |> Enum.at(Counter.increment(pid))
+      |> Map.get(:form)
+      |> Map.put(:phoenix_form, f)
+      |> Map.put(:template, template)
+      |> Map.put(:template_options, template_options)
+
+      html = collection.fun_item.(subform)
+
+      delete = Phoenix.HTML.Form.checkbox f, :formex_delete,
+        class: "formex-collection-item-remove-checkbox",
+        style: "display: none;"
+
+      content_tag(:div, [
+        html,
+        delete
+      ], class: "formex-collection-item")
+    end)
+
+    Counter.reset(pid)
+
+    content_tag(:div, html, class: "formex-collection-items")
+  end
+
+  def formex_collection_add(form_collection, label, class \\ "") do
+    button = Formex.Button.create_button(:button, :add, label: label, phoenix_opts: [
+      class: "formex-collection-add "<>class
+    ])
+
+    template_options = form_collection.template_options
+    template = form_collection.template
+    form = form_collection.form
+
+    template.generate_row(form, button, template_options)
+  end
+
+  def formex_collection_remove(label, confirm \\ "Are you sure?") do
+    content_tag(:a, [
+      label
+    ], href: "#", class: "formex-collection-item-remove", "data-confirm": confirm)
+  end
+
+  defp generate_collection_prototype(form, item_name, item, fun_item) do
     struct = form.model
     |> struct
     |> Map.put(item_name, [struct(item.model)])
@@ -211,10 +269,11 @@ defmodule Formex.View do
     prot_form = Formex.Builder.create_form(form.type, struct)
 
     {:safe, prot_html} = formex_form_for(prot_form, "", fn f ->
-      formex_row(f, item_name, without_prototype: true)
+      formex_collection(f, item_name, fn collection ->
+        formex_collection_items(collection)
+      end, fun_item, without_prototype: true)
     end)
 
     {:safe, Enum.at(prot_html, 1)}
   end
-
 end

@@ -10,9 +10,10 @@ export class Collection {
     $(document).on('formex-collection-change', callback)
   }
 
+  // to poprawić jeśli będzie wiele poziomów
   static resetIndexes() {
     $('.formex-collection').each(function () {
-      $(this).data('index', $(this).find('> .formex-collection-item').length)
+      $(this).data('index', $(this).find('.formex-collection-item').length)
     })
   }
 
@@ -47,13 +48,13 @@ export class Collection {
     $(document).on('click', '.formex-collection-add', function (e) {
       e.preventDefault()
 
-      Collection.addCollectionItemForm($(this).prev())
+      Collection.addCollectionItemForm($(this).closest('.formex-collection'))
     })
 
-    $(document).on('click', '.formex-collection-item-remove a', function (e) {
+    $(document).on('click', '.formex-collection-item-remove', function (e) {
       e.preventDefault()
 
-      if (!confirm('Are you sure?'))
+      if (!confirm($(this).data('confirm')))
         return
 
       let collectionHolder = $(this).closest('.formex-collection')
@@ -93,18 +94,15 @@ export class Collection {
     //   prototype = Collection.replaceIndex(prototype, /__name2__/g, parentIndex)
     // }
 
-    collectionHolder.data('index', index + 1)
-    collectionHolder.append(prototype)
+    collectionHolder.find('.formex-collection-items').append(prototype)
     collectionHolder.trigger('formex-collection-add-item', collectionHolder.find('> :last-child'))
     collectionHolder.trigger('formex-collection-change')
 
     Collection.resetIndexes()
-
-    // callback dla widgets itd.
   }
 
   static replaceIndex(prototype, placeholder, index) {
-    let $prototype = $(prototype)
+    let $prototype = $(prototype).find('.formex-collection-item').first()
 
     function fun(name) {
       let els = $prototype.find('['+name+']')

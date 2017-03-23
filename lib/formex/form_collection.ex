@@ -2,12 +2,10 @@ defmodule Formex.FormCollection do
   @repo Application.get_env(:formex, :repo)
   alias __MODULE__
   alias Formex.Field
-  alias Formex.Button
   alias Formex.Form
   alias Formex.FormNested
 
   defstruct forms: [],
-    add_button: nil,
     model: nil,
     name: nil,
     required: true
@@ -40,10 +38,7 @@ defmodule Formex.FormCollection do
     form_collection = %FormCollection{
       forms: subforms_old ++ subforms_new,
       name: name,
-      model: submodule,
-      add_button: Button.create_button(:button, :add, label: "Add", phoenix_opts: [
-        class: "formex-collection-add"
-      ])
+      model: submodule
     }
 
     {form, form_collection}
