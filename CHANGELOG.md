@@ -1,4 +1,13 @@
-## v0.4.0 (2017-06-08)
+## v0.4.1 (2017-03-24)
+* Added
+  * Collections of forms
+  * Ability to write templates of nested forms
+* Changed
+  * API of `Formex.View`
+
+    Use `use Formex.View` instead of `import Formex.View` inside your web.ex
+
+## v0.4.0 (2017-03-08)
 * Changed API of `Formex.Type`
   * swapped second and third argument of `Formex.Type.add\4`.
 
@@ -14,7 +23,7 @@
   * removed `Formex.Type.add_button\4`. Use `Formex.Type.add\4` instead.
   * removed `Formex.Type.add_form\4`. Use `Formex.Type.add\4` instead.
 
-## v0.3.3 (2017-06-06)
+## v0.3.3 (2017-03-06)
 * Added
   * Nested forms with `_to_one` relation
 

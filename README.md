@@ -46,8 +46,7 @@ end
 
 def view do
   quote do
-    import Formex.View
-    import Formex.View.Collection
+    use Formex.View
   end
 end
 ```

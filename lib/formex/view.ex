@@ -60,6 +60,14 @@ defmodule Formex.View do
       ```
   """
 
+  defmacro __using__([]) do
+    quote do
+      import Formex.View
+      import Formex.View.Nested
+      import Formex.View.Collection
+    end
+  end
+
   @doc """
   Works similar to a `Phoenix.HTML.Form.form_for/4`
 
@@ -139,7 +147,7 @@ defmodule Formex.View do
       %Button{} ->
         template.generate_row(form, item, template_options)
       %FormNested{} ->
-        Formex.View.Nested.generate(form, item, template, template_options)
+        Formex.View.Nested.formex_nested(form, item, template, template_options)
       %FormCollection{} ->
         Formex.View.Collection.formex_collection(form, item_name, options)
     end
@@ -162,13 +170,34 @@ defmodule Formex.View do
 end
 
 defmodule Formex.View.Nested do
-  def generate(form, item, template, template_options) do
+  import Formex.View
+
+  def formex_nested(form, item_name) do
+    formex_nested(form, item_name, nil, [])
+  end
+
+  def formex_nested(form, item_name, fun) when is_function(fun) do
+    formex_nested(form, item_name, fun, [])
+  end
+
+  def formex_nested(form, item_name, options) when is_list(options) do
+    formex_nested(form, item_name, nil, options)
+  end
+
+  def formex_nested(form, item_name, fun, options) do
+    item             = Enum.find(form.items, &(&1.name == item_name))
+    template         = Formex.View.get_template(form, options)
+    template_options = Formex.View.get_template_options(form, options)
+
+    fun = if !fun, do: &(formex_rows(&1)), else: fun
+
     Phoenix.HTML.Form.inputs_for(form.phoenix_form, item.name, fn f ->
       item.form
       |> Map.put(:phoenix_form, f)
       |> Map.put(:template, template)
       |> Map.put(:template_options, template_options)
-      |> Formex.View.formex_rows()
+      |> fun.()
+      # |> Formex.View.formex_rows()
     end)
   end
 end
