@@ -37,23 +37,21 @@ defmodule Formex.Type do
 
   ## Nested forms
 
-  ### *_to_one
-
   We have models `User`, and `UserInfo`. The `UserInfo` contains extra information that we don't
   want, for some reason, store in the `User` model.
 
   ```
   schema "users" do
-    field :first_name, :string
-    field :last_name, :string
-    belongs_to :user_info, App.UserInfo
+    field       :first_name, :string
+    field       :last_name, :string
+    belongs_to  :user_info, App.UserInfo
   end
   ```
 
   ```
   schema "user_infos" do
-    field :section, :string
-    field :organisation_cell, :string
+    field   :section, :string
+    field   :organisation_cell, :string
     has_one :user, App.User
   end
   ```
@@ -98,23 +96,161 @@ defmodule Formex.Type do
       ```
       <%= formex_row f, :first_name %>
       <%= formex_row f, :last_name %>
-      <%= formex_row f, :user_info %>
+      <%= formex_nested f, :user_info %>
       ```
   * Set a form template for nested form
       ```
       <%= formex_row f, :first_name %>
       <%= formex_row f, :last_name %>
       <div class="form-horizontal">
-        <%= formex_row f, :user_info, template: Formex.Template.BootstrapHorizontal %>
+        <%= formex_nested f, :user_info, template: Formex.Template.BootstrapHorizontal %>
       </div>
       ```
+  * Use your render function
+      ```
+      <%= formex_row f, :first_name %>
+      <%= formex_row f, :last_name %>
+      <%= formex_nested f, :user_info, fun subform -> %>
+        <%= formex_row subform, :section %>
+        <%= formex_row subform, :organisation_cell %>
+      <% end %>
+      ```
 
-  At the moment it is not possible to write more sophisticated template for subform.
 
-  ### *_to_many
+  ## Collections of forms
 
-  Work in progress
+  ### Installation
 
+  To start using this functionality you have to include the JS library.
+
+  `package.json`
+  ```json
+  "dependencies": {
+    "formex": "file:deps/formex",
+  }
+  ```
+
+  JavaScript
+  ```javascript
+  import {Collection} from 'formex'
+
+  Collection.run(function() {
+    // optional callback on collection change
+  })
+  ```
+
+  ### Model
+
+  We have models `User`, and `UserAddress`.
+
+  ```
+  schema "users" do
+    field     :first_name, :string
+    field     :last_name, :string
+    has_many  :user_addresses, App.UserAddress
+  end
+  ```
+
+  ```
+  schema "user_addresses" do
+    field       :street, :string
+    field       :postal_code, :string
+    field       :city, :string
+    belongs_to  :user, App.User
+
+    formex_collection_child() # important!
+  end
+  ```
+
+  ### Form Type
+
+  Our form will consist of two modules:
+
+  `user_type.ex`
+  ```
+  defmodule App.UserType do
+    use Formex.Type
+
+    def build_form(form) do
+      form
+      |> add(:first_name, :text_input)
+      |> add(:last_name, :text_input)
+      |> add(:user_addresses, App.UserAddressType)
+    end
+  end
+  ```
+
+  `user_address_type.ex`
+  ```
+  defmodule App.UserInfoType do
+    use Formex.Type
+
+    def build_form( form ) do
+      form
+      |> add(:street, :text_input)
+      |> add(:city, :text_input)
+    end
+  end
+  ```
+
+  ### Template
+
+  Our collection can be displayed in various ways:
+  * Print whole form, with collection, at once
+      ```
+      <%= formex_rows f %>
+      ```
+  * Standard
+      ```
+      <%= formex_row f, :first_name %>
+      <%= formex_row f, :last_name %>
+      <%= formex_collection f, :user_addresses %>
+      ```
+  * Set a form template for collection
+      ```
+      <%= formex_row f, :first_name %>
+      <%= formex_row f, :last_name %>
+      <div class="form-horizontal">
+        <%= formex_collection f, :user_addresses, template: Formex.Template.BootstrapHorizontal %>
+      </div>
+      ```
+  * Use your render function
+      ```
+      <%= formex_row f, :first_name %>
+      <%= formex_row f, :last_name %>
+      <%= formex_collection f, :user_addresses, [template: Formex.Template.BootstrapHorizontal],
+        fun collection -> %>
+        <div class="form-horizontal">
+          <%= formex_collection_items collection %>
+          <%= formex_collection_add collection, "Add" %>
+        </div>
+      <% end %>
+      ```
+  * You can also set a render function for collection item
+      ```
+      <%= formex_row f, :first_name %>
+      <%= formex_row f, :last_name %>
+
+      <% collection = fn collection -> %>
+        <div class="form-horizontal">
+          <%= formex_collection_items collection %>
+          <%= formex_collection_add collection, "Add" %>
+        </div>
+      <% end %>
+
+      <% collection_item = fn subform -> %>
+        <%= formex_collection_remove {:safe, "&times;"}, "Are you sure you want to remove?" %>
+        <%= formex_row subform, :street %>
+        <%= formex_row subform, :city %>
+      <% end %>
+
+      <%= formex_collection f, :user_addresses, [template: Formex.Template.BootstrapHorizontal],
+      collection, collection_item, end %>
+      ```
+
+  Result with some additional HTML and CSS:
+
+  <img src="http://i.imgur.com/0JvPcna.png" width="724px">
   """
 
   defmacro __using__([]) do

@@ -170,6 +170,7 @@ Furthermore, the form code is separated from the template.
 * [Usage in a controller](https://hexdocs.pm/formex/Formex.Controller.html)
 * [Usage in a template](https://hexdocs.pm/formex/Formex.View.html)
 * [Nested forms](https://hexdocs.pm/formex/Formex.Type.html#module-nested-forms)
+* [Collections of forms](https://hexdocs.pm/formex/Formex.Type.html#module-collections-of-forms)
 
 ### Custom fields
 * [SelectAssoc](https://hexdocs.pm/formex/Formex.CustomField.SelectAssoc.html)
@@ -192,14 +193,15 @@ Now you can use tests via `mix test`.
 ### TODO
 
 - [x] more options for `Formex.CustomField.SelectAssoc`
-    - [x] `choice_label`
-    - [x] `query`
-    - [x] `GROUP BY`
-    - [x] multiple_select
+  - [x] `choice_label`
+  - [x] `query`
+  - [x] `GROUP BY`
+  - [x] multiple_select
 - [x] validate if sent `<option>` exists in generated `:select`
-- [ ] nested forms
+- [x] nested forms
   - [x] \_to_one
-  - [ ] \_to_many
+  - [x] \_to_many
 - [x] templating
 - [x] tests
 - [x] submit button
+- [ ] usage without schemas
