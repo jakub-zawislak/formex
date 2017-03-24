@@ -140,6 +140,8 @@ defmodule Formex.View do
         template.generate_row(form, item, template_options)
       %FormNested{} ->
         Formex.View.Nested.generate(form, item, template, template_options)
+      %FormCollection{} ->
+        Formex.View.Collection.formex_collection(form, item_name, options)
     end
   end
 
@@ -178,6 +180,20 @@ defmodule Formex.View.Collection do
 
   defstruct [:form, :item, :template, :template_options, :fun_item]
   @type t :: %Formex.View.Collection{}
+
+  def formex_collection(form, item_name, options \\ []) do
+    formex_collection(form, item_name, fn collection ->
+      [
+        formex_collection_items(collection),
+        formex_collection_add(collection)
+      ]
+    end, fn subform ->
+      [
+        formex_collection_remove(),
+        formex_rows(subform)
+      ]
+    end, options)
+  end
 
   def formex_collection(form, item_name, fun, fun_item, options \\ []) do
     item             = Enum.find(form.items, &(&1.name == item_name))
@@ -243,7 +259,7 @@ defmodule Formex.View.Collection do
     content_tag(:div, html, class: "formex-collection-items")
   end
 
-  def formex_collection_add(form_collection, label, class \\ "") do
+  def formex_collection_add(form_collection, label \\ "Add", class \\ "") do
     button = Formex.Button.create_button(:button, :add, label: label, phoenix_opts: [
       class: "formex-collection-add "<>class
     ])
@@ -255,7 +271,7 @@ defmodule Formex.View.Collection do
     template.generate_row(form, button, template_options)
   end
 
-  def formex_collection_remove(label, confirm \\ "Are you sure?") do
+  def formex_collection_remove(label \\ {:safe, "&times;"}, confirm \\ "Are you sure?") do
     content_tag(:a, [
       label
     ], href: "#", class: "formex-collection-item-remove", "data-confirm": confirm)
