@@ -268,10 +268,22 @@ defmodule Formex.Type do
     end
   end
 
-  # * an `*_to_many` assoc, the `Formex.Field.add_collection/4` is called
+  def add(form, name) do
+    add(form, name, :text_input, [])
+  end
+
+  def add(form, name, opts) when is_list(opts) do
+    add(form, name, :text_input, opts)
+  end
+
+  def add(form, name, type_or_module) when not is_list(type_or_module) do
+    add(form, name, type_or_module, [])
+  end
 
   @doc """
   Adds an form item to the form. May be a field, custom field, button, or subform.
+
+  `type_or_module` is `:text_input` by default.
 
   Behaviour depends on `type_or_module` argument:
     * if it's a module and
@@ -281,7 +293,7 @@ defmodule Formex.Type do
     * otherwise, the `Formex.Field.create_field/4` is called.
   """
   @spec add(form :: Form.t, name :: Atom.t, type_or_module :: Atom.t, opts :: Map.t) :: Form.t
-  def add(form, name, type_or_module, opts \\ []) do
+  def add(form, name, type_or_module, opts) do
 
     {form, item} = if Formex.Utils.module?(type_or_module) do
       if Formex.Utils.implements?(type_or_module, Formex.CustomField) do
