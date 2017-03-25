@@ -42,6 +42,7 @@ defmodule Formex.Mixfile do
   defp package do
     [maintainers: ["Jakub Zawiślak"],
      licenses: ["MIT"],
+     files: ~w(lib priv web CHANGELOG.md LICENSE.md mix.exs package.json README.md),
      links: %{github: "https://github.com/jakub-zawislak/formex"}]
   end
 

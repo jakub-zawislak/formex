@@ -1,3 +1,6 @@
+// This module is unfinished. It doesn't support collections of collections.
+// Another issue is jQuery dependency :D
+
 import $ from 'jquery'
 
 export class Collection {
