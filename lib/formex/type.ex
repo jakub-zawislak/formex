@@ -182,7 +182,7 @@ defmodule Formex.Type do
 
   `user_address_type.ex`
   ```
-  defmodule App.UserInfoType do
+  defmodule App.UserAddressType do
     use Formex.Type
 
     def build_form( form ) do
@@ -250,7 +250,7 @@ defmodule Formex.Type do
 
   Result with some additional HTML and CSS:
 
-  <img src="http://i.imgur.com/0JvPcna.png" width="724px">
+  <img src="http://i.imgur.com/OZeW87P.png" width="724px">
   """
 
   defmacro __using__([]) do

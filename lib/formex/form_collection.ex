@@ -8,6 +8,7 @@ defmodule Formex.FormCollection do
   defstruct forms: [],
     model: nil,
     name: nil,
+    opts: [],
     required: true
 
   @type t :: %FormCollection{}
@@ -38,7 +39,9 @@ defmodule Formex.FormCollection do
     form_collection = %FormCollection{
       forms: subforms_old ++ subforms_new,
       name: name,
-      model: submodule
+      model: submodule,
+      required: Keyword.get(opts, :required, true),
+      opts: opts
     }
 
     {form, form_collection}
@@ -47,7 +50,7 @@ defmodule Formex.FormCollection do
   defp create_existing_subforms(name, substructs, params, type, submodule, opts) do
     substructs
     |> Enum.map(fn substruct ->
-      {_, subparams} = Enum.find(params, {nil, %{}}, fn {k, v} ->
+      {_, subparams} = Enum.find(params, {nil, %{}}, fn {_k, v} ->
         substruct.id == v["id"] |> Integer.parse |> elem(0)
       end)
 
