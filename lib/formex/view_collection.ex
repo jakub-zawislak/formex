@@ -202,14 +202,17 @@ defmodule Formex.View.Collection do
 
       html = collection.fun_item.(subform)
 
-      delete = Phoenix.HTML.Form.checkbox f, :formex_delete,
-        class: "formex-collection-item-remove-checkbox",
-        type: "hidden"
+      if subform.struct.id do
+        delete = Phoenix.HTML.Form.hidden_input f, :formex_delete,
+          class: "formex-collection-item-remove-checkbox"
 
-      content_tag(:div, [
-        html,
-        delete
-      ], class: "formex-collection-item")
+        content_tag(:div, [
+          html,
+          delete
+        ], class: "formex-collection-item")
+      else
+        content_tag(:div, html, class: "formex-collection-item formex-collection-item-new")
+      end
     end)
 
     Counter.reset(pid)

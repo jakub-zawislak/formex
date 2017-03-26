@@ -66,8 +66,12 @@ export class Collection {
 
       collectionHolder.trigger('formex-collection-remove-item', item)
 
-      item.find('.formex-collection-item-remove-checkbox').click()
-      item.hide()
+      if (!item.is('.formex-collection-item-new')) {
+        item.find('.formex-collection-item-remove-checkbox').val('true')
+        item.hide()
+      } else {
+        item.remove()
+      }
 
       collectionHolder.trigger('formex-collection-removed-item')
       collectionHolder.trigger('formex-collection-change')

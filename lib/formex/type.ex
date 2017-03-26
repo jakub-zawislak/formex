@@ -287,8 +287,8 @@ defmodule Formex.Type do
 
   Behaviour depends on `type_or_module` argument:
     * if it's a module and
-      * implements Formex.CustomField, the `c:Formex.CustomField.create_field/3` is called
-      * implements Formex.Type, the `Formex.Form.create_subform/4` is called
+      * implements `Formex.CustomField`, the `c:Formex.CustomField.create_field/3` is called
+      * implements `Formex.Type`, the `Formex.Form.create_subform/4` is called
     * if it's `:submit` or `:reset`, the `Formex.Button.create_button/3` is called
     * otherwise, the `Formex.Field.create_field/4` is called.
   """
