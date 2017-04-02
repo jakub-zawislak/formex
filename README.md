@@ -8,6 +8,9 @@ Formex will build changeset and additional Ecto queries (to get options for `<se
 Formex also comes with helper functions for templating. For now there is only a Bootstrap 3 form
 template, but you can easily create your own templates.
 
+**It doesn't require a database**, although there is an Ecto dependency.
+You can use Ecto's `embedded_schema` (instead of `schema`) to use it without database.
+
 ## TL;DR
 
 <img src="http://i.imgur.com/YIG0R2P.png" width="800px">
@@ -210,4 +213,5 @@ Now you can use tests via `mix test`.
 - [x] templating
 - [x] tests
 - [x] submit button
-- [ ] usage without schemas
+- [x] usage without schemas
+- [ ] make it work without Ecto so everyone will be happy

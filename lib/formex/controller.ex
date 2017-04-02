@@ -72,9 +72,18 @@ defmodule Formex.Controller do
   end
   ```
 
-  ## Usage without database
+  ## Usage without a database
 
-  `Registration` is a module with an `Ecto.Schema.embedded_schema/1`.
+  ```
+  defmodule App.Registration do
+    use App.Web, :model
+
+    embedded_schema do # instead of `schema`
+      field :email
+      field :password
+    end
+  end
+  ```
 
   ```
   def register(conn, %{"registration" => registration_params}) do
@@ -83,14 +92,13 @@ defmodule Formex.Controller do
     |> handle_form
     |> case do
       {:ok, registration} ->
-        # do something with the `registration` (it's a form data)
+        # do something with the `registration`
       {:error, form} ->
-        # display a form with errors
+        # display errors
         render(conn, "index.html", form: form)
     end
   end
   ```
-
   """
 
   @doc """

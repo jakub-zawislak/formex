@@ -1,3 +1,7 @@
+## v0.4.4 (2017-04-01)
+* Added
+  * Ability to use with `embedded_schema`, without a database
+
 ## v0.4.1 (2017-03-24)
 * Added
   * Collections of forms
