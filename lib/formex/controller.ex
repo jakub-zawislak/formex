@@ -1,19 +1,18 @@
 defmodule Formex.Controller do
+  alias Formex.Form
+  @repo Application.get_env(:formex, :repo)
 
   defmacro __using__(_) do
     quote do
       import Formex.Builder
-      import Formex.Repo
+      import Formex.Controller
     end
   end
 
-  # use Formex.Builder
-  # use Formex.Repo
-
   @moduledoc """
-  Module that imports `Formex.Builder` and `Formex.Repo`.
+  Helpers for controller. Imports `Formex.Builder`.
 
-  Usage:
+  # Installation:
 
   `web/web.ex`
   ```
@@ -24,7 +23,9 @@ defmodule Formex.Controller do
   end
   ```
 
-  Usage inside a controller:
+  # Usage
+
+  ## CRUD
 
   ```
   def new(conn, _params) do
@@ -70,6 +71,64 @@ defmodule Formex.Controller do
     end
   end
   ```
+
+  ## Usage without database
+
+  `Registration` is a module with an `Ecto.Schema.embedded_schema/1`.
+
+  ```
+  def register(conn, %{"registration" => registration_params}) do
+    RegistrationType
+    |> create_form(%Registration{}, registration_params)
+    |> handle_form
+    |> case do
+      {:ok, registration} ->
+        # do something with the `registration` (it's a form data)
+      {:error, form} ->
+        # display a form with errors
+        render(conn, "index.html", form: form)
+    end
+  end
+  ```
+
   """
+
+  @doc """
+  Works similar to `insert_form_data/1` and `update_form_data/1`, but doesn't require a database.
+  Should be used with `embedded_schema`.
+  """
+  @spec handle_form(Form.t) :: {:ok, Ecto.Schema.t} | {:error, Form.t}
+  def handle_form(form) do
+    if form.changeset.valid? do
+      {:ok, Ecto.Changeset.apply_changes(form.changeset)}
+    else
+      changeset = %{form.changeset | action: :update}
+      {:error, Map.put(form, :changeset, changeset)}
+    end
+  end
+
+  @doc """
+  Invokes `Repo.insert`. In case of `:error`, returns `{:error, form}` (with new `form.changeset`
+  value) instead of `{:error, changeset}` (as Ecto does)
+  """
+  @spec insert_form_data(Form.t) :: {:ok, Ecto.Schema.t} | {:error, Form.t}
+  def insert_form_data(form) do
+    case @repo.insert(form.changeset) do
+      {:ok, schema}       -> {:ok, schema}
+      {:error, changeset} -> {:error, Map.put(form, :changeset, changeset)}
+    end
+  end
+
+  @doc """
+  Invokes `Repo.update`. In case of `:error`, returns `{:error, form}` (with new `form.changeset`
+  value) instead of `{:error, changeset}` (as Ecto does)
+  """
+  @spec update_form_data(Form.t) :: {:ok, Ecto.Schema.t} | {:error, Form.t}
+  def update_form_data(form) do
+    case @repo.update(form.changeset) do
+      {:ok, schema}       -> {:ok, schema}
+      {:error, changeset} -> {:error, Map.put(form, :changeset, changeset)}
+    end
+  end
 
 end

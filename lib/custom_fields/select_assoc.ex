@@ -98,7 +98,7 @@ defmodule Formex.CustomField.SelectAssoc do
     name = Regex.replace(~r/_id$/, Atom.to_string(name_id), "")
     |> String.to_atom
 
-    module  = form.model.__schema__(:association, name).queryable
+    module  = form.model.__schema__(:association, name).related
     opts    = parse_opts(module, opts)
     choices = get_choices(module, opts)
 
@@ -117,7 +117,7 @@ defmodule Formex.CustomField.SelectAssoc do
   end
 
   defp create_field_multiple(form, name, opts) do
-    module  = form.model.__schema__(:association, name).queryable
+    module  = form.model.__schema__(:association, name).related
     opts    = parse_opts(module, opts)
     choices = get_choices(module, opts)
 

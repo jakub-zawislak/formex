@@ -27,7 +27,7 @@ defmodule Formex.FormNested do
       {form, substruct}
     end
 
-    submodule = form.model.__schema__(:association, name).queryable
+    submodule = Form.get_assoc_or_embed(form, name).related
     params    = form.params[to_string(name)] || %{}
 
     subform = Formex.Builder.create_form(type, substruct, params, submodule)

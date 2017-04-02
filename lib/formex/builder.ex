@@ -75,7 +75,7 @@ defmodule Formex.Builder do
     Form.get_fields(form)
     |> Enum.filter(&(&1.type == :multiple_select))
     |> Enum.reduce(changeset, fn field, changeset ->
-      module = form.model.__schema__(:association, field.name).queryable
+      module = form.model.__schema__(:association, field.name).related
       ids    = form.params[to_string(field.name)] || []
 
       associated = module
@@ -91,10 +91,17 @@ defmodule Formex.Builder do
   defp cast_embedded_forms(changeset, form) do
     Form.get_subforms(form)
     |> Enum.reduce(changeset, fn item, changeset ->
+
+      cast_func = if Form.is_assoc(form, item.name) do
+        &cast_assoc/3
+      else
+        &cast_embed/3
+      end
+
       case item do
         %Formex.FormNested{} ->
           changeset
-          |> cast_assoc(item.name, required: item.required, with: fn _substruct, _params ->
+          |> cast_func.(item.name, required: item.required, with: fn _substruct, _params ->
             subform = item.form
             create_changeset(subform, subform.type).changeset
           end)
@@ -103,7 +110,7 @@ defmodule Formex.Builder do
           {:ok, pid} = Counter.start_link # does anyone has a better idea?
 
           changeset = changeset
-          |> cast_assoc(item.name, required: item.required, with: fn _substruct, _params ->
+          |> cast_func.(item.name, required: item.required, with: fn _substruct, _params ->
             subform = item.forms
             |> Enum.at(Counter.increment(pid))
             |> Map.get(:form)

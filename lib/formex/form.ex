@@ -77,11 +77,29 @@ defmodule Formex.Form do
   @spec create_subform(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
   def create_subform(form, type, name, opts \\ []) do
 
-    case form.model.__schema__(:association, name).cardinality do
+    case get_assoc_or_embed(form, name).cardinality do
       :one  -> Formex.FormNested.create(form, type, name, opts)
       :many -> Formex.FormCollection.create(form, type, name, opts)
     end
 
+  end
+
+  @doc false
+  @spec get_assoc_or_embed(form :: Form.t, name :: Atom.t) :: any
+  def get_assoc_or_embed(form, name) do
+
+    if is_assoc(form, name) do
+      form.model.__schema__(:association, name)
+    else
+      form.model.__schema__(:embed, name)
+    end
+
+  end
+
+  @doc false
+  @spec is_assoc(form :: Form.t, name :: Atom.t) :: boolean
+  def is_assoc(form, name) do
+    form.model.__schema__(:association, name) != nil
   end
 
 end
