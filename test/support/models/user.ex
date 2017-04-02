@@ -7,6 +7,7 @@ defmodule Formex.TestModel.User do
 
     belongs_to :department, Formex.TestModel.Department
     belongs_to :user_info, Formex.TestModel.UserInfo
+    has_many   :user_addresses, Formex.TestModel.UserAddress
 
     timestamps()
   end

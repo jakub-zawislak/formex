@@ -182,7 +182,7 @@ defmodule Formex.Type do
 
   `user_address_type.ex`
   ```
-  defmodule App.UserInfoType do
+  defmodule App.UserAddressType do
     use Formex.Type
 
     def build_form( form ) do
@@ -248,9 +248,11 @@ defmodule Formex.Type do
       collection, collection_item, end %>
       ```
 
+  For more info about rendering check `Formex.View.Collection.formex_collection/5`
+
   Result with some additional HTML and CSS:
 
-  <img src="http://i.imgur.com/0JvPcna.png" width="724px">
+  <img src="http://i.imgur.com/OZeW87P.png" width="724px">
   """
 
   defmacro __using__([]) do
@@ -266,20 +268,32 @@ defmodule Formex.Type do
     end
   end
 
-  # * an `*_to_many` assoc, the `Formex.Field.add_collection/4` is called
+  def add(form, name) do
+    add(form, name, :text_input, [])
+  end
+
+  def add(form, name, opts) when is_list(opts) do
+    add(form, name, :text_input, opts)
+  end
+
+  def add(form, name, type_or_module) when not is_list(type_or_module) do
+    add(form, name, type_or_module, [])
+  end
 
   @doc """
   Adds an form item to the form. May be a field, custom field, button, or subform.
 
+  `type_or_module` is `:text_input` by default.
+
   Behaviour depends on `type_or_module` argument:
     * if it's a module and
-      * implements Formex.CustomField, the `c:Formex.CustomField.create_field/3` is called
-      * implements Formex.Type, the `Formex.Form.create_subform/4` is called
+      * implements `Formex.CustomField`, the `c:Formex.CustomField.create_field/3` is called
+      * implements `Formex.Type`, the `Formex.Form.create_subform/4` is called
     * if it's `:submit` or `:reset`, the `Formex.Button.create_button/3` is called
     * otherwise, the `Formex.Field.create_field/4` is called.
   """
   @spec add(form :: Form.t, name :: Atom.t, type_or_module :: Atom.t, opts :: Map.t) :: Form.t
-  def add(form, name, type_or_module, opts \\ []) do
+  def add(form, name, type_or_module, opts) do
 
     {form, item} = if Formex.Utils.module?(type_or_module) do
       if Formex.Utils.implements?(type_or_module, Formex.CustomField) do

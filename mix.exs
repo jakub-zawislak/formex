@@ -3,7 +3,7 @@ defmodule Formex.Mixfile do
 
   def project do
     [app: :formex,
-     version: "0.4.0",
+     version: "0.4.3",
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -42,6 +42,7 @@ defmodule Formex.Mixfile do
   defp package do
     [maintainers: ["Jakub Zawiślak"],
      licenses: ["MIT"],
+     files: ~w(lib priv web CHANGELOG.md LICENSE.md mix.exs package.json README.md),
      links: %{github: "https://github.com/jakub-zawislak/formex"}]
   end
 

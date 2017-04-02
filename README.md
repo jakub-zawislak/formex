@@ -10,7 +10,7 @@ template, but you can easily create your own templates.
 
 ## TL;DR
 
-<img src="http://i.imgur.com/ZwJr3JI.png" width="800px">
+<img src="http://i.imgur.com/YIG0R2P.png" width="800px">
 
 ## Installation
 `mix.exs`
@@ -38,6 +38,12 @@ config :formex,
 
 `web/web.ex`
 ```elixir
+def model do
+  quote do
+    use Formex.Schema
+  end
+end
+
 def controller do
   quote do
     use Formex.Controller
