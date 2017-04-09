@@ -1,6 +1,6 @@
 {
   "name": "formex",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Formex is an abstract layer that helps to build forms in Phoenix and Ecto",
   "main": "./priv/static/js/formex.js",
   "repository": {
