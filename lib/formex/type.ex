@@ -259,6 +259,7 @@ defmodule Formex.Type do
     quote do
       @behaviour Formex.Type
       import Formex.Type
+      require Formex.CustomField.SelectAssoc # it often doesn't work without it
 
       def changeset_after_create_callback( changeset ) do
         changeset
