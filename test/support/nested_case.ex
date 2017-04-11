@@ -15,6 +15,13 @@ defmodule Formex.NestedCase do
         TestRepo.insert(%User{first_name: "Jan", last_name: "Cebula"})
         TestRepo.insert(%User{first_name: "Przemek", last_name: "Cebula"})
       end
+
+      def get_first_user() do
+        User
+        |> User.ordered
+        |> TestRepo.all
+        |> Enum.at(0)
+      end
     end
   end
 end

@@ -11,4 +11,9 @@ defmodule Formex.TestModel.UserAddress do
     timestamps()
     formex_collection_child()
   end
+
+  def ordered(query) do
+    from c in query,
+      order_by: c.id
+  end
 end

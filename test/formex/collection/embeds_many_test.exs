@@ -1,41 +1,39 @@
-defmodule Formex.Collection.OneToMany.UserAddressType do
+defmodule Formex.Collection.EmbedsMany.UserSchoolType do
   use Formex.Type
 
   def build_form(form) do
     form
-    |> add(:street, :text_input, label: "Street")
-    |> add(:city, :text_input, label: "City")
-    |> add(:postal_code, :text_input, label: "Postal code")
+    |> add(:name, :text_input, label: "School name")
   end
 end
 
-defmodule Formex.Collection.OneToMany.UserType do
-  use Formex.Type
-
-  def build_form(form) do
-    form
-    |> add(:first_name, :text_input, label: "Imię")
-    |> add(:last_name, :text_input, label: "Nazwisko")
-    |> add(:user_addresses, Formex.Collection.OneToMany.UserAddressType, required: false)
-  end
-end
-
-defmodule Formex.Collection.OneToMany.UserRequiredType do
+defmodule Formex.Collection.EmbedsMany.UserType do
   use Formex.Type
 
   def build_form(form) do
     form
     |> add(:first_name, :text_input, label: "Imię")
     |> add(:last_name, :text_input, label: "Nazwisko")
-    |> add(:user_addresses, Formex.Collection.OneToMany.UserAddressType)
+    |> add(:schools, Formex.Collection.EmbedsMany.UserSchoolType, required: false)
   end
 end
 
-defmodule Formex.Collection.OneToManyTest do
+defmodule Formex.Collection.EmbedsMany.UserRequiredType do
+  use Formex.Type
+
+  def build_form(form) do
+    form
+    |> add(:first_name, :text_input, label: "Imię")
+    |> add(:last_name, :text_input, label: "Nazwisko")
+    |> add(:schools, Formex.Collection.EmbedsMany.UserSchoolType)
+  end
+end
+
+defmodule Formex.Collection.EmbedsManyTest do
   use Formex.CollectionCase
   use Formex.Controller
-  alias Formex.Collection.OneToMany.UserType
-  alias Formex.Collection.OneToMany.UserRequiredType
+  alias Formex.Collection.EmbedsMany.UserType
+  alias Formex.Collection.EmbedsMany.UserRequiredType
 
   test "view" do
     insert_users()
@@ -49,10 +47,10 @@ defmodule Formex.Collection.OneToManyTest do
     form_str = form_html |> to_string
 
     assert String.match?(form_str, ~r/Imię/)
-    assert String.match?(form_str, ~r/Street/)
+    assert String.match?(form_str, ~r/School name/)
   end
 
-  test "insert user and user_address" do
+  test "insert user and school" do
     params      = %{"first_name" => "a", "last_name" => "a"}
     form        = create_form(UserRequiredType, %User{}, params)
     {:error, _} = insert_form_data(form)
@@ -61,64 +59,63 @@ defmodule Formex.Collection.OneToManyTest do
     form        = create_form(UserType, %User{}, params)
     {:ok,    _} = insert_form_data(form)
 
-    params      = %{"first_name" => "a", "last_name" => "a", "user_addresses" => %{
-      "0" => %{"street" => ""}
+    params      = %{"first_name" => "a", "last_name" => "a", "schools" => %{
+      "0" => %{"name" => ""}
     }}
     form        = create_form(UserRequiredType, %User{}, params)
     {:error, _} = insert_form_data(form)
 
-    params      = %{"first_name" => "a", "last_name" => "a", "user_addresses" => %{
-      "0" => %{"street" => "s", "postal_code" => "p", "city" => "c"}
+    params      = %{"first_name" => "a", "last_name" => "a", "schools" => %{
+      "0" => %{"name" => "s"}
     }}
     form        = create_form(UserRequiredType, %User{}, params)
     {:ok, user} = insert_form_data(form)
 
-    assert Enum.at(user.user_addresses, 0).city == "c"
+    assert Enum.at(user.schools, 0).name == "s"
   end
 
-  test "edit user and user_address" do
+  test "edit user and school" do
     insert_users()
 
     user = get_user(0)
 
-    params      = %{"user_addresses" => %{
-      "0" => %{"street" => ""}
+    params      = %{"schools" => %{
+      "0" => %{"name" => ""}
     }}
     form        = create_form(UserRequiredType, user, params)
     {:error, _} = update_form_data(form)
 
-    params      = %{"user_addresses" => %{
-      "0" => %{"street" => "s1", "postal_code" => "p1", "city" => "c1"}
+    params      = %{"schools" => %{
+      "0" => %{"name" => "1"}
     }}
     form        = create_form(UserRequiredType, user, params)
     {:ok, user} = update_form_data(form)
 
-    params      = %{"user_addresses" => %{
-      "0" => %{"id" => Enum.at(user.user_addresses, 0).id |> Integer.to_string,
-        "street" => "s2", "postal_code" => "p2", "city" => "c2"}
+    params      = %{"schools" => %{
+      "0" => %{"id" => Enum.at(user.schools, 0).id, "name" => "2"}
     }}
-    user        = get_user(0) # download it again, we want unloaded user_address
+    user        = get_user(0) # download it again, we want unloaded school
     form        = create_form(UserRequiredType, user, params)
     {:ok, user} = update_form_data(form)
 
-    assert Enum.at(user.user_addresses, 0).city == "c2"
+    assert Enum.at(user.schools, 0).name == "2"
   end
 
-  test "remove user_address" do
+  test "remove school" do
     insert_users()
 
     user = get_user(1)
 
-    params      = %{"user_addresses" => %{
-      "0" => %{"id" => Enum.at(user.user_addresses, 0).id |> Integer.to_string,
+    params      = %{"schools" => %{
+      "0" => %{"id" => Enum.at(user.schools, 0).id,
         "formex_delete" => "true"},
-      "1" => %{"id" => Enum.at(user.user_addresses, 1).id |> Integer.to_string}
+      "1" => %{"id" => Enum.at(user.schools, 1).id}
     }}
     form        = create_form(UserRequiredType, user, params)
     {:ok, _} = update_form_data(form)
 
     user = get_user(1)
 
-    assert Enum.at(user.user_addresses, 0).city == "Olsztyn"
+    assert Enum.at(user.schools, 0).name == "Liceum"
   end
 end

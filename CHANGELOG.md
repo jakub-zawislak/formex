@@ -1,3 +1,10 @@
+## v0.4.6 (2017-04-10)
+* Fixed collections where items has ID as UUID instead of integer. `embedded_schema`
+  uses UUID.
+
+## v0.4.5 (2017-04-09)
+* Fixed JS library
+
 ## v0.4.4 (2017-04-01)
 * Added
   * Ability to use with `embedded_schema`, without a database

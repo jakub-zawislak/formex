@@ -9,7 +9,17 @@ defmodule Formex.TestModel.User do
     belongs_to :user_info, Formex.TestModel.UserInfo
     has_many   :user_addresses, Formex.TestModel.UserAddress
 
+    embeds_many :schools, School do
+      field :name, :string
+      formex_collection_child()
+    end
+
     timestamps()
+  end
+
+  def ordered(query) do
+    from c in query,
+      order_by: c.id
   end
 
 end

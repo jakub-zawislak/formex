@@ -51,7 +51,12 @@ defmodule Formex.FormCollection do
     substructs
     |> Enum.map(fn substruct ->
       {_, subparams} = Enum.find(params, {nil, %{}}, fn {_k, v} ->
-        substruct.id == v["id"] |> Integer.parse |> elem(0)
+        id = if is_integer(substruct.id) do
+          v["id"] |> Integer.parse |> elem(0)
+        else
+          v["id"]
+        end
+        substruct.id == id
       end)
 
       create_subform(name, type, substruct, subparams, submodule, opts)

@@ -3,7 +3,7 @@ defmodule Formex.Mixfile do
 
   def project do
     [app: :formex,
-     version: "0.4.5",
+     version: "0.4.6",
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -27,7 +27,7 @@ defmodule Formex.Mixfile do
     [{:phoenix_html, "~> 2.0"},
      {:ecto, "~> 2.0"},
      {:ex_doc, ">= 0.0.0", only: :dev},
-     {:mariaex, "~> 0.8.1", only: [:dev, :test]}, # without a :dev the jakub-zawislak/phoenix-forms won't start. maybe should be removed
+     {:postgrex, "~> 0.13.2", only: [:dev, :test]}, # without a :dev the jakub-zawislak/phoenix-forms won't start. maybe should be removed
      {:phoenix, "~> 1.2", only: [:dev, :test]},
      {:phoenix_ecto, "~> 3.2", only: [:dev, :test]}
     ]

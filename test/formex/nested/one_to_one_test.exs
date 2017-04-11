@@ -73,7 +73,7 @@ defmodule Formex.Nested.OneToOneTest do
   test "edit user and user_info" do
     insert_users()
 
-    user = TestRepo.all(User) |> Enum.at(0)
+    user = get_first_user()
 
     params      = %{"user_info" => %{"section" => ""}}
     form        = create_form(UserRequiredType, user, params)
@@ -84,7 +84,8 @@ defmodule Formex.Nested.OneToOneTest do
     {:ok, user} = update_form_data(form)
 
     params      = %{"user_info" => %{"id" => user.user_info.id, "section" => "a"}}
-    user        = TestRepo.all(User) |> Enum.at(0) # download it again, we want unloaded user_info
+    user        = get_first_user() # download it again, we want unloaded user_info
+
     form        = create_form(UserRequiredType, user, params)
     {:ok, user} = update_form_data(form)
 
