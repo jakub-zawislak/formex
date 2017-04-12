@@ -40,7 +40,7 @@ defmodule Formex.View.Nested do
       ```
   * Use your render function
       ```
-      <%= formex_nested f, :user_info, fun subform -> %>
+      <%= formex_nested f, :user_info, fn subform -> %>
         <%= formex_row subform, :section %>
         <%= formex_row subform, :organisation_cell %>
       <% end %>
@@ -49,7 +49,7 @@ defmodule Formex.View.Nested do
       ```
       <div class="form-horizontal">
         <%= formex_nested f, :user_info, [template: Formex.Template.BootstrapHorizontal],
-          fun subform -> %>
+          fn subform -> %>
           <%= formex_row subform, :section %>
           <%= formex_row subform, :organisation_cell %>
         <% end %>

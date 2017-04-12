@@ -58,7 +58,7 @@ defmodule Formex.View.Collection do
   * Use your render function
       ```
       <%= formex_collection f, :user_addresses, [template: Formex.Template.BootstrapHorizontal],
-        fun collection -> %>
+        fn collection -> %>
         <div class="form-horizontal">
           <%= formex_collection_items collection %>
           <%= formex_collection_add collection, "Add" %>

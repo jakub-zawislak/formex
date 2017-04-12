@@ -110,7 +110,7 @@ defmodule Formex.Type do
       ```
       <%= formex_row f, :first_name %>
       <%= formex_row f, :last_name %>
-      <%= formex_nested f, :user_info, fun subform -> %>
+      <%= formex_nested f, :user_info, fn subform -> %>
         <%= formex_row subform, :section %>
         <%= formex_row subform, :organisation_cell %>
       <% end %>
@@ -219,7 +219,7 @@ defmodule Formex.Type do
       <%= formex_row f, :first_name %>
       <%= formex_row f, :last_name %>
       <%= formex_collection f, :user_addresses, [template: Formex.Template.BootstrapHorizontal],
-        fun collection -> %>
+        fn collection -> %>
         <div class="form-horizontal">
           <%= formex_collection_items collection %>
           <%= formex_collection_add collection, "Add" %>
