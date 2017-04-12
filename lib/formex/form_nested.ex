@@ -30,7 +30,7 @@ defmodule Formex.FormNested do
     submodule = Form.get_assoc_or_embed(form, name).related
     params    = form.params[to_string(name)] || %{}
 
-    subform = Formex.Builder.create_form(type, substruct, params, submodule)
+    subform = Formex.Builder.create_form(type, substruct, params, form.opts, submodule)
     item    = %FormNested{
       form: subform,
       name: name,

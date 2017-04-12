@@ -17,6 +17,7 @@ defmodule Formex.Form do
     * `:phoenix_form` - `%Phoenix.HTML.Form{}`
     * `:template` - the module that implements `Formex.Template`, for example:
       `Formex.Template.BootstrapHorizontal`. Can be set via a `Formex.View.formex_form_for` options
+    * `:opts` - additional data passed in a controller. See: `Formex.Builder.create_form/5`
   """
   defstruct type: nil,
     struct: nil,
@@ -25,6 +26,7 @@ defmodule Formex.Form do
     params: %{},
     changeset: nil,
     phoenix_form: nil,
+    opts: [],
     template: nil,
     template_options: nil
 

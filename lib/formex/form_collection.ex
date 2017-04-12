@@ -33,8 +33,8 @@ defmodule Formex.FormCollection do
 
     params = form.params[to_string(name)] || []
 
-    subforms_old = create_existing_subforms(name, substructs, params, type, submodule, opts)
-    subforms_new = create_new_subforms(name, params, type, submodule, opts)
+    subforms_old = create_existing_subforms(form, name, substructs, params, type, submodule, opts)
+    subforms_new = create_new_subforms(form, name, params, type, submodule, opts)
 
     form_collection = %FormCollection{
       forms: subforms_old ++ subforms_new,
@@ -47,7 +47,7 @@ defmodule Formex.FormCollection do
     {form, form_collection}
   end
 
-  defp create_existing_subforms(name, substructs, params, type, submodule, opts) do
+  defp create_existing_subforms(form, name, substructs, params, type, submodule, opts) do
     substructs
     |> Enum.map(fn substruct ->
       {_, subparams} = Enum.find(params, {nil, %{}}, fn {_k, v} ->
@@ -59,22 +59,22 @@ defmodule Formex.FormCollection do
         substruct.id == id
       end)
 
-      create_subform(name, type, substruct, subparams, submodule, opts)
+      create_subform(form, name, type, substruct, subparams, submodule, opts)
     end)
   end
 
-  defp create_new_subforms(name, params, type, submodule, opts) do
+  defp create_new_subforms(form, name, params, type, submodule, opts) do
       params
       |> Enum.filter(fn {_key, val} -> !val["id"] end)
       |> Enum.map(fn {_key, subparams} ->
         substruct = struct(submodule, subparams)
 
-        create_subform(name, type, substruct, subparams, submodule, opts)
+        create_subform(form, name, type, substruct, subparams, submodule, opts)
       end)
   end
 
-  defp create_subform(name, type, substruct, subparams, submodule, opts) do
-    subform = Formex.Builder.create_form(type, substruct, subparams, submodule)
+  defp create_subform(form, name, type, substruct, subparams, submodule, opts) do
+    subform = Formex.Builder.create_form(type, substruct, subparams, form.opts, submodule)
 
     %FormNested{
       form: subform,

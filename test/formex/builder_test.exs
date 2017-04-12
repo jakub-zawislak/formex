@@ -18,8 +18,9 @@ defmodule Formex.BuilderTest do
   alias Formex.TestRepo
 
   test "create a form" do
-    form = create_form(BuilderTestType, %Article{})
+    form = create_form(BuilderTestType, %Article{}, %{}, [some: :data])
     assert Enum.at(form.items, 0).name == :title
+    assert form.opts[:some] == :data
   end
 
   test "field not required" do

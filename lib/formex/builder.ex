@@ -23,18 +23,22 @@ defmodule Formex.Builder do
   ## Arguments
 
     * `type` - the module that implements `Formex.Type` behaviour, for example: `App.ArticleType`
-    * `struct` - the struct that will be used in `Ecto.Changeset.cast/3`, for example: `%App.Article{}`
+    * `struct` - the struct that will be used in `Ecto.Changeset.cast/3`, for example:
+      `%App.Article{}`
     * `params` - the parameters that will be used in `Ecto.Changeset.cast/3`
-    * `model` - optional model in case if `struct` is nil. Used by `Formex.Type.add_form/4`
+    * `opts` - some additional data. For example, if you need to access a current user in
+      `c:Formex.Type.build_form/1`, pass it here
+    * `model` - optional model in case if `struct` is nil. Used by `Formex.Type.add/4`
   """
-  @spec create_form(module, Ecto.Schema.t, Map.t) :: Form.t
-  def create_form(type, struct, params \\ %{}, model \\ nil) do
+  @spec create_form(module, Ecto.Schema.t, Map.t, List.t, module) :: Form.t
+  def create_form(type, struct, params \\ %{}, opts \\ [], model \\ nil) do
 
     form = %Form{
       type: type,
       struct: struct,
       model: if(model, do: model, else: struct.__struct__),
-      params: params
+      params: params,
+      opts: opts
     }
     |> type.build_form()
 
