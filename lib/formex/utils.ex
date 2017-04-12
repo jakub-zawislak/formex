@@ -15,7 +15,7 @@ defmodule Formex.Utils do
   @moduledoc false
 
   def module?(module) do
-    :erlang.function_exported(module, :module_info, 0)
+    Code.ensure_loaded?(module)
   end
 
   def implements?(module, behaviour) do

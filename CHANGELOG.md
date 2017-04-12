@@ -1,3 +1,6 @@
+## v0.4.7 (2017-04-12)
+* Fixed "`Phoenix.HTML.Form.Formex.CustomField.SelectAssoc/3` is undefined" errors
+
 ## v0.4.6 (2017-04-10)
 * Fixed collections where items has ID as UUID instead of integer. `embedded_schema`
   uses UUID.
