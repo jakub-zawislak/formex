@@ -1,5 +1,6 @@
 ## v0.4.8 (2017-04-13)
-* Added prefixes `formex-` in HTML attributes (`data-prototype` is now `data-formex-prototype` etc.)
+* Added prefixes `formex-` in HTML attributes (`data-prototype` is now `data-formex-prototype` etc.).
+  Run `npm install formex` to update JS library.
 
 ## v0.4.7 (2017-04-12)
 * Fixed "`Phoenix.HTML.Form.Formex.CustomField.SelectAssoc/3` is undefined" errors

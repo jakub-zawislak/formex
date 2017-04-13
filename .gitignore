@@ -20,7 +20,7 @@ erl_crash.dump
 *.ez
 
 .DS_Store
-.npm-debug.log
+npm-debug.log
 /node_modules
 
 /config/test.secret.exs
