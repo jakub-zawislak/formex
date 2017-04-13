@@ -88,7 +88,7 @@ defmodule Formex.View.Collection do
 
   The `formex_collection` produces
   ```html
-  <div class="formex-collection data-prototype="..."></div>
+  <div class="formex-collection data-formex-prototype="..."></div>
   ```
   The `formex-prototype` is used by JS to generate new subforms.
 
@@ -111,21 +111,21 @@ defmodule Formex.View.Collection do
 
   The final result may look like this:
   ```html
-  <div class="formex-collection" data-prototype=" result of `fun_item` ">
+  <div class="formex-collection" data-formex-prototype=" result of `fun_item` ">
 
     <div class="formex-collection-items">
 
       <input name="user[user_addresses][0][id]" type="hidden" value="1">
       <div class="formex-collection-item">
         <input name="user[user_addresses][0][formex_delete]" type="hidden" value="false">
-        <a class="formex-collection-item-remove" data-confirm="Are you sure?" href="#">×</a>
+        <a class="formex-collection-item-remove" data-formex-confirm="Are you sure?" href="#">×</a>
         subform inputs
       </div>
 
       <input name="user[user_addresses][1][id]" type="hidden" value="9">
       <div class="formex-collection-item">
       <input name="user[user_addresses][1][formex_delete]" type="hidden" value="false">
-        <a class="formex-collection-item-remove" data-confirm="Are you sure?" href="#">×</a>
+        <a class="formex-collection-item-remove" data-formex-confirm="Are you sure?" href="#">×</a>
         subform inputs
       </div>
 
@@ -163,7 +163,7 @@ defmodule Formex.View.Collection do
     if prototype do
       content_tag :div, html,
         class: "formex-collection",
-        data: [prototype: prototype |> elem(1) |> to_string]
+        data: ["formex-prototype": prototype |> elem(1) |> to_string]
     else
       html
     end
@@ -237,7 +237,7 @@ defmodule Formex.View.Collection do
   def formex_collection_remove(label \\ {:safe, "&times;"}, confirm \\ "Are you sure?") do
     content_tag(:a, [
       label
-    ], href: "#", class: "formex-collection-item-remove", "data-confirm": confirm)
+    ], href: "#", class: "formex-collection-item-remove", "data-formex-confirm": confirm)
   end
 
   defp generate_collection_prototype(form, item_name, item, fun_item, options) do

@@ -7,7 +7,7 @@ module.exports = {
     ],
   },
   output: {
-    path: "./priv/static/js",
+    path: __dirname+"/priv/static/js",
     filename: "[name].js",
     library: 'webpackNumbers',
     libraryTarget: 'umd'

@@ -16,13 +16,13 @@ export class Collection {
   // to poprawić jeśli będzie wiele poziomów
   static resetIndexes() {
     $('.formex-collection').each(function () {
-      $(this).data('index', $(this).find('.formex-collection-item').length)
+      $(this).data('formex-index', $(this).find('.formex-collection-item').length)
     })
   }
 
   static replacePrototypeNames() {
-    $('[data-prototype]').each(function () {
-      let data = $(this).data('prototype')
+    $('[data-formex-prototype]').each(function () {
+      let data = $(this).data('formex-prototype')
 
       // idzie od końca
       data = data.replace(/([0-9a-z\[\]_]+)_0_([0-9a-z\[\]_]+)/gi, '$1___name___$2')
@@ -30,7 +30,7 @@ export class Collection {
       data = data.replace(/([0-9a-z\[\]_]+)\[0\]([0-9a-z\[\]_]+)/gi, '$1[__name__]$2')
       // data = data.replace(/([0-9a-z\[\]_]+)\[0\]([0-9a-z\[\]_]+)/gi, '$1[__name2__]$2')
 
-      $(this).data('prototype', data)
+      $(this).data('formex-prototype', data)
     })
 
     /*
@@ -38,12 +38,12 @@ export class Collection {
     * to samo z name22 na name2 itd (to niezrobione)
     * może tak być wtedy gdy wyślemy formularz - id już jest ustawione za name, a name2 powinno być name lecz nie jest
     */
-    // $('[data-prototype]').each(function () {
-    //   let data = $(this).data('prototype')
+    // $('[data-formex-prototype]').each(function () {
+    //   let data = $(this).data('formex-prototype')
     //
     //   data = data.replace(/("[0-9a-z\[\]_]+((?!.*__name__).)[0-9a-z\[\]_]+)__name2__([0-9a-z\[\]_]+")/gi, '$1__name__$3')
     //
-    //   $(this).data('prototype', data)
+    //   $(this).data('formex-prototype', data)
     // })
   }
 
@@ -57,7 +57,7 @@ export class Collection {
     $(document).on('click', '.formex-collection-item-remove', function (e) {
       e.preventDefault()
 
-      if (!confirm($(this).data('confirm')))
+      if (!confirm($(this).data('formex-confirm')))
         return
 
       let collectionHolder = $(this).closest('.formex-collection')
@@ -80,8 +80,8 @@ export class Collection {
 
 
   static addCollectionItemForm(collectionHolder) {
-    let prototype = collectionHolder.data('prototype')
-    let index = collectionHolder.data('index')
+    let prototype = collectionHolder.data('formex-prototype')
+    let index = collectionHolder.data('formex-index')
 
     prototype = Collection.replaceIndex(prototype, /__name__/g, index)
 
