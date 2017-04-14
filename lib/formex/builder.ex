@@ -120,7 +120,7 @@ defmodule Formex.Builder do
             |> Map.get(:form)
 
             changeset = create_changeset(subform, subform.type).changeset
-            |> cast(subform.params, [:formex_delete])
+            |> cast(subform.params, [item.delete_field])
 
             if get_change(changeset, :formex_delete) do
               %{changeset | action: :delete}

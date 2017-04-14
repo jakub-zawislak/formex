@@ -9,6 +9,7 @@ defmodule Formex.FormCollection do
     model: nil,
     name: nil,
     opts: [],
+    delete_field: nil,
     required: true
 
   @type t :: %FormCollection{}
@@ -16,6 +17,8 @@ defmodule Formex.FormCollection do
   @spec create(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
   def create(form, type, name, opts) do
     substructs = Field.get_value(form, name)
+
+    {delete_field, opts} = Keyword.pop(opts, :delete_field)
 
     {form, substructs} = if Ecto.assoc_loaded? substructs do
       {form, substructs}
@@ -29,6 +32,12 @@ defmodule Formex.FormCollection do
       {form, substructs}
     end
 
+    # substructs = if opts[:filter] do
+    #   Enum.filter(substructs, opts[:filter])
+    # else
+    #   substructs
+    # end
+
     submodule = Form.get_assoc_or_embed(form, name).related
 
     params = form.params[to_string(name)] || []
@@ -41,7 +50,8 @@ defmodule Formex.FormCollection do
       name: name,
       model: submodule,
       required: Keyword.get(opts, :required, true),
-      opts: opts
+      opts: opts,
+      delete_field: delete_field || :formex_delete
     }
 
     {form, form_collection}
