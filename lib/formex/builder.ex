@@ -26,8 +26,24 @@ defmodule Formex.Builder do
     * `struct` - the struct that will be used in `Ecto.Changeset.cast/3`, for example:
       `%App.Article{}`
     * `params` - the parameters that will be used in `Ecto.Changeset.cast/3`
-    * `opts` - some additional data. For example, if you need to access a current user in
-      `c:Formex.Type.build_form/1`, pass it here
+    * `opts` - some additional data. Accessible by `form.opts`. Example:
+
+        Set current logged user
+        ```
+        form = create_form(TransferType, %Transfer{}, %{}, user: user)
+        ```
+        
+        Filter select options that belongs to this user
+        ```
+        def build_form(form) do
+          form
+          |> add(:user_account_id, SelectAssoc, query: fn query ->
+              query
+              |> Account.by_user(form.opts[:user])
+            end
+        end
+        ```
+
     * `model` - optional model in case if `struct` is nil. Used by `Formex.Type.add/4`
   """
   @spec create_form(module, Ecto.Schema.t, Map.t, List.t, module) :: Form.t
