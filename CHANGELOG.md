@@ -1,4 +1,5 @@
-## v0.4.9 (2017-04-16)
+## v0.4.10 (2017-04-16)
+* Ability to filter items in form collections
 * Improved code of form collections. It's required to update JS library: 
   Run `npm install formex`.
 
