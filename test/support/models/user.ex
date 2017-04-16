@@ -8,6 +8,7 @@ defmodule Formex.TestModel.User do
     belongs_to :department, Formex.TestModel.Department
     belongs_to :user_info, Formex.TestModel.UserInfo
     has_many   :user_addresses, Formex.TestModel.UserAddress
+    has_many   :user_accounts, Formex.TestModel.UserAccount
 
     embeds_many :schools, School do
       field :name, :string

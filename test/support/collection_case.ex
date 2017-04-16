@@ -5,6 +5,7 @@ defmodule Formex.CollectionCase do
       import Formex.Builder
       alias Formex.TestModel.User
       alias Formex.TestModel.UserAddress
+      alias Formex.TestModel.UserAccount
       alias Formex.TestRepo
 
       def insert_users() do
@@ -15,6 +16,10 @@ defmodule Formex.CollectionCase do
         ], schools: [
           %{id: "1dc5da4c-d4cd-4d4b-8167-5e8b61d53f7e", name: "Gimnazjum"},
           %{id: "b1902697-b577-44ae-bbd2-010c84eea0cc", name: "Liceum"}
+        ], user_accounts: [
+          %UserAccount{number: "number1"},
+          %UserAccount{number: "number2"},
+          %UserAccount{number: "number3"},
         ]})
         TestRepo.insert(%User{first_name: "Krystyna", last_name: "Pawłowicz"})
         TestRepo.insert(%User{first_name: "Jan", last_name: "Cebula"})
@@ -27,6 +32,7 @@ defmodule Formex.CollectionCase do
         |> TestRepo.all
         |> Enum.at(key)
         |> TestRepo.preload(user_addresses: UserAddress.ordered(UserAddress))
+        |> TestRepo.preload(user_accounts: UserAccount.ordered(UserAccount))
       end
     end
   end

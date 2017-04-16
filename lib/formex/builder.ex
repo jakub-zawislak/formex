@@ -120,17 +120,22 @@ defmodule Formex.Builder do
               substruct
             end
 
-            subform = item
+            item
             |> FormCollection.get_subform_by_struct(substruct)
-            |> Map.get(:form)
- 
-            changeset = create_changeset(subform, subform.type).changeset
-            |> cast(subform.params, [item.delete_field])
+            |> case do
+              nil -> cast(substruct, %{}, [])
 
-            if get_change(changeset, :formex_delete) do
-              %{changeset | action: :delete}
-            else
-              changeset
+              nested_form ->
+                subform = nested_form.form
+    
+                changeset = create_changeset(subform, subform.type).changeset
+                |> cast(subform.params, [item.delete_field])
+
+                if get_change(changeset, :formex_delete) do
+                  %{changeset | action: :delete}
+                else
+                  changeset
+                end
             end
           end)
       end

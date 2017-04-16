@@ -248,7 +248,7 @@ defmodule Formex.Type do
       collection, collection_item, end %>
       ```
 
-  For more info about rendering check `Formex.View.Collection.formex_collection/5`
+  For more info about rendering see `Formex.View.Collection.formex_collection/5`
 
   Result with some additional HTML and CSS:
 

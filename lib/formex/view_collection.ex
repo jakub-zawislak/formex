@@ -191,30 +191,34 @@ defmodule Formex.View.Collection do
     template_options = collection.template_options
 
     html = Phoenix.HTML.Form.inputs_for(form.phoenix_form, item.name, fn f ->
-      subform = item
+      item
       |> FormCollection.get_subform_by_struct(f.data)
-      |> Map.get(:form)
-      |> Map.put(:phoenix_form, f)
-      |> Map.put(:template, template)
-      |> Map.put(:template_options, template_options)
+      |> case do 
+        nil -> ""
+        nested_form ->
+          subform = nested_form.form 
+          |> Map.put(:phoenix_form, f)
+          |> Map.put(:template, template)
+          |> Map.put(:template_options, template_options)
 
-            # IO.inspect subform
-      html = collection.fun_item.(subform)
+          html = collection.fun_item.(subform)
 
-      if subform.struct.id do
-        delete_field = Phoenix.HTML.Form.hidden_input f, item.delete_field, "data-formex-remove": ""
+          if subform.struct.id do
+            delete_field = Phoenix.HTML.Form.hidden_input f, item.delete_field, 
+              "data-formex-remove": ""
 
-        content_tag(:div, [
-          html,
-          delete_field
-        ], class: "formex-collection-item")
-      else
-        id_field = Phoenix.HTML.Form.hidden_input f, :formex_id, "data-formex-id": ""
+            content_tag(:div, [
+              html,
+              delete_field
+            ], class: "formex-collection-item")
+          else
+            id_field = Phoenix.HTML.Form.hidden_input f, :formex_id, "data-formex-id": ""
 
-        content_tag(:div, [
-          html,
-          id_field
-        ], class: "formex-collection-item formex-collection-item-new")
+            content_tag(:div, [
+              html,
+              id_field
+            ], class: "formex-collection-item formex-collection-item-new")
+          end
       end
     end)
 

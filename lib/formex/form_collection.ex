@@ -14,6 +14,33 @@ defmodule Formex.FormCollection do
 
   @type t :: %FormCollection{}
 
+  @moduledoc """
+  Form collections
+
+  To get started see `Formex.Type`, section _Collections of forms_.
+
+  Functionality that are not mentioned in the link above:
+
+  ## Options
+  
+  * `delete_field` - defaults to `:formex_delete`. Defines input that will be set to true
+    if we click &times;. Behaviours depends on value:
+      * `:formex_delete` - if `formex_delete` is true, this collection item 
+        will be removed. 
+      * another field - it's a simple input that may be stored in repo
+      
+        For example, we can in our model create `removed` field. Then set 
+        `delete_field: :removed` option.
+  
+  * `filter` - filters items that will be displayed in our form. Example:
+      ```
+      form
+      |> add(:addresses, App.AddressType, delete_field: :removed, filter: fn item ->
+        !item.removed
+      end)
+      ```
+  """
+
   @spec create(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
   def create(form, type, name, opts) do
     substructs = Field.get_value(form, name)
@@ -32,11 +59,11 @@ defmodule Formex.FormCollection do
       {form, substructs}
     end
 
-    # substructs = if opts[:filter] do
-    #   Enum.filter(substructs, opts[:filter])
-    # else
-    #   substructs
-    # end
+    substructs = if opts[:filter] do
+      Enum.filter(substructs, opts[:filter])
+    else
+      substructs
+    end
 
     submodule = Form.get_assoc_or_embed(form, name).related
 

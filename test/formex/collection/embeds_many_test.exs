@@ -100,8 +100,6 @@ defmodule Formex.Collection.EmbedsManyTest do
     form        = create_form(UserRequiredType, user, params)
     {:ok, user} = update_form_data(form)
 
-    schools = Enum.sort(user.schools, &(&1.id < &2.id))
-
     assert Enum.at(user.schools, 0).name == "name0new"
     assert Enum.at(user.schools, 1).name == "name1"
     assert Enum.at(user.schools, 2).name == "name2"
