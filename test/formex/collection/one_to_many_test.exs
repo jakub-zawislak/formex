@@ -88,20 +88,28 @@ defmodule Formex.Collection.OneToManyTest do
     {:error, _} = update_form_data(form)
 
     params      = %{"user_addresses" => %{
-      "0" => %{"street" => "s1", "postal_code" => "p1", "city" => "c1"}
+      "0" => %{"street" => "s0", "postal_code" => "p0", "city" => "c0"}
     }}
     form        = create_form(UserRequiredType, user, params)
     {:ok, user} = update_form_data(form)
 
     params      = %{"user_addresses" => %{
       "0" => %{"id" => Enum.at(user.user_addresses, 0).id |> Integer.to_string,
+        "street" => "s0new", "postal_code" => "p0new", "city" => "c0new"},
+      "1" => %{"formex_id" => "1",
+        "street" => "s1", "postal_code" => "p1", "city" => "c1"},
+      "2" => %{"formex_id" => "2",
         "street" => "s2", "postal_code" => "p2", "city" => "c2"}
     }}
     user        = get_user(0) # download it again, we want unloaded user_address
     form        = create_form(UserRequiredType, user, params)
     {:ok, user} = update_form_data(form)
 
-    assert Enum.at(user.user_addresses, 0).city == "c2"
+    addresses = Enum.sort(user.user_addresses, &(&1.id < &2.id))
+
+    assert Enum.at(addresses, 0).city == "c0new"
+    assert Enum.at(addresses, 1).city == "c1"
+    assert Enum.at(addresses, 2).city == "c2"
   end
 
   test "remove user_address" do

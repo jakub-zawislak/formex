@@ -60,13 +60,13 @@ defmodule Formex.Collection.EmbedsManyTest do
     {:ok,    _} = insert_form_data(form)
 
     params      = %{"first_name" => "a", "last_name" => "a", "schools" => %{
-      "0" => %{"name" => ""}
+      "0" => %{"name" => "", "formex-id" => "some-id"}
     }}
     form        = create_form(UserRequiredType, %User{}, params)
     {:error, _} = insert_form_data(form)
 
     params      = %{"first_name" => "a", "last_name" => "a", "schools" => %{
-      "0" => %{"name" => "s"}
+      "0" => %{"name" => "s", "formex-id" => "some-id"}
     }}
     form        = create_form(UserRequiredType, %User{}, params)
     {:ok, user} = insert_form_data(form)
@@ -86,19 +86,25 @@ defmodule Formex.Collection.EmbedsManyTest do
     {:error, _} = update_form_data(form)
 
     params      = %{"schools" => %{
-      "0" => %{"name" => "1"}
+      "0" => %{"name" => "name0"}
     }}
     form        = create_form(UserRequiredType, user, params)
     {:ok, user} = update_form_data(form)
 
     params      = %{"schools" => %{
-      "0" => %{"id" => Enum.at(user.schools, 0).id, "name" => "2"}
+      "0" => %{"id" => Enum.at(user.schools, 0).id, "name" => "name0new"},
+      "1" => %{"formex_id" => "1", "name" => "name1"},
+      "2" => %{"formex_id" => "2", "name" => "name2"}
     }}
     user        = get_user(0) # download it again, we want unloaded school
     form        = create_form(UserRequiredType, user, params)
     {:ok, user} = update_form_data(form)
 
-    assert Enum.at(user.schools, 0).name == "2"
+    schools = Enum.sort(user.schools, &(&1.id < &2.id))
+
+    assert Enum.at(user.schools, 0).name == "name0new"
+    assert Enum.at(user.schools, 1).name == "name1"
+    assert Enum.at(user.schools, 2).name == "name2"
   end
 
   test "remove school" do
