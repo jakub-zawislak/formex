@@ -57,6 +57,19 @@ defmodule Formex.FormCollection do
     {form, form_collection}
   end
 
+  @doc false
+  @spec get_subform_by_struct(form_collection :: t, struct :: Map.t) :: FormNested.t
+  def get_subform_by_struct(form_collection, struct) do
+    form_collection.forms
+    |> Enum.find(fn form_nested ->
+      if struct.id do
+        form_nested.form.struct.id == struct.id
+      else
+        form_nested.form.struct.formex_id == struct.formex_id
+      end
+    end)
+  end
+
   defp create_existing_subforms(form, name, substructs, params, type, submodule, opts) do
     substructs
     |> Enum.map(fn substruct ->
@@ -74,13 +87,13 @@ defmodule Formex.FormCollection do
   end
 
   defp create_new_subforms(form, name, params, type, submodule, opts) do
-      params
-      |> Enum.filter(fn {_key, val} -> !val["id"] end)
-      |> Enum.map(fn {_key, subparams} ->
-        substruct = struct(submodule, subparams)
+    params
+    |> Enum.filter(fn {_key, val} -> !val["id"] end)
+    |> Enum.map(fn {_key, subparams} ->
+      substruct = struct(submodule, [formex_id: subparams["formex_id"]])
 
-        create_subform(form, name, type, substruct, subparams, submodule, opts)
-      end)
+      create_subform(form, name, type, substruct, subparams, submodule, opts)
+    end)
   end
 
   defp create_subform(form, name, type, substruct, subparams, submodule, opts) do

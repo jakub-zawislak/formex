@@ -3,7 +3,7 @@ defmodule Formex.View.Collection do
   import Formex.View
   alias __MODULE__
   alias Formex.Form
-  alias Formex.Utils.Counter
+  alias Formex.FormCollection
 
   @moduledoc """
   Helper functions for templating collection of forms.
@@ -185,37 +185,38 @@ defmodule Formex.View.Collection do
 
   @spec formex_collection_items(t) :: Phoenix.HTML.safe
   def formex_collection_items(collection) do
-    {:ok, pid} = Counter.start_link # does anyone has a better idea?
-
     form = collection.form
     item = collection.item
     template = collection.template
     template_options = collection.template_options
 
     html = Phoenix.HTML.Form.inputs_for(form.phoenix_form, item.name, fn f ->
-      subform = item.forms
-      |> Enum.at(Counter.increment(pid))
+      subform = item
+      |> FormCollection.get_subform_by_struct(f.data)
       |> Map.get(:form)
       |> Map.put(:phoenix_form, f)
       |> Map.put(:template, template)
       |> Map.put(:template_options, template_options)
 
+            # IO.inspect subform
       html = collection.fun_item.(subform)
 
       if subform.struct.id do
-        delete = Phoenix.HTML.Form.hidden_input f, item.delete_field,
-          class: "formex-collection-item-remove-checkbox"
+        delete_field = Phoenix.HTML.Form.hidden_input f, item.delete_field, "data-formex-remove": ""
 
         content_tag(:div, [
           html,
-          delete
+          delete_field
         ], class: "formex-collection-item")
       else
-        content_tag(:div, html, class: "formex-collection-item formex-collection-item-new")
+        id_field = Phoenix.HTML.Form.hidden_input f, :formex_id, "data-formex-id": ""
+
+        content_tag(:div, [
+          html,
+          id_field
+        ], class: "formex-collection-item formex-collection-item-new")
       end
     end)
-
-    Counter.reset(pid)
 
     content_tag(:div, html, class: "formex-collection-items")
   end
@@ -241,9 +242,12 @@ defmodule Formex.View.Collection do
   end
 
   defp generate_collection_prototype(form, item_name, item, fun_item, options) do
+    substruct = item.model
+    |> struct
+
     struct = form.model
     |> struct
-    |> Map.put(item_name, [struct(item.model)])
+    |> Map.put(item_name, [substruct])
 
     prot_form = Formex.Builder.create_form(form.type, struct)
 

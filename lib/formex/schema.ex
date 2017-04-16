@@ -10,6 +10,7 @@ defmodule Formex.Schema do
   defmacro formex_collection_child do
     quote do
       Ecto.Schema.field(:formex_delete, :boolean, virtual: true)
+      Ecto.Schema.field(:formex_id, :string, virtual: true)
     end
   end
 

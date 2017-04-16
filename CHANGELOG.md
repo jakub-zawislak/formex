@@ -1,3 +1,7 @@
+## v0.4.9 (2017-04-16)
+* Improved code of form collections. It's required to update JS library: 
+  Run `npm install formex`.
+
 ## v0.4.8 (2017-04-13)
 * Added prefixes `formex-` in HTML attributes (`data-prototype` is now `data-formex-prototype` etc.).
   Run `npm install formex` to update JS library.

@@ -2,6 +2,7 @@
 // Another issue is jQuery dependency :D
 
 import $ from 'jquery'
+import uuidV4 from 'uuid/v4'
 
 export class Collection {
 
@@ -67,7 +68,7 @@ export class Collection {
       collectionHolder.trigger('formex-collection-remove-item', item)
 
       if (!item.is('.formex-collection-item-new')) {
-        item.find('.formex-collection-item-remove-checkbox').val('true')
+        item.find('[data-formex-remove]').val('true')
         item.hide()
       } else {
         item.remove()
@@ -77,7 +78,6 @@ export class Collection {
       collectionHolder.trigger('formex-collection-change')
     })
   }
-
 
   static addCollectionItemForm(collectionHolder) {
     let prototype = collectionHolder.data('formex-prototype')
@@ -100,6 +100,8 @@ export class Collection {
     //
     //   prototype = Collection.replaceIndex(prototype, /__name2__/g, parentIndex)
     // }
+
+    prototype.find('[data-formex-id]').val(uuidV4())
 
     collectionHolder.find('.formex-collection-items').append(prototype)
     collectionHolder.trigger('formex-collection-add-item', collectionHolder.find('> :last-child'))

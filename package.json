@@ -1,6 +1,6 @@
 {
   "name": "formex",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Formex is an abstract layer that helps to build forms in Phoenix and Ecto",
   "main": "./priv/static/js/formex.js",
   "repository": {
@@ -12,7 +12,8 @@
     "start": "webpack -p --watch-stdin --color --devtool source-map"
   },
   "dependencies": {
-    "jquery": "*"
+    "jquery": "*",
+    "uuid": "^3.0.1"
   },
   "files": [
     "README.md",
