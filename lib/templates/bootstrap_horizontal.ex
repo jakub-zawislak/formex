@@ -1,6 +1,6 @@
 defmodule Formex.Template.BootstrapHorizontal do
   use Formex.Template, :main
-  import Formex.Template.Bootstrap
+  use Formex.Template.Bootstrap
 
   @moduledoc """
   The Bootstrap 3 [horizontal](http://getbootstrap.com/css/#forms-horizontal) template

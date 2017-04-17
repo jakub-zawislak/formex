@@ -132,14 +132,9 @@ defmodule Formex.View do
   """
   @spec formex_row(Form.t, Atom.t, Keyword.t) :: Phoenix.HTML.safe
   def formex_row(form, item_name, options \\ []) do
-
-    item             = Enum.find(form.items, &(&1.name == item_name))
+    item             = get_item(form, item_name)
     template         = get_template(form, options)
     template_options = get_template_options(form, options)
-
-    if !item do
-      throw("Key :"<>to_string(item_name)<>" not found in form "<>to_string(form.type))
-    end
 
     case item do
       %Field{} ->
@@ -151,6 +146,23 @@ defmodule Formex.View do
       %FormCollection{} ->
         Formex.View.Collection.formex_collection(form, item_name, options)
     end
+  end
+
+  @spec formex_input(Form.t, Atom.t, Keyword.t) :: Phoenix.HTML.safe
+  def formex_input(form, item_name, options \\ []) do
+    item     = get_item(form, item_name)
+    template = get_template(form, options)
+
+    template.generate_input(form, item)
+  end
+
+  @spec formex_label(Form.t, Atom.t, Keyword.t) :: Phoenix.HTML.safe
+  def formex_label(form, item_name, options \\ []) do
+    item     = get_item(form, item_name)
+    template = get_template(form, options)
+    class    = options[:class] && options[:class] || ""
+
+    template.generate_label(form, item, class)
   end
 
   def get_template(form, row_options) do
@@ -165,6 +177,16 @@ defmodule Formex.View do
     |> Keyword.merge(Application.get_env(:formex, :template_options) || [])
     |> Keyword.merge(form.template_options || [])
     |> Keyword.merge(row_options[:template_options] || [])
+  end
+
+  defp get_item(form, item_name) do
+    item = Enum.find(form.items, &(&1.name == item_name))
+
+    if !item do
+      throw("Key :"<>to_string(item_name)<>" not found in form "<>to_string(form.type))
+    end
+
+    item
   end
 
 end

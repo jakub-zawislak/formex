@@ -1,3 +1,6 @@
+## v0.4.11 (2017-04-17)
+* Added `Formex.View.formex_input` and `Formex.View.formex_label`
+
 ## v0.4.10 (2017-04-16)
 * Ability to filter items in form collections
 * Improved code of form collections. It's required to update JS library: 

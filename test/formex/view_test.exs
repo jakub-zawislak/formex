@@ -28,25 +28,31 @@ defmodule Formex.ViewTest do
     form = create_form(ViewTestType, %Article{})
 
     {:safe, form_html} = Formex.View.formex_form_for(form, "", fn f ->
-      f
-      |> Formex.View.formex_rows
+      Formex.View.formex_rows(f)
     end)
 
-    assert form_html
-    |> to_string
-    |> String.match?(~r/some-class/)
+    form_html = to_string(form_html)
 
-    assert form_html
-    |> to_string
-    |> String.match?(~r/Choose category/)
+    assert String.match?(form_html, ~r/some-class/)
+    assert String.match?(form_html, ~r/Choose category/)
+    assert String.match?(form_html, ~r/Submit form/)
+    assert String.match?(form_html, ~r/btn-success/)
 
-    assert form_html
-    |> to_string
-    |> String.match?(~r/Submit form/)
+    {:safe, form_html} = Formex.View.formex_form_for(form, "", fn f ->
+      Formex.View.formex_input(f, :title)
+    end)
 
-    assert form_html
-    |> to_string
-    |> String.match?(~r/btn-success/)
+    form_html = to_string(form_html)
+    assert String.match?(form_html, ~r/id="article_title"/)
+    assert !String.match?(form_html, ~r/for="article_title"/)
+
+    {:safe, form_html} = Formex.View.formex_form_for(form, "", fn f ->
+      Formex.View.formex_label(f, :title)
+    end)
+
+    form_html = to_string(form_html)
+    assert !String.match?(form_html, ~r/id="article_title"/)
+    assert String.match?(form_html, ~r/for="article_title"/)
 
   end
 

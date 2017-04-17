@@ -91,6 +91,8 @@ defmodule Formex.Template do
       For example, `Formex.Template.BootstrapHorizontal` uses options that stores columns sizes.
   """
   @callback generate_row(form :: Form.t, field :: Formex.Field.t, options :: Keyword.t) :: Phoenix.HTML.safe
+  @callback generate_input(form :: Form.t, field_or_button :: any) :: Phoenix.HTML.safe
+  @callback generate_label(form :: Form.t, field :: Field.t, class :: String.t) :: Phoenix.HTML.safe
 
   defmacro __using__(which) when is_atom(which) do
     apply(__MODULE__, which, [])

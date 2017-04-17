@@ -1,6 +1,6 @@
 defmodule Formex.Template.BootstrapVertical do
   use Formex.Template, :main
-  import Formex.Template.Bootstrap
+  use Formex.Template.Bootstrap
 
   @moduledoc """
   The Bootstrap 3 [basic](http://getbootstrap.com/css/#forms-example) template.

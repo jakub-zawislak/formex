@@ -1,70 +1,75 @@
 defmodule Formex.Template.Bootstrap do
   use Formex.Template, :helper
-
+  
   @moduledoc false
 
-  @spec generate_input(form :: Form.t, field :: Field.t) :: Phoenix.HTML.safe
-  def generate_input(form, field = %Field{}) do
+  defmacro __using__([]) do
+    quote do
+      use Formex.Template, :helper
+      import Formex.Template.Bootstrap
 
-    type = field.type
-    data = field.data
-    phoenix_opts = field.phoenix_opts
+      @spec generate_input(form :: Form.t, field :: Field.t) :: Phoenix.HTML.safe
+      def generate_input(form, field = %Field{}) do
 
-    args = [form.phoenix_form, field.name]
+        type = field.type
+        data = field.data
+        phoenix_opts = field.phoenix_opts
 
-    args = args ++ cond do
-      Enum.member?([:select, :multiple_select], type) ->
-        [data[:choices]]
-      true ->
-        []
-    end
+        args = [form.phoenix_form, field.name]
 
-    args = args ++ cond do
-      Enum.member?([:checkbox, :file_input], type) ->
-        [phoenix_opts]
-      true ->
-        [add_class(phoenix_opts, "form-control")]
-    end
+        args = args ++ cond do
+          Enum.member?([:select, :multiple_select], type) ->
+            [data[:choices]]
+          true ->
+            []
+        end
 
-    input = render_phoenix_input(field, args)
+        args = args ++ cond do
+          Enum.member?([:checkbox, :file_input], type) ->
+            [phoenix_opts]
+          true ->
+            [add_class(phoenix_opts, "form-control")]
+        end
 
-    cond do
-      Enum.member?([:checkbox], type) ->
-        content_tag(:div, [
-          content_tag(:label, [
+        input = render_phoenix_input(field, args)
+
+        cond do
+          Enum.member?([:checkbox], type) ->
+            content_tag(:div, [
+              content_tag(:label, [
+                input
+                ])
+              ], class: "checkbox")
+          true ->
             input
-            ])
-          ], class: "checkbox")
-      true ->
-        input
+        end
+      end
+
+      @spec generate_input(_form :: Form.t, button :: Button.t) :: Phoenix.HTML.safe
+      def generate_input(_form, button = %Button{}) do
+
+        class = if String.match?(button.phoenix_opts[:class], ~r/btn\-/) do
+          "btn"
+        else
+          "btn btn-default"
+        end
+
+        phoenix_opts = add_class(button.phoenix_opts, class)
+
+        render_phoenix_input(button, [button.label, phoenix_opts])
+      end
+
+      @spec generate_label(form :: Form.t, field :: Field.t, class :: String.t) :: Phoenix.HTML.safe
+      def generate_label(form, field, class \\ "") do
+        Phoenix.HTML.Form.label(
+          form.phoenix_form,
+          field.name,
+          field.label,
+          class: "control-label "<>class
+        )
+      end
     end
   end
-
-  @spec generate_input(_form :: Form.t, button :: Button.t) :: Phoenix.HTML.safe
-  def generate_input(_form, button = %Button{}) do
-
-    class = if String.match?(button.phoenix_opts[:class], ~r/btn\-/) do
-      "btn"
-    else
-      "btn btn-default"
-    end
-
-    phoenix_opts = add_class(button.phoenix_opts, class)
-
-    render_phoenix_input(button, [button.label, phoenix_opts])
-  end
-
-  @spec generate_label(form :: Form.t, field :: Field.t, class :: String.t) :: Phoenix.HTML.safe
-  def generate_label(form, field, class \\ "") do
-    Phoenix.HTML.Form.label(
-      form.phoenix_form,
-      field.name,
-      field.label,
-      class: "control-label "<>class
-    )
-  end
-
-  #
 
   def attach_addon(field_html, field) do
     if field.opts[:addon] do
