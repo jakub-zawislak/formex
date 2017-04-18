@@ -205,7 +205,11 @@ defmodule Formex.CustomField.SelectAssoc do
         !is_nil(choice_label) ->
           Map.get(row, choice_label)
         true ->
-          row.name
+          if Map.has_key? row, :name do
+            row.name
+          else
+            throw "Key :name not found. You should use the :choice_label option of SelectAssoc"
+          end
       end
 
       {label, row.id}
