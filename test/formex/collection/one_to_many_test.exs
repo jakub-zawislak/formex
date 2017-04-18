@@ -150,35 +150,35 @@ defmodule Formex.Collection.OneToManyTest do
     assert Enum.at(user.user_addresses, 0).city == "Olsztyn"
   end
 
-  test "filter accounts" do
-    insert_users()
+  # test "filter accounts" do
+  #   insert_users()
 
-    user = get_user(1)
+  #   user = get_user(1)
 
-    params = %{"user_accounts" => %{
-      "0" => %{"id" => Enum.at(user.user_accounts, 0).id |> Integer.to_string},
-      "1" => %{"id" => Enum.at(user.user_accounts, 1).id |> Integer.to_string,
-        "removed" => "true"},
-      "2" => %{"id" => Enum.at(user.user_accounts, 2).id |> Integer.to_string}
-    }}
-    form = create_form(UserFilterType, user, params)
-    {:ok, _} = update_form_data(form)
+  #   params = %{"user_accounts" => %{
+  #     "0" => %{"id" => Enum.at(user.user_accounts, 0).id |> Integer.to_string},
+  #     "1" => %{"id" => Enum.at(user.user_accounts, 1).id |> Integer.to_string,
+  #       "removed" => "true"},
+  #     "2" => %{"id" => Enum.at(user.user_accounts, 2).id |> Integer.to_string}
+  #   }}
+  #   form = create_form(UserFilterType, user, params)
+  #   {:ok, _} = update_form_data(form)
 
-    user = get_user(1)
+  #   user = get_user(1)
 
-    assert Enum.at(user.user_accounts, 1).removed == true
+  #   assert Enum.at(user.user_accounts, 1).removed == true
 
-    # 
+  #   # 
 
-    form = create_form(UserFilterType, user)
-    {:safe, form_html} = Formex.View.formex_form_for(form, "", fn f ->
-      Formex.View.formex_rows(f)
-    end)
+  #   form = create_form(UserFilterType, user)
+  #   {:safe, form_html} = Formex.View.formex_form_for(form, "", fn f ->
+  #     Formex.View.formex_rows(f)
+  #   end)
 
-    form_str = form_html |> to_string
+  #   form_str = form_html |> to_string
 
-    assert String.match?(form_str, ~r/user\[user_accounts\]\[0\]\[removed\]/)
-    assert !String.match?(form_str, ~r/user\[user_accounts\]\[1\]\[removed\]/)
-    assert String.match?(form_str, ~r/user\[user_accounts\]\[2\]\[removed\]/)
-  end
+  #   assert String.match?(form_str, ~r/user\[user_accounts\]\[0\]\[removed\]/)
+  #   assert !String.match?(form_str, ~r/user\[user_accounts\]\[1\]\[removed\]/)
+  #   assert String.match?(form_str, ~r/user\[user_accounts\]\[2\]\[removed\]/)
+  # end
 end

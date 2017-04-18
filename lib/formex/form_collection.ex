@@ -31,14 +31,6 @@ defmodule Formex.FormCollection do
       
         For example, we can in our model create `removed` field. Then set 
         `delete_field: :removed` option.
-  
-  * `filter` - filters items that will be displayed in our form. Example:
-      ```
-      form
-      |> add(:addresses, App.AddressType, delete_field: :removed, filter: fn item ->
-        !item.removed
-      end)
-      ```
   """
 
   @spec create(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
@@ -59,11 +51,11 @@ defmodule Formex.FormCollection do
       {form, substructs}
     end
 
-    substructs = if opts[:filter] do
-      Enum.filter(substructs, opts[:filter])
-    else
-      substructs
-    end
+    # substructs = if opts[:filter] do
+    #   Enum.filter(substructs, opts[:filter])
+    # else
+    #   substructs
+    # end
 
     submodule = Form.get_assoc_or_embed(form, name).related
 

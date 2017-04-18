@@ -1,3 +1,6 @@
+## v0.4.13 (2017-04-18)
+* Temporarily removed the filter collection items functionality, that was added in the 0.4.10
+
 ## v0.4.11 (2017-04-17)
 * Added `Formex.View.formex_input` and `Formex.View.formex_label`
 
