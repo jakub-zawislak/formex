@@ -81,7 +81,7 @@ defmodule Formex.View.Collection do
       <% end %>
 
       <%= formex_collection f, :user_addresses, [template: Formex.Template.BootstrapHorizontal],
-      collection, collection_item, end %>
+      collection, collection_item %>
       ```
 
   ## Generated HTML
