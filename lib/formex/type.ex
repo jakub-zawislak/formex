@@ -245,7 +245,7 @@ defmodule Formex.Type do
       <% end %>
 
       <%= formex_collection f, :user_addresses, [template: Formex.Template.BootstrapHorizontal],
-      collection, collection_item, end %>
+      collection, collection_item %>
       ```
 
   For more info about rendering see `Formex.View.Collection.formex_collection/5`
