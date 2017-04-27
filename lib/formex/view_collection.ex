@@ -253,7 +253,7 @@ defmodule Formex.View.Collection do
     |> struct
     |> Map.put(item_name, [substruct])
 
-    prot_form = Formex.Builder.create_form(form.type, struct)
+    prot_form = Formex.Builder.create_form(form.type, struct, %{}, form.opts)
 
     options = Keyword.put(options, :without_prototype, true)
 
