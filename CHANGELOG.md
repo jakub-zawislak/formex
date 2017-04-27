@@ -1,5 +1,7 @@
-## v0.4.14 (2017-04-27)
+## v0.4.15 (2017-04-27)
 * Added `form` parameter in `Formex.Type.changeset_after_create_callback`
+
+## v0.4.14 (2017-04-27)
 * Fixed passing `form.opts` to a prototype form in `Formex.View.Collection`
 
 ## v0.4.13 (2017-04-18)
