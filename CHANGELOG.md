@@ -1,5 +1,6 @@
 ## v0.4.14 (2017-04-27)
-* Fixed passing `form.opts` to a prototype form in View.Collection
+* Added `form` parameter in `Formex.Type.changeset_after_create_callback`
+* Fixed passing `form.opts` to a prototype form in `Formex.View.Collection`
 
 ## v0.4.13 (2017-04-18)
 * Temporarily removed ability to filter collection items, that was added in the 0.4.10

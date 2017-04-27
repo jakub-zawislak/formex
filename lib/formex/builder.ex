@@ -85,7 +85,7 @@ defmodule Formex.Builder do
     |> cast_embedded_forms(form)
     |> validate_required(get_required_fields_names(form))
     |> validate_selects(form)
-    |> type.changeset_after_create_callback
+    |> type.changeset_after_create_callback(form)
 
     form
     |> Map.put(:changeset, changeset)

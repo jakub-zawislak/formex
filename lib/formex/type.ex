@@ -260,11 +260,11 @@ defmodule Formex.Type do
       @behaviour Formex.Type
       import Formex.Type
 
-      def changeset_after_create_callback( changeset ) do
+      def changeset_after_create_callback(changeset, _form) do
         changeset
       end
 
-      defoverridable [changeset_after_create_callback: 1]
+      defoverridable [changeset_after_create_callback: 2]
     end
   end
 
@@ -321,6 +321,7 @@ defmodule Formex.Type do
   Callback that will be called after changeset creation. In this function you can
   for example add an extra validation to your changeset.
   """
-  @callback changeset_after_create_callback(changeset :: Ecto.Changeset.t) :: Ecto.Changeset.t
+  @callback changeset_after_create_callback(changeset :: Ecto.Changeset.t, form :: Formex.Form.t) 
+    :: Ecto.Changeset.t
 
 end
