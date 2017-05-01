@@ -44,7 +44,8 @@ defmodule Formex.Builder do
         end
         ```
 
-    * `model` - optional model in case if `struct` is nil. Used by `Formex.Type.add/4`
+    * `model` - optional Ecto model in case if `struct` is nil. Used by `Formex.FormexCollection` 
+      and `Formex.FormNested`
   """
   @spec create_form(module, Ecto.Schema.t, Map.t, List.t, module) :: Form.t
   def create_form(type, struct, params \\ %{}, opts \\ [], model \\ nil) do
@@ -52,7 +53,7 @@ defmodule Formex.Builder do
     form = %Form{
       type: type,
       struct: struct,
-      model: if(model, do: model, else: struct.__struct__),
+      struct_module: if(model, do: model, else: struct.__struct__),
       params: params,
       opts: opts
     }
@@ -77,7 +78,7 @@ defmodule Formex.Builder do
   #
 
   defp create_changeset(form, type) do
-    struct = if form.struct, do: form.struct, else: struct(form.model)
+    struct = if form.struct, do: form.struct, else: struct(form.struct_module)
 
     changeset = struct
     |> cast(form.params, get_normal_fields_names(form))
@@ -95,7 +96,7 @@ defmodule Formex.Builder do
     Form.get_fields(form)
     |> Enum.filter(&(&1.type == :multiple_select))
     |> Enum.reduce(changeset, fn field, changeset ->
-      module = form.model.__schema__(:association, field.name).related
+      module = form.struct_module.__schema__(:association, field.name).related
       ids    = form.params[to_string(field.name)] || []
 
       associated = module
@@ -178,7 +179,7 @@ defmodule Formex.Builder do
   defp filter_normal_fields(items, form) do
     items
     |> Enum.filter(fn field ->
-      form.model.__schema__(:association, field.name) == nil
+      form.struct_module.__schema__(:association, field.name) == nil
     end)
   end
 

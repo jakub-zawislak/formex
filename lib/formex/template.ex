@@ -130,7 +130,7 @@ defmodule Formex.Template do
   end
 
   @doc """
-  Adds a CSS class to a `:phoenix_opts` keyword
+  Adds a CSS class to the `:phoenix_opts` keyword
   """
   @spec add_class(phoenix_opts :: Keyword.t, class :: String.t) :: Keyword.t
   def add_class(phoenix_opts, class) do

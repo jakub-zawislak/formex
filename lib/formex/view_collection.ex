@@ -246,10 +246,10 @@ defmodule Formex.View.Collection do
   end
 
   defp generate_collection_prototype(form, item_name, item, fun_item, options) do
-    substruct = item.model
+    substruct = item.struct_module
     |> struct
 
-    struct = form.model
+    struct = form.struct_module
     |> struct
     |> Map.put(item_name, [substruct])
 

@@ -57,7 +57,7 @@ defmodule Formex.Collection.OneToManyTest do
   use Formex.Controller
   alias Formex.Collection.OneToMany.UserType
   alias Formex.Collection.OneToMany.UserRequiredType
-  alias Formex.Collection.OneToMany.UserFilterType
+  # alias Formex.Collection.OneToMany.UserFilterType
 
   test "view" do
     insert_users()

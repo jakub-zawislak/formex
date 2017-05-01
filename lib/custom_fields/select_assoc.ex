@@ -86,8 +86,9 @@ defmodule Formex.CustomField.SelectAssoc do
       ```
   """
 
+  @doc false
   def create_field(form, name, opts) do
-    if form.model.__schema__(:association, name) == nil do
+    if form.struct_module.__schema__(:association, name) == nil do
       create_field_single(form, name, opts)
     else
       create_field_multiple(form, name, opts)
@@ -98,7 +99,7 @@ defmodule Formex.CustomField.SelectAssoc do
     name = Regex.replace(~r/_id$/, Atom.to_string(name_id), "")
     |> String.to_atom
 
-    module  = form.model.__schema__(:association, name).related
+    module  = form.struct_module.__schema__(:association, name).related
     opts    = parse_opts(module, opts)
     choices = get_choices(module, opts)
 
@@ -117,7 +118,7 @@ defmodule Formex.CustomField.SelectAssoc do
   end
 
   defp create_field_multiple(form, name, opts) do
-    module  = form.model.__schema__(:association, name).related
+    module  = form.struct_module.__schema__(:association, name).related
     opts    = parse_opts(module, opts)
     choices = get_choices(module, opts)
 

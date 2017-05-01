@@ -6,7 +6,7 @@ defmodule Formex.FormCollection do
   alias Formex.FormNested
 
   defstruct forms: [],
-    model: nil,
+    struct_module: nil,
     name: nil,
     opts: [],
     delete_field: nil,
@@ -67,7 +67,7 @@ defmodule Formex.FormCollection do
     form_collection = %FormCollection{
       forms: subforms_old ++ subforms_new,
       name: name,
-      model: submodule,
+      struct_module: submodule,
       required: Keyword.get(opts, :required, true),
       opts: opts,
       delete_field: delete_field || :formex_delete
