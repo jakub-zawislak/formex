@@ -109,6 +109,7 @@ defmodule Formex.CustomField.SelectAssoc do
       value: Field.get_value(form, name),
       label: Field.get_label(name, opts),
       required: Keyword.get(opts, :required, true),
+      validation: Keyword.get(opts, :validation, []),
       data: [
         choices: choices
       ],

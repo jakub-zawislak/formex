@@ -1,3 +1,63 @@
+defprotocol Formex.BuilderProtocol do
+  @spec create_form(Keyword.t) :: Form.t
+  def create_form(arguments)
+end
+
+defmodule Formex.BuilderType.Struct do
+  defstruct [:form]
+end
+
+defmodule Formex.Builder2 do
+  alias Formex.Form
+
+  @spec create_form(module, struct, Map.t, List.t, module) :: Form.t
+  def create_form(type, struct, params \\ %{}, opts \\ [], struct_module \\ nil) do
+
+    struct_module = if(struct_module, do: struct_module, else: struct.__struct__)
+
+    wrapper = if struct_module.module_info(:exports)[:formex_wrapper] do
+      struct_module.wrapper
+    else
+      Formex.BuilderType.Struct
+    end
+
+    form = %Form{
+      type: type,
+      struct: struct,
+      struct_module: struct_module,
+      params: params,
+      opts: opts
+    }
+
+    struct(wrapper, form: form)
+    |> Formex.BuilderProtocol.create_form()
+    |> apply_params()
+    |> Formex.Validator.validate()
+  end
+
+  defp apply_params(form) do
+    %{struct: struct, params: params} = form
+
+    struct = params
+    |> Enum.reduce(struct, fn {key, val}, struct ->
+      struct
+      |> Map.update!(String.to_atom(key), fn _ -> val end)
+    end)
+
+    Map.put(form, :struct, struct)
+  end
+end
+
+defimpl Formex.BuilderProtocol, for: Formex.BuilderType.Struct do
+  alias Formex.Form
+
+  @spec create_form(Form.t) :: Form.t
+  def create_form(%{form: form}) do
+    form
+    |> form.type.build_form()
+  end
+end
+
 defmodule Formex.Builder do
   import Ecto.Changeset
   import Ecto.Query
@@ -48,12 +108,12 @@ defmodule Formex.Builder do
       and `Formex.FormNested`
   """
   @spec create_form(module, Ecto.Schema.t, Map.t, List.t, module) :: Form.t
-  def create_form(type, struct, params \\ %{}, opts \\ [], model \\ nil) do
+  def create_form(type, struct, params \\ %{}, opts \\ [], struct_module \\ nil) do
 
     form = %Form{
       type: type,
       struct: struct,
-      struct_module: if(model, do: model, else: struct.__struct__),
+      struct_module: if(struct_module, do: struct_module, else: struct.__struct__),
       params: params,
       opts: opts
     }

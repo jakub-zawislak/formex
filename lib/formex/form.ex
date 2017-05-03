@@ -1,6 +1,7 @@
 defmodule Formex.Form do
   alias __MODULE__
   alias Formex.Field
+  alias Formex.Button
   alias Formex.FormNested
   alias Formex.FormCollection
 
@@ -8,11 +9,11 @@ defmodule Formex.Form do
   Defines the Formex.Form struct.
 
     * `:type` - the module that implements `Formex.Type`, for example: `App.ArticleType`
-    * `:struct` - the struct that will be used in `Ecto.Changeset.cast`, for example: `%App.Article{}`
+    * `:struct` - the struct of your data, for example: `%App.Article{}`
     * `:struct_module` - `struct.__struct__`, for example: `App.Article`
-    * `:items` - list of `Formex.Field` and `Formex.Button` structs
+    * `:items` - list of `Formex.Field` and `Button` structs
     * `:params` - params that will be used in `Ecto.Changeset.cast`
-    * `:changeset` - `%Ecto.Changeset{}`
+    * `:ext_data` - data stored by `formex` extension
     * `:phoenix_form` - `%Phoenix.HTML.Form{}`
     * `:template` - the module that implements `Formex.Template`, for example:
       `Formex.Template.BootstrapHorizontal`. Can be set via a `Formex.View.formex_form_for` options
@@ -21,9 +22,11 @@ defmodule Formex.Form do
   defstruct type: nil,
     struct: nil,
     struct_module: nil,
+    valid?: false,
+    errors: [],
     items: [],
     params: %{},
-    changeset: nil,
+    ext_data: nil,
     phoenix_form: nil,
     opts: [],
     template: nil,
@@ -32,7 +35,7 @@ defmodule Formex.Form do
   @type t :: %Form{}
 
   @doc """
-  Adds field to the form. More: `Formex.Field.create_field/4`, `Formex.Button.create_button/3`
+  Adds field to the form. More: `Formex.Field.create_field/4`, `Button.create_button/3`
   """
   @spec put_item(form :: t, item :: any) :: t
   def put_item(form, item) do
@@ -48,6 +51,15 @@ defmodule Formex.Form do
   def get_fields(form) do
     form.items
     |> Enum.filter(&(&1.__struct__ == Field))
+  end
+
+  @doc """
+  Returns list of items which can be validated (all except the `Button`)
+  """
+  @spec get_fields_validatable(form :: t) :: list
+  def get_fields_validatable(form) do
+    form.items
+    |> Enum.filter(&(&1.__struct__ != Button))
   end
 
   @doc """

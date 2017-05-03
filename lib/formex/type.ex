@@ -260,11 +260,13 @@ defmodule Formex.Type do
       @behaviour Formex.Type
       import Formex.Type
 
-      def changeset_after_create_callback( changeset ) do
+      def changeset_after_create_callback(changeset) do
         changeset
       end
 
-      defoverridable [changeset_after_create_callback: 1]
+      def validate_whole_struct?, do: false
+
+      defoverridable [changeset_after_create_callback: 1, validate_whole_struct?: 0]
     end
   end
 
@@ -281,7 +283,7 @@ defmodule Formex.Type do
   end
 
   @doc """
-  Adds an form item to the form. May be a field, custom field, button, or subform.
+  Adds a form item to the form. May be a field, custom field, button, or subform.
 
   `type_or_module` is `:text_input` by default.
 
@@ -322,5 +324,14 @@ defmodule Formex.Type do
   for example add an extra validation to your changeset.
   """
   @callback changeset_after_create_callback(changeset :: Ecto.Changeset.t) :: Ecto.Changeset.t
+
+  @doc """
+  The Vex validator has a `Vex.Struct.validates/2` that is used to define validation inside
+  a struct's module. `Formex.Vex` can use that validation in addition to a validation set in a form 
+  type. Because it is not always a desired behaviour, you can control it in this callback.
+
+  Defaults to `false`.
+  """
+  @callback validate_whole_struct?() :: boolean
 
 end

@@ -7,7 +7,8 @@ defmodule Formex.Field do
     * `:name` - a field name, for example: `:title`
     * `:type` - a type of a field that in most cases will be the name of a function from `Phoenix.HTML.Form`
     * `:value` - the value from struct/params
-    * `:required` - is field required?
+    * `:required` - is field required? Used only in template
+    * `:validation` - validation rules to be passed to a validator 
     * `:label` - the text label
     * `:data` - additional data used by particular field type (eg. `:select` stores here data
       for `<option>`'s)
@@ -15,10 +16,10 @@ defmodule Formex.Field do
     * `:phoenix_opts` - options that will be passed to `Phoenix.HTML.Form`
   """
   defstruct name: nil,
-    # assoc: false,
     type: nil,
     value: nil,
     required: true,
+    validation: [],
     label: "",
     data: [],
     opts: [],
@@ -61,6 +62,7 @@ defmodule Formex.Field do
       value: get_value(form, name),
       label: get_label(name, opts),
       required: Keyword.get(opts, :required, true),
+      validation: Keyword.get(opts, :validation, true),
       data: data,
       opts: prepare_opts(opts),
       phoenix_opts: prepare_phoenix_opts(opts)

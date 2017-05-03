@@ -1,3 +1,5 @@
+## v0.5.0 (2017-05-)
+
 ## v0.4.13 (2017-04-18)
 * Temporarily removed ability to filter collection items, that was added in the 0.4.10
 

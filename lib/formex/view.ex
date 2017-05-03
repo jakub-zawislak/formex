@@ -89,8 +89,14 @@ defmodule Formex.View do
     phoenix_options = options
     |> Keyword.delete(:template)
     |> Keyword.delete(:template_options)
+    |> Keyword.put_new(:as, :formex)
 
-    Phoenix.HTML.Form.form_for(form.changeset, action, phoenix_options, fn f ->
+    fake_params = %{}
+    |> Map.put(to_string(phoenix_options[:as]), form.params)
+
+    fake_conn = %Plug.Conn{params: fake_params, method: "POST"}
+
+    Phoenix.HTML.Form.form_for(fake_conn, action, phoenix_options, fn f ->
       form
       |> Map.put(:phoenix_form, f)
       |> Map.put(:template, options[:template])

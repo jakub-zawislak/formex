@@ -6,8 +6,8 @@ defmodule Formex.FormNested do
 
   defstruct form: nil,
     name: nil,
-    opts: [],
-    required: true
+    validation: [],
+    opts: []
 
   @type t :: %FormNested{}
 
@@ -34,7 +34,7 @@ defmodule Formex.FormNested do
     item    = %FormNested{
       form: subform,
       name: name,
-      required: Keyword.get(opts, :required, true),
+      validation: Keyword.get(opts, :validation, []),
       opts: opts
     }
 

@@ -10,7 +10,7 @@ defmodule Formex.FormCollection do
     name: nil,
     opts: [],
     delete_field: nil,
-    required: true
+    validation: []
 
   @type t :: %FormCollection{}
 
@@ -68,7 +68,7 @@ defmodule Formex.FormCollection do
       forms: subforms_old ++ subforms_new,
       name: name,
       struct_module: submodule,
-      required: Keyword.get(opts, :required, true),
+      validation: Keyword.get(opts, :validation, []),
       opts: opts,
       delete_field: delete_field || :formex_delete
     }
@@ -121,7 +121,7 @@ defmodule Formex.FormCollection do
     %FormNested{
       form: subform,
       name: name,
-      required: Keyword.get(opts, :required, true),
+      validation: Keyword.get(opts, :validation, []),
       opts: opts
     }
   end

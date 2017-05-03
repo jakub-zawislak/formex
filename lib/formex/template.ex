@@ -114,19 +114,19 @@ defmodule Formex.Template do
   end
 
   @doc """
-  Translates error using function set in `:formex` config
+  Returns list of errors
   """
-  @spec translate_error(Form.t, Field.t) :: any
-  def translate_error(form, field) do
-    Application.get_env(:formex, :translate_error).(form.phoenix_form.errors[field.name])
+  @spec get_errors(Form.t, Field.t) :: any
+  def get_errors(form, field) do
+    form.errors[field.name]
   end
 
   @doc """
-  Checks if given field has a changeset error
+  Checks if given field has an error
   """
   @spec has_error(Form.t, Field.t) :: any
   def has_error(form, field) do
-    form.phoenix_form.errors[field.name]
+    Enum.count(form.errors[field.name]) > 0
   end
 
   @doc """

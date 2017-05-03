@@ -107,12 +107,20 @@ defmodule Formex.Controller do
   """
   @spec handle_form(Form.t) :: {:ok, Ecto.Schema.t} | {:error, Form.t}
   def handle_form(form) do
-    if form.changeset.valid? do
-      {:ok, Ecto.Changeset.apply_changes(form.changeset)}
-    else
-      changeset = %{form.changeset | action: :update}
-      {:error, Map.put(form, :changeset, changeset)}
-    end
+    # if form.changeset.valid? do
+    #   {:ok, Ecto.Changeset.apply_changes(form.changeset)}
+    # else
+    #   changeset = %{form.changeset | action: :update}
+    #   {:error, Map.put(form, :changeset, changeset)}
+    # end
+
+    # if form.changeset.valid? do
+      {:ok, form.struct}
+      {:error, form}
+    # else
+    #   changeset = %{form.changeset | action: :update}
+    #   {:error, Map.put(form, :changeset, changeset)}
+    # end
   end
 
   @doc """
