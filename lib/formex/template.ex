@@ -114,6 +114,16 @@ defmodule Formex.Template do
   end
 
   @doc """
+  Translates error using `translate_error/2` and converts it using `Phoenix.HTML.Format.text_to_html/2`
+  """
+  @spec prepare_error(Form.t, Field.t) :: Phoenix.HTML.safe
+  def prepare_error(form, field) do
+    form
+    |> translate_error(form)
+    |> Phoenix.HTML.Format.text_to_html()
+  end
+
+  @doc """
   Translates error using function set in `:formex` config
   """
   @spec translate_error(Form.t, Field.t) :: any

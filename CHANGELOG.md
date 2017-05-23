@@ -1,3 +1,6 @@
+## v0.4.16 (2017-05-23)
+* Template now converts `\n` to `<br>` in error messages using `Phoenix.HTML.Format.text_to_html\2`
+
 ## v0.4.15 (2017-04-27)
 * Added `form` parameter in `Formex.Type.changeset_after_create_callback`
 
@@ -12,7 +15,7 @@
 
 ## v0.4.10 (2017-04-16)
 * Ability to filter items in form collections
-* Improved code of form collections. It's required to update JS library: 
+* Improved code of form collections. It's required to update JS library:
   Run `npm install formex`.
 
 ## v0.4.8 (2017-04-13)

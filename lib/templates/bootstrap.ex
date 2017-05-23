@@ -1,6 +1,6 @@
 defmodule Formex.Template.Bootstrap do
   use Formex.Template, :helper
-  
+
   @moduledoc false
 
   defmacro __using__([]) do
@@ -82,8 +82,8 @@ defmodule Formex.Template.Bootstrap do
 
   def attach_error(tags, form, field) do
     if has_error(form, field) do
-      error_text  = translate_error(form, field)
-      error_field = content_tag(:span, error_text, class: "help-block")
+      error_html  = prepare_error(form, field)
+      error_field = content_tag(:span, error_html, class: "help-block")
       tags ++ [error_field]
     else
       tags
