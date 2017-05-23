@@ -119,7 +119,7 @@ defmodule Formex.Template do
   @spec prepare_error(Form.t, Field.t) :: Phoenix.HTML.safe
   def prepare_error(form, field) do
     form
-    |> translate_error(form)
+    |> translate_error(field)
     |> Phoenix.HTML.Format.text_to_html()
   end
 
