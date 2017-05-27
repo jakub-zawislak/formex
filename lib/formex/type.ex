@@ -260,13 +260,9 @@ defmodule Formex.Type do
       @behaviour Formex.Type
       import Formex.Type
 
-      def changeset_after_create_callback(changeset) do
-        changeset
-      end
+      # def validate_whole_struct?, do: false
 
-      def validate_whole_struct?, do: false
-
-      defoverridable [changeset_after_create_callback: 1, validate_whole_struct?: 0]
+      # defoverridable [validate_whole_struct?: 0]
     end
   end
 
@@ -319,19 +315,13 @@ defmodule Formex.Type do
   """
   @callback build_form(form :: Formex.Form.t) :: Formex.Form.t
 
-  @doc """
-  Callback that will be called after changeset creation. In this function you can
-  for example add an extra validation to your changeset.
-  """
-  @callback changeset_after_create_callback(changeset :: Ecto.Changeset.t) :: Ecto.Changeset.t
+  # @doc """
+  # The Vex validator has a `Vex.Struct.validates/2` that is used to define validation inside
+  # a struct's module. `Formex.Vex` can use that validation in addition to a validation set in a form 
+  # type. Because it is not always a desired behaviour, you can control it in this callback.
 
-  @doc """
-  The Vex validator has a `Vex.Struct.validates/2` that is used to define validation inside
-  a struct's module. `Formex.Vex` can use that validation in addition to a validation set in a form 
-  type. Because it is not always a desired behaviour, you can control it in this callback.
-
-  Defaults to `false`.
-  """
-  @callback validate_whole_struct?() :: boolean
+  # Defaults to `false`.
+  # """
+  # @callback validate_whole_struct?() :: boolean
 
 end

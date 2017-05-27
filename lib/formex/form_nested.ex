@@ -11,26 +11,33 @@ defmodule Formex.FormNested do
 
   @type t :: %FormNested{}
 
+  @doc """
+  Creates a nested form.
+
+  Example:
+
+  ```
+  form
+  |> add(:user_info, :nested, type: App.UserInfoType, struct_module: App.UserInfo)
+  ```
+
+  ## Options
+
+    * `type` - module that implements `Formex.Type`. Required
+  """
   @spec create(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
   def create(form, type, name, opts) do
     substruct = Field.get_value(form, name)
 
-    {form, substruct} = if Ecto.assoc_loaded? substruct do
-      {form, substruct}
+    submodule = if form.struct_info[name] != :any do 
+      form.struct_info[name]
     else
-      struct    = @repo.preload(form.struct, name)
-      substruct = Map.get(struct, name)
-
-      struct = Map.put(struct, name, substruct)
-      form   = Map.put(form, :struct, struct)
-
-      {form, substruct}
+      Keyword.get(opts, :struct_module) || raise "the :struct_module option is required"
     end
 
-    submodule = Form.get_assoc_or_embed(form, name).related
-    params    = form.params[to_string(name)] || %{}
+    params  = form.params[to_string(name)] || %{}
 
-    subform = Formex.Builder.create_form(type, substruct, params, form.opts, submodule)
+    subform = Formex.Builder2.create_form(type, substruct, params, form.opts, submodule)
     item    = %FormNested{
       form: subform,
       name: name,

@@ -80,6 +80,7 @@ defmodule Formex.View do
     * `template` - a form template that implements `Formex.Template`, for example:
       `Formex.Template.BootstrapHorizontal`
     * `template_options` - additional options, supported by the template
+    * `as` - form name, defaults to `:formex`
 
   """
   @spec formex_form_for(form :: Form.t, action :: String.t, options :: Keyword.t,
@@ -92,17 +93,44 @@ defmodule Formex.View do
     |> Keyword.put_new(:as, :formex)
 
     fake_params = %{}
-    |> Map.put(to_string(phoenix_options[:as]), form.params)
+    |> Map.put(to_string(phoenix_options[:as]), struct_to_params(form.struct))
 
     fake_conn = %Plug.Conn{params: fake_params, method: "POST"}
 
-    Phoenix.HTML.Form.form_for(fake_conn, action, phoenix_options, fn f ->
+    Phoenix.HTML.Form.form_for(fake_conn, action, phoenix_options, fn phx_form ->      
       form
-      |> Map.put(:phoenix_form, f)
+      |> Map.put(:phoenix_form, phx_form)
       |> Map.put(:template, options[:template])
       |> Map.put(:template_options, options[:template_options])
       |> fun.()
     end)
+  end
+
+  @spec struct_to_params(struct) :: Map.t
+  defp struct_to_params(struct) do 
+    struct
+    |> Map.from_struct
+    |> Enum.map(fn {key, val} ->
+      new_key = to_string(key)
+
+      new_val = cond do 
+        is_map(val) ->
+          struct_to_params(val)
+
+        is_list(val) -> 
+          Range.new(0, Enum.count(val)-1)
+          |> Enum.zip(val)
+          |> Enum.map(fn {key, substruct} ->
+            {to_string(key), struct_to_params(substruct)}
+          end)
+          |> Enum.into(%{})
+
+        true -> val
+      end
+
+      {new_key, new_val}
+    end)
+    |> Enum.into(%{})
   end
 
   @doc """

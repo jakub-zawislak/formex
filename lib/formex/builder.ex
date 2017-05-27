@@ -1,14 +1,22 @@
 defprotocol Formex.BuilderProtocol do
-  @spec create_form(Keyword.t) :: Form.t
-  def create_form(arguments)
+  @spec create_struct_info(Map.t) :: Map.t
+  def create_struct_info(args)
+
+  @spec create_form(Map.t) :: Map.t
+  def create_form(args)
 end
 
 defmodule Formex.BuilderType.Struct do
+  @moduledoc false
   defstruct [:form]
 end
 
 defmodule Formex.Builder2 do
   alias Formex.Form
+  alias Formex.Validator
+  alias Formex.BuilderProtocol
+  alias Formex.FormCollection
+  alias Formex.FormNested
 
   @spec create_form(module, struct, Map.t, List.t, module) :: Form.t
   def create_form(type, struct, params \\ %{}, opts \\ [], struct_module \\ nil) do
@@ -30,18 +38,50 @@ defmodule Formex.Builder2 do
     }
 
     struct(wrapper, form: form)
-    |> Formex.BuilderProtocol.create_form()
+    |> BuilderProtocol.create_struct_info()
+    |> BuilderProtocol.create_form()
+    |> Map.get(:form)
     |> apply_params()
-    |> Formex.Validator.validate()
+    |> Validator.validate()
   end
 
+  # not kosher :D should be written with recursion
+  @spec apply_params(form :: Form.t) :: Form.t
   defp apply_params(form) do
-    %{struct: struct, params: params} = form
+    %{struct: struct, params: params, struct_info: struct_info} = form
 
-    struct = params
-    |> Enum.reduce(struct, fn {key, val}, struct ->
+    struct = Enum.reduce(params, struct, fn {key, val}, struct ->
+      key = String.to_atom(key)
+
       struct
-      |> Map.update!(String.to_atom(key), fn _ -> val end)
+      |> Map.update!(key, fn _old_val ->
+        case Form.find(form, key) do
+          collection = %FormCollection{} ->
+            
+            Enum.map(val, fn {_sub_key, sub_val} ->
+
+              sub_struct = collection.struct_module |> struct
+              
+              Enum.reduce(sub_val, sub_struct, fn {sub_sub_key, sub_sub_val}, sub_struct ->
+                sub_sub_key = String.to_atom(sub_sub_key)
+
+                sub_struct
+                |> Map.put(sub_sub_key, sub_sub_val)
+              end)
+            end)
+
+          nested = %FormNested{} ->
+            Enum.reduce(val, struct, fn {sub_key, sub_val}, struct ->
+              sub_key = String.to_atom(sub_key)
+
+              struct
+              |> Map.put(sub_key, sub_val)
+            end)
+
+          _ ->
+            val
+        end
+      end)
     end)
 
     Map.put(form, :struct, struct)
@@ -51,10 +91,27 @@ end
 defimpl Formex.BuilderProtocol, for: Formex.BuilderType.Struct do
   alias Formex.Form
 
-  @spec create_form(Form.t) :: Form.t
-  def create_form(%{form: form}) do
-    form
-    |> form.type.build_form()
+  @spec create_form(Map.t) :: Map.t
+  def create_form(args) do
+    form = args.form.type.build_form(args.form)
+
+    Map.put(args, :form, form)
+  end
+
+  @spec create_struct_info(Map.t) :: Map.t
+  def create_struct_info(args) do
+    form   = args.form
+    struct = struct(form.struct_module)
+
+    struct_info = struct
+    |> Map.from_struct
+    |> Enum.map(fn {k, v} -> 
+      v = if is_list(v), do: :collection, else: :any
+      {k, v}
+    end)
+
+    form = Map.put(form, :struct_info, struct_info)
+    Map.put(args, :form, form)
   end
 end
 

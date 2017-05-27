@@ -190,9 +190,12 @@ defmodule Formex.View.Collection do
     template = collection.template
     template_options = collection.template_options
 
-    html = Phoenix.HTML.Form.inputs_for(form.phoenix_form, item.name, fn f ->
+    html = form.phoenix_form
+    |> Phoenix.HTML.Form.inputs_for(item.name, [default: []], fn f ->
+      fake_struct = %{id: f.params["id"], formex_id: f.params["formex_id"]}
+
       item
-      |> FormCollection.get_subform_by_struct(f.data)
+      |> FormCollection.get_subform_by_struct(fake_struct)
       |> case do 
         nil -> ""
         nested_form ->
@@ -204,19 +207,22 @@ defmodule Formex.View.Collection do
           html = collection.fun_item.(subform)
 
           if subform.struct.id do
+            id_field = Phoenix.HTML.Form.hidden_input f, :id
+            IO.inspect item.delete_field
             delete_field = Phoenix.HTML.Form.hidden_input f, item.delete_field, 
               "data-formex-remove": ""
 
             content_tag(:div, [
               html,
+              id_field,
               delete_field
             ], class: "formex-collection-item")
           else
-            id_field = Phoenix.HTML.Form.hidden_input f, :formex_id, "data-formex-id": ""
+            formex_id_field = Phoenix.HTML.Form.hidden_input f, :formex_id, "data-formex-id": ""
 
             content_tag(:div, [
               html,
-              id_field
+              formex_id_field
             ], class: "formex-collection-item formex-collection-item-new")
           end
       end
@@ -253,11 +259,11 @@ defmodule Formex.View.Collection do
     |> struct
     |> Map.put(item_name, [substruct])
 
-    prot_form = Formex.Builder.create_form(form.type, struct)
+    prot_form = Formex.Builder2.create_form(form.type, struct)
 
     options = Keyword.put(options, :without_prototype, true)
 
-    {:safe, prot_html} = formex_form_for(prot_form, "", fn f ->
+    {:safe, prot_html} = formex_form_for(prot_form, "", [as: form.phoenix_form.name], fn f ->
       formex_collection(f, item_name, options, fn collection ->
         formex_collection_items(collection)
       end, fun_item)

@@ -39,17 +39,19 @@ defmodule Formex.FormCollection do
 
     {delete_field, opts} = Keyword.pop(opts, :delete_field)
 
-    {form, substructs} = if Ecto.assoc_loaded? substructs do
-      {form, substructs}
-    else
-      struct    = @repo.preload(form.struct, name)
-      substructs = Map.get(struct, name)
+    substructs = Field.get_value(form, name)
 
-      struct = Map.put(struct, name, substructs)
-      form   = Map.put(form, :struct, struct)
+    # {form, substructs} = if Ecto.assoc_loaded? substructs do
+    #   {form, substructs}
+    # else
+    #   struct    = @repo.preload(form.struct, name)
+    #   substructs = Map.get(struct, name)
 
-      {form, substructs}
-    end
+    #   struct = Map.put(struct, name, substructs)
+    #   form   = Map.put(form, :struct, struct)
+
+    #   {form, substructs}
+    # end
 
     # substructs = if opts[:filter] do
     #   Enum.filter(substructs, opts[:filter])
@@ -57,7 +59,13 @@ defmodule Formex.FormCollection do
     #   substructs
     # end
 
-    submodule = Form.get_assoc_or_embed(form, name).related
+    # submodule = Form.get_assoc_or_embed(form, name).related
+
+    submodule = if form.struct_info[name] != :collection do 
+      form.struct_info[name]
+    else
+      Keyword.get(opts, :struct_module) || raise "the :struct_module option is required"
+    end
 
     params = form.params[to_string(name)] || []
 
@@ -116,7 +124,7 @@ defmodule Formex.FormCollection do
   end
 
   defp create_subform(form, name, type, substruct, subparams, submodule, opts) do
-    subform = Formex.Builder.create_form(type, substruct, subparams, form.opts, submodule)
+    subform = Formex.Builder2.create_form(type, substruct, subparams, form.opts, submodule)
 
     %FormNested{
       form: subform,

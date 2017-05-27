@@ -9,7 +9,11 @@
   (form would always be invalid) and perform validation manually in changeset. 
   But then, asterisk at the field will not be displayed, although it's required.
 
-  The above change solves that problem. It's the same behaviour as in Symfony 
+  The above change solves that problem. Now it works in the same way as in Symfony 
 
 
 usunąć translate error z configa
+
+:collection :nested itd.
+
+changeset_after_create_callback - to przecież ecto

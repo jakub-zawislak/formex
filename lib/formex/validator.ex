@@ -5,13 +5,36 @@ defmodule Formex.Validator do
   def validate(form) do
     validator = Application.get_env(:formex, :validator)
 
-    validator.validate(form)
+    form = validator.validate(form)
 
-    # obsłuyć nested i kolekcje
+    Map.put(form, :valid?, valid?(form))
+  end
 
-    # wyliczyć `valid?`
+  # obsłuyć kolekcje
+  
+  
+  @spec valid?(Form.t) :: boolean
+  defp valid?(form) do 
+    subforms_valid? = Form.get_nested(form)
+    |> Enum.reduce_while(true, fn item, acc ->
+      if item.form.valid? do 
+        {:cont, true}
+      else
+        {:halt, false}
+      end
+    end)
 
-    # jeszcze validate_whole_struct
+    if !subforms_valid? do 
+      false
+    else
+      Enum.reduce_while(form.errors, true, fn {k, v}, acc ->
+        if Enum.count(v) > 0 do 
+          {:halt, false}
+        else
+          {:cont, true}
+        end
+      end)
+    end
   end
 
   @callback validate(form :: Formex.Form.t) :: List.t

@@ -62,7 +62,7 @@ defmodule Formex.Field do
       value: get_value(form, name),
       label: get_label(name, opts),
       required: Keyword.get(opts, :required, true),
-      validation: Keyword.get(opts, :validation, true),
+      validation: Keyword.get(opts, :validation),
       data: data,
       opts: prepare_opts(opts),
       phoenix_opts: prepare_phoenix_opts(opts)

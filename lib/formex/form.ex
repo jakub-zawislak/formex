@@ -11,23 +11,30 @@ defmodule Formex.Form do
     * `:type` - the module that implements `Formex.Type`, for example: `App.ArticleType`
     * `:struct` - the struct of your data, for example: `%App.Article{}`
     * `:struct_module` - `struct.__struct__`, for example: `App.Article`
+    * `:struct_info` - additional info about struct, that can differs between implementations 
+      of `Formex.BuilderProtocol`
     * `:items` - list of `Formex.Field` and `Button` structs
     * `:params` - params that will be used in `Ecto.Changeset.cast`
     * `:ext_data` - data stored by `formex` extension
     * `:phoenix_form` - `%Phoenix.HTML.Form{}`
     * `:template` - the module that implements `Formex.Template`, for example:
       `Formex.Template.BootstrapHorizontal`. Can be set via a `Formex.View.formex_form_for` options
+    * `:prepare_form_nested` - callback function used by `Formex.Ecto`
+    * `:prepare_form_collection` - callback function used by `Formex.Ecto`
     * `:opts` - additional data passed in a controller. See: `Formex.Builder.create_form/5`
   """
   defstruct type: nil,
     struct: nil,
     struct_module: nil,
+    struct_info: nil,
     valid?: false,
     errors: [],
     items: [],
     params: %{},
     ext_data: nil,
     phoenix_form: nil,
+    prepare_form_nested: nil,
+    prepare_form_collection: nil,
     opts: [],
     template: nil,
     template_options: nil
@@ -72,29 +79,39 @@ defmodule Formex.Form do
   end
 
   @doc """
-  Creates a form for assoc.
-
-  Example:
-
-  ```
-  form
-  |> add_form(:user_info, App.UserInfoType)
-  ```
-
-  ## Options
-
-    * `required` - is the subform required.
-
-      Defaults to `true`. This option will be passed to `Ecto.Changeset.cast_assoc/3`
+  Finds form item by name
   """
+  @spec find(form :: t, name :: atom) :: list
+  def find(form, name) do
+    form.items
+    |> Enum.find(&(&1.name == name))
+  end
+
+  @doc """
+  Returns list of `t:Formex.FormNested.t/0`
+  """
+  @spec get_nested(form :: t) :: list
+  def get_nested(form) do
+    form.items
+    |> Enum.filter(&(&1.__struct__ == FormNested))
+  end
+
+  @doc """
+  Returns list of `t:Formex.FormCollection.t/0`
+  """
+  @spec get_collections(form :: t) :: list
+  def get_collections(form) do
+    form.items
+    |> Enum.filter(&(&1.__struct__ == FormCollection))
+  end
+
   @spec create_subform(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
   def create_subform(form, type, name, opts \\ []) do
-
-    case get_assoc_or_embed(form, name).cardinality do
-      :one  -> Formex.FormNested.create(form, type, name, opts)
-      :many -> Formex.FormCollection.create(form, type, name, opts)
+    if form.struct_info[name] == :collection do 
+      Formex.FormCollection.create(form, type, name, opts)
+    else
+      Formex.FormNested.create(form, type, name, opts)
     end
-
   end
 
   @doc false
