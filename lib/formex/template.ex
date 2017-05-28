@@ -118,7 +118,7 @@ defmodule Formex.Template do
   """
   @spec get_errors(Form.t, Field.t) :: any
   def get_errors(form, field) do
-    form.errors[field.name]
+    form.errors[field.name] || []
   end
 
   @doc """
@@ -126,7 +126,7 @@ defmodule Formex.Template do
   """
   @spec has_error(Form.t, Field.t) :: any
   def has_error(form, field) do
-    Enum.count(form.errors[field.name]) > 0
+    Enum.count(get_errors(form, field)) > 0
   end
 
   @doc """

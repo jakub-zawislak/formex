@@ -1,5 +1,9 @@
 defmodule Formex.Validator do
   alias Formex.Form
+  alias Formex.FormCollection
+  alias Formex.FormNested
+
+  @callback validate(form :: Formex.Form.t) :: List.t
 
   @spec validate(Form.t) :: Form.t
   def validate(form) do
@@ -7,52 +11,62 @@ defmodule Formex.Validator do
 
     form = validator.validate(form)
 
+    items = form.items
+    |> Enum.map(fn item ->
+      case item do
+        collection = %FormCollection{} ->
+          %{collection | forms: Enum.map(collection.forms, fn nested -> 
+            %{nested | form: validate(nested.form)}
+          end)}
+        nested = %FormNested{} ->
+          %{nested | form: validate(nested.form)}
+        _ ->
+          item
+      end
+    end)
+
+    form = %{form | items: items}
+
     Map.put(form, :valid?, valid?(form))
   end
 
-  # obsłuyć kolekcje, jest tylko nested
-  
-  
+  # 
+
   @spec valid?(Form.t) :: boolean
   defp valid?(form) do 
-    subforms_valid? = Form.get_nested(form)
-    |> Enum.reduce_while(true, fn item, _acc ->
-      if item.form.valid? do 
-        {:cont, true}
-      else
-        {:halt, false}
-      end
+    valid? = Enum.reduce_while(form.errors, true, fn {k, v}, _acc ->
+      if Enum.count(v) > 0,
+        do:   {:halt, false},
+        else: {:cont, true}
     end)
 
-    subforms_valid? = subforms_valid? && Form.get_collections(form)
+    valid? && nested_valid?(form) && collections_valid?(form)
+  end
+
+  @spec nested_valid?(Form.t) :: boolean
+  defp nested_valid?(form) do 
+    Form.get_nested(form)
+    |> Enum.reduce_while(true, fn item, _acc ->
+      if item.form.valid?,
+        do:   {:cont, true},
+        else: {:halt, false}
+    end)
+  end
+
+  @spec collections_valid?(Form.t) :: boolean
+  defp collections_valid?(form) do 
+    Form.get_collections(form)
     |> Enum.reduce_while(true, fn collection, _acc ->
       collection.forms
       |> Enum.reduce_while(true, fn item, _sub_acc ->
-        if item.form.valid? do 
-          {:cont, true}
-        else
-          {:halt, false}
-        end
+        if item.form.valid?,
+          do:   {:cont, true},
+          else: {:halt, false}
       end)
-      |> if do 
-        {:cont, true}
-      else
-        {:halt, false}
+      |> case do 
+        true  -> {:cont, true}
+        false -> {:halt, false}
       end
     end)
-
-    if !subforms_valid? do 
-      false
-    else
-      Enum.reduce_while(form.errors, true, fn {k, v}, _acc ->
-        if Enum.count(v) > 0 do 
-          {:halt, false}
-        else
-          {:cont, true}
-        end
-      end)
-    end
   end
-
-  @callback validate(form :: Formex.Form.t) :: List.t
 end

@@ -1,5 +1,6 @@
 defmodule Formex.Controller do
   alias Formex.Form
+  alias Formex.Validator
   @repo Application.get_env(:formex, :repo)
 
   defmacro __using__(_) do
@@ -113,14 +114,15 @@ defmodule Formex.Controller do
     #   changeset = %{form.changeset | action: :update}
     #   {:error, Map.put(form, :changeset, changeset)}
     # end
-IO.inspect form.valid?
-    # if form.changeset.valid? do
+
+    form = form
+    |> Validator.validate()
+
+    if form.valid? do
       {:ok, form.struct}
+    else
       {:error, form}
-    # else
-    #   changeset = %{form.changeset | action: :update}
-    #   {:error, Map.put(form, :changeset, changeset)}
-    # end
+    end
   end
 
   @doc """

@@ -13,7 +13,6 @@ end
 
 defmodule Formex.Builder2 do
   alias Formex.Form
-  alias Formex.Validator
   alias Formex.BuilderProtocol
   alias Formex.FormCollection
   alias Formex.FormNested
@@ -42,7 +41,6 @@ defmodule Formex.Builder2 do
     |> BuilderProtocol.create_form()
     |> Map.get(:form)
     |> apply_params()
-    |> Validator.validate()
   end
 
   # not kosher :D should be written with recursion
