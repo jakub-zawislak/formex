@@ -113,7 +113,7 @@ defmodule Formex.Controller do
     #   changeset = %{form.changeset | action: :update}
     #   {:error, Map.put(form, :changeset, changeset)}
     # end
-
+IO.inspect form.valid?
     # if form.changeset.valid? do
       {:ok, form.struct}
       {:error, form}

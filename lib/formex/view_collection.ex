@@ -208,7 +208,6 @@ defmodule Formex.View.Collection do
 
           if subform.struct.id do
             id_field = Phoenix.HTML.Form.hidden_input f, :id
-            IO.inspect item.delete_field
             delete_field = Phoenix.HTML.Form.hidden_input f, item.delete_field, 
               "data-formex-remove": ""
 
