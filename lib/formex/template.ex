@@ -110,7 +110,12 @@ defmodule Formex.Template do
   """
   @spec render_phoenix_input(item :: any, args :: Keyword.t) :: any
   def render_phoenix_input(item, args) do
-    apply(Phoenix.HTML.Form, item.type, args)
+    if item.type == :array_input  do
+      [form | [field | list ]] = args
+      Formex.InputHelpers.array_input(form, field, list)
+    else
+      apply(Phoenix.HTML.Form, item.type, args)
+    end
   end
 
   @doc """

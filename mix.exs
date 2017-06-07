@@ -24,11 +24,11 @@ defmodule Formex.Mixfile do
   end
 
   defp deps do
-    [{:phoenix_html, "~> 2.0"},
-     {:ecto, "~> 2.0"},
+    [{:phoenix_html, "~> 2.6"},
+     {:ecto, "~> 2.1"},
      {:ex_doc, ">= 0.0.0", only: :dev},
      {:postgrex, ">= 0.0.0", only: [:dev, :test]}, # without a :dev the jakub-zawislak/phoenix-forms won't start. maybe should be removed
-     {:phoenix, "~> 1.2", only: [:dev, :test]},
+     {:phoenix, "~> 1.2.1", only: [:dev, :test]},
      {:phoenix_ecto, "~> 3.0", only: [:dev, :test]}
     ]
   end
