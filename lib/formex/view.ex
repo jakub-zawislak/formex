@@ -91,13 +91,22 @@ defmodule Formex.View do
     |> Keyword.delete(:template)
     |> Keyword.delete(:template_options)
     |> Keyword.put_new(:as, :formex)
+    |> Keyword.put_new(:method, form.method || :post)
 
     fake_params = %{}
-    |> Map.put(to_string(phoenix_options[:as]), struct_to_params(form.struct))
+    |> Map.put(to_string(phoenix_options[:as]), form_to_params(form))
+
+    # fake_params = %{
+    #   to_string(phoenix_options[:as]) => %{
+    #     "schools" => %{"0" => %{"department_id" => nil, "formex_delete" => nil,
+    #     "formex_id" => nil, "id" => "b1902697-b577-44ae-bbd2-010c84eea0cc",
+    #     "name" => "fgh234aa54"}}
+    #   }
+    # }
 
     fake_conn = %Plug.Conn{params: fake_params, method: "POST"}
 
-    Phoenix.HTML.Form.form_for(fake_conn, action, phoenix_options, fn phx_form ->      
+    Phoenix.HTML.Form.form_for(fake_conn, action, phoenix_options, fn phx_form ->
       form
       |> Map.put(:phoenix_form, phx_form)
       |> Map.put(:template, options[:template])
@@ -106,31 +115,51 @@ defmodule Formex.View do
     end)
   end
 
-  @spec struct_to_params(struct) :: Map.t
-  defp struct_to_params(struct) do 
-    struct
-    |> Map.from_struct
-    |> Enum.map(fn {key, val} ->
-      new_key = to_string(key)
+  @spec form_to_params(form :: Form.t) :: Map.t
+  defp form_to_params(form) do
 
-      new_val = cond do 
-        is_map(val) ->
-          struct_to_params(val)
+    form.items
+    |> Enum.map(fn item ->
+      case item do
+        %Field{} ->
+          val = Map.get(form.struct, item.name)
 
-        is_list(val) -> 
-          Range.new(0, Enum.count(val)-1)
-          |> Enum.zip(val)
-          |> Enum.map(fn {key, substruct} ->
-            {to_string(key), struct_to_params(substruct)}
+          new_val = case item.type do
+            :multi_select ->
+              val.map(&(&1.id |> to_string))
+            _ ->
+              val
+          end
+
+          { to_string(item.name), new_val }
+
+        %FormNested{} ->
+          { to_string(item.name), form_to_params(item.form) }
+
+        %FormCollection{} ->
+          new_val = Range.new(0, Enum.count(item.forms)-1)
+          |> Enum.zip(item.forms)
+          |> Enum.map(fn {key, nested_form} ->
+            sub_struct = nested_form.form.struct
+
+            subparams  = form_to_params(nested_form.form)
+            |> Map.put("id", sub_struct.id |> to_string)
+            |> Map.put("formex_id", sub_struct.formex_id)
+            |> Map.put(to_string(item.delete_field), Map.get(sub_struct, item.delete_field))
+
+            { to_string(key), subparams }
           end)
           |> Enum.into(%{})
 
-        true -> val
-      end
+          { to_string(item.name), new_val }
 
-      {new_key, new_val}
+        _ ->
+          false
+      end
     end)
+    |> Enum.filter(&(&1))
     |> Enum.into(%{})
+    # |> IO.inspect
   end
 
   @doc """

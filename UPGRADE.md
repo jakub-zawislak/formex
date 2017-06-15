@@ -17,3 +17,5 @@ usunąć translate error z configa
 :collection :nested itd.
 
 changeset_after_create_callback - to przecież ecto
+
+<%= if @form.changeset.action do %>(wyświetl błąd) - już nie ma form.changeset

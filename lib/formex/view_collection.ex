@@ -196,10 +196,10 @@ defmodule Formex.View.Collection do
 
       item
       |> FormCollection.get_subform_by_struct(fake_struct)
-      |> case do 
+      |> case do
         nil -> ""
         nested_form ->
-          subform = nested_form.form 
+          subform = nested_form.form
           |> Map.put(:phoenix_form, f)
           |> Map.put(:template, template)
           |> Map.put(:template_options, template_options)
@@ -208,7 +208,7 @@ defmodule Formex.View.Collection do
 
           if subform.struct.id do
             id_field = Phoenix.HTML.Form.hidden_input f, :id
-            delete_field = Phoenix.HTML.Form.hidden_input f, item.delete_field, 
+            delete_field = Phoenix.HTML.Form.hidden_input f, item.delete_field,
               "data-formex-remove": ""
 
             content_tag(:div, [

@@ -6,16 +6,14 @@ defmodule Formex.FormNested do
 
   defstruct form: nil,
     name: nil,
+    struct_module: nil,
+    type: nil,
     validation: [],
     opts: []
 
   @type t :: %FormNested{}
 
-  @doc """
-  Creates a nested form.
-
-  Example:
-
+  @moduledoc """
   ```
   form
   |> add(:user_info, :nested, type: App.UserInfoType, struct_module: App.UserInfo)
@@ -25,27 +23,42 @@ defmodule Formex.FormNested do
 
     * `type` - module that implements `Formex.Type`. Required
   """
-  @spec create(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
-  def create(form, type, name, opts) do
-    substruct = Field.get_value(form, name)
+  
+  @spec start_creating(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
+  def start_creating(form, type, name, opts) do
 
-    submodule = if form.struct_info[name] != :any do 
-      form.struct_info[name]
-    else
-      Keyword.get(opts, :struct_module) || raise "the :struct_module option is required"
+    submodule = case form.struct_info[name] do 
+      {:nested, submodule} -> submodule
+      _ -> nil
     end
 
-    params  = form.params[to_string(name)] || %{}
+    submodule = if !submodule do 
+      Keyword.get(opts, :struct_module) || raise "the :struct_module option is required"
+    else
+      submodule
+    end
 
-    subform = Formex.Builder2.create_form(type, substruct, params, form.opts, submodule)
-    item    = %FormNested{
-      form: subform,
+    %FormNested{
       name: name,
+      struct_module: submodule,
+      type: type,
       validation: Keyword.get(opts, :validation, []),
       opts: opts
     }
+  end
 
-    {form, item}
+  @spec finish_creating(form :: Form.t, form_nested :: FormNested.t) :: Form.t
+  def finish_creating(form, form_nested) do
+    %{type: type, name: name, struct_module: struct_module} = form_nested
+
+    substruct = Field.get_value(form, name)
+
+    params  = form.params[to_string(name)] || %{}
+
+    subform = Formex.Builder2.create_form(type, substruct, params, form.opts, struct_module)
+
+    form_nested
+    |> Map.put(:form, subform)
   end
 
 end

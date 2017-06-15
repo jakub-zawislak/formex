@@ -115,8 +115,7 @@ defmodule Formex.Controller do
     #   {:error, Map.put(form, :changeset, changeset)}
     # end
 
-    form = form
-    |> Validator.validate()
+    form = form |> Validator.validate()
 
     if form.valid? do
       {:ok, form.struct}
@@ -131,9 +130,14 @@ defmodule Formex.Controller do
   """
   @spec insert_form_data(Form.t) :: {:ok, Ecto.Schema.t} | {:error, Form.t}
   def insert_form_data(form) do
-    case @repo.insert(form.changeset) do
-      {:ok, schema}       -> {:ok, schema}
-      {:error, changeset} -> {:error, Map.put(form, :changeset, changeset)}
+    form = form |> Validator.validate()
+
+    if form.valid? do 
+      struct = @repo.insert(form.changeset)
+
+      {:ok, struct}
+    else
+      {:error, form}
     end
   end
 
@@ -143,9 +147,14 @@ defmodule Formex.Controller do
   """
   @spec update_form_data(Form.t) :: {:ok, Ecto.Schema.t} | {:error, Form.t}
   def update_form_data(form) do
-    case @repo.update(form.changeset) do
-      {:ok, schema}       -> {:ok, schema}
-      {:error, changeset} -> {:error, Map.put(form, :changeset, changeset)}
+    form = form |> Validator.validate()
+
+    if form.valid? do 
+      struct = @repo.update(form.changeset)
+
+      {:ok, struct}
+    else
+      {:error, form}
     end
   end
 

@@ -286,24 +286,25 @@ defmodule Formex.Type do
   Behaviour depends on `type_or_module` argument:
     * if it's a module and
       * implements `Formex.CustomField`, the `c:Formex.CustomField.create_field/3` is called
-      * implements `Formex.Type`, the `Formex.Form.create_subform/4` is called
+      * implements `Formex.Type`, the `Formex.Form.register/4` is called (it's for 
+        nested forms and collections of forms)
     * if it's `:submit` or `:reset`, the `Formex.Button.create_button/3` is called
     * otherwise, the `Formex.Field.create_field/4` is called.
   """
   @spec add(form :: Form.t, name :: Atom.t, type_or_module :: Atom.t, opts :: Map.t) :: Form.t
   def add(form, name, type_or_module, opts) do
 
-    {form, item} = if Formex.Utils.module?(type_or_module) do
+    item = if Formex.Utils.module?(type_or_module) do
       if Formex.Utils.implements?(type_or_module, Formex.CustomField) do
-        {form, type_or_module.create_field(form, name, opts)}
+        type_or_module.create_field(form, name, opts)
       else
-        Formex.Form.create_subform(form, type_or_module, name, opts)
+        Formex.Form.start_creating(form, type_or_module, name, opts)
       end
     else
       if Enum.member?([:submit, :reset], type_or_module) do
-        {form, Formex.Button.create_button(type_or_module, name, opts)}
+        Formex.Button.create_button(type_or_module, name, opts)
       else
-        {form, Formex.Field.create_field(form, type_or_module, name, opts)}
+        Formex.Field.create_field(form, type_or_module, name, opts)
       end
     end
 

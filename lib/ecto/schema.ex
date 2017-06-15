@@ -1,9 +1,11 @@
-defmodule Formex.Schema do
+defmodule Formex.Ecto.Schema do
   require Ecto.Schema
 
   defmacro __using__([]) do
     quote do
-      import Formex.Schema
+      import Formex.Ecto.Schema
+
+      def formex_wrapper, do: Formex.BuilderType.Ecto
     end
   end
 

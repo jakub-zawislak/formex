@@ -15,12 +15,14 @@ defmodule Formex.Form do
       of `Formex.BuilderProtocol`
     * `:items` - list of `Formex.Field` and `Button` structs
     * `:params` - params that will be used in `Ecto.Changeset.cast`
-    * `:ext_data` - data stored by `formex` extension
+    * `:ext_data` - data stored by `formex` extensions
     * `:phoenix_form` - `%Phoenix.HTML.Form{}`
     * `:template` - the module that implements `Formex.Template`, for example:
       `Formex.Template.BootstrapHorizontal`. Can be set via a `Formex.View.formex_form_for` options
     * `:prepare_form_nested` - callback function used by `Formex.Ecto`
     * `:prepare_form_collection` - callback function used by `Formex.Ecto`
+    * `:method` - `:post`, `:put` etc. May be used by `Formex.View`. 
+      E.g. `Formex.Ecto.Builder` sets here `:put` if we editing `struct`, `:post` otherwise.
     * `:opts` - additional data passed in a controller. See: `Formex.Builder.create_form/5`
   """
   defstruct type: nil,
@@ -35,6 +37,7 @@ defmodule Formex.Form do
     phoenix_form: nil,
     prepare_form_nested: nil,
     prepare_form_collection: nil,
+    method: nil,
     opts: [],
     template: nil,
     template_options: nil
@@ -105,13 +108,33 @@ defmodule Formex.Form do
     |> Enum.filter(&(&1.__struct__ == FormCollection))
   end
 
-  @spec create_subform(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
-  def create_subform(form, type, name, opts \\ []) do
-    if form.struct_info[name] == :collection do 
-      Formex.FormCollection.create(form, type, name, opts)
+  @spec start_creating(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
+  def start_creating(form, type, name, opts \\ []) do
+    info = form.struct_info[name]
+
+    if is_tuple(info) && elem(info, 0) == :collection do 
+      Formex.FormCollection.start_creating(form, type, name, opts)
     else
-      Formex.FormNested.create(form, type, name, opts)
+      Formex.FormNested.start_creating(form, type, name, opts)
     end
+  end
+
+  @spec finish_creating(form :: Form.t) :: Form.t
+  def finish_creating(form) do
+    new_items = form.items 
+    |> Enum.map(fn item ->
+      case item do
+        %FormCollection{} ->
+          FormCollection.finish_creating(form, item)
+        %FormNested{} ->
+          FormNested.finish_creating(form, item)
+        _ ->
+          item
+      end
+    end)
+
+    form
+    |> Map.put(:items, new_items)
   end
 
   @doc false

@@ -10,7 +10,8 @@ defmodule Formex.FormCollection do
     name: nil,
     opts: [],
     delete_field: nil,
-    validation: []
+    validation: [],
+    type: nil
 
   @type t :: %FormCollection{}
 
@@ -22,36 +23,48 @@ defmodule Formex.FormCollection do
   Functionality that are not mentioned in the link above:
 
   ## Options
-  
+
   * `delete_field` - defaults to `:formex_delete`. Defines input that will be set to true
     if we click &times;. Behaviours depends on value:
-      * `:formex_delete` - if `formex_delete` is true, this collection item 
-        will be removed. 
+      * `:formex_delete` - if `formex_delete` is true, this collection item
+        will be removed.
       * another field - it's a simple input that may be stored in repo
-      
-        For example, we can in our model create `removed` field. Then set 
+
+        For example, we can in our model create `removed` field. Then set
         `delete_field: :removed` option.
   """
 
-  @spec create(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
-  def create(form, type, name, opts) do
-    substructs = Field.get_value(form, name)
+  @spec start_creating(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Map.t
+  def start_creating(form, type, name, opts) do
+
+    {:collection, submodule} = form.struct_info[name]
+
+    submodule = if !submodule do
+      Keyword.get(opts, :struct_module) || raise "the :struct_module option is required"
+    else
+      submodule
+    end
 
     {delete_field, opts} = Keyword.pop(opts, :delete_field)
 
+    form_collection = %FormCollection{
+      name: name,
+      type: type,
+      opts: opts,
+      struct_module: submodule,
+      validation: Keyword.get(opts, :validation, []),
+      delete_field: delete_field || :formex_delete
+    }
+
+    form_collection
+  end
+
+  # called when substruct are ready
+  @spec finish_creating(form :: Form.t, form_collection :: FormCollection.t) :: Form.t
+  def finish_creating(form, form_collection) do
+    %{name: name, struct_module: struct_module, type: type, opts: opts} = form_collection
+
     substructs = Field.get_value(form, name)
-
-    # {form, substructs} = if Ecto.assoc_loaded? substructs do
-    #   {form, substructs}
-    # else
-    #   struct    = @repo.preload(form.struct, name)
-    #   substructs = Map.get(struct, name)
-
-    #   struct = Map.put(struct, name, substructs)
-    #   form   = Map.put(form, :struct, struct)
-
-    #   {form, substructs}
-    # end
 
     # substructs = if opts[:filter] do
     #   Enum.filter(substructs, opts[:filter])
@@ -59,29 +72,13 @@ defmodule Formex.FormCollection do
     #   substructs
     # end
 
-    # submodule = Form.get_assoc_or_embed(form, name).related
-
-    submodule = if form.struct_info[name] != :collection do 
-      form.struct_info[name]
-    else
-      Keyword.get(opts, :struct_module) || raise "the :struct_module option is required"
-    end
-
     params = form.params[to_string(name)] || []
 
-    subforms_old = create_existing_subforms(form, name, substructs, params, type, submodule, opts)
-    subforms_new = create_new_subforms(form, name, params, type, submodule, opts)
+    subforms_old = create_existing_subforms(form, name, substructs, params, type, struct_module, opts)
+    subforms_new = create_new_subforms(form, name, params, type, struct_module, opts)
 
-    form_collection = %FormCollection{
-      forms: subforms_old ++ subforms_new,
-      name: name,
-      struct_module: submodule,
-      validation: Keyword.get(opts, :validation, []),
-      opts: opts,
-      delete_field: delete_field || :formex_delete
-    }
-
-    {form, form_collection}
+    form_collection
+    |> Map.put(:forms, subforms_old ++ subforms_new)
   end
 
   @doc false
@@ -90,7 +87,7 @@ defmodule Formex.FormCollection do
     form_collection.forms
     |> Enum.find(fn form_nested ->
       if struct.id do
-        form_nested.form.struct.id == struct.id
+        to_string(form_nested.form.struct.id) == struct.id
       else
         form_nested.form.struct.formex_id == struct.formex_id
       end
@@ -124,12 +121,15 @@ defmodule Formex.FormCollection do
   end
 
   defp create_subform(form, name, type, substruct, subparams, submodule, opts) do
+
     subform = Formex.Builder2.create_form(type, substruct, subparams, form.opts, submodule)
 
     %FormNested{
       form: subform,
       name: name,
       validation: Keyword.get(opts, :validation, []),
+      struct_module: submodule,
+      type: type,
       opts: opts
     }
   end

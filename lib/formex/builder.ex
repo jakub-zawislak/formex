@@ -23,7 +23,7 @@ defmodule Formex.Builder2 do
     struct_module = if(struct_module, do: struct_module, else: struct.__struct__)
 
     wrapper = if struct_module.module_info(:exports)[:formex_wrapper] do
-      struct_module.wrapper
+      struct_module.formex_wrapper
     else
       Formex.BuilderType.Struct
     end
@@ -92,10 +92,12 @@ defimpl Formex.BuilderProtocol, for: Formex.BuilderType.Struct do
   @spec create_form(Map.t) :: Map.t
   def create_form(args) do
     form = args.form.type.build_form(args.form)
+    |> Form.finish_creating
 
     Map.put(args, :form, form)
   end
 
+  # collects info about struct fields data types
   @spec create_struct_info(Map.t) :: Map.t
   def create_struct_info(args) do
     form   = args.form
@@ -103,8 +105,9 @@ defimpl Formex.BuilderProtocol, for: Formex.BuilderType.Struct do
 
     struct_info = struct
     |> Map.from_struct
+    |> Enum.filter(&(elem(&1, 0) !== :__meta__))
     |> Enum.map(fn {k, v} -> 
-      v = if is_list(v), do: :collection, else: :any
+      v = if is_list(v), do: {:collection, nil}, else: :any
       {k, v}
     end)
 
