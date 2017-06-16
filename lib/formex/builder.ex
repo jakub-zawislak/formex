@@ -55,11 +55,11 @@ defmodule Formex.Builder2 do
       |> Map.update!(key, fn _old_val ->
         case Form.find(form, key) do
           collection = %FormCollection{} ->
-            
+
             Enum.map(val, fn {_sub_key, sub_val} ->
 
               sub_struct = collection.struct_module |> struct
-              
+
               Enum.reduce(sub_val, sub_struct, fn {sub_sub_key, sub_sub_val}, sub_struct ->
                 sub_sub_key = String.to_atom(sub_sub_key)
 
@@ -82,7 +82,7 @@ defmodule Formex.Builder2 do
       end)
     end)
 
-    Map.put(form, :struct, struct)
+    Map.put(form, :new_struct, struct)
   end
 end
 
@@ -106,7 +106,7 @@ defimpl Formex.BuilderProtocol, for: Formex.BuilderType.Struct do
     struct_info = struct
     |> Map.from_struct
     |> Enum.filter(&(elem(&1, 0) !== :__meta__))
-    |> Enum.map(fn {k, v} -> 
+    |> Enum.map(fn {k, v} ->
       v = if is_list(v), do: {:collection, nil}, else: :any
       {k, v}
     end)
@@ -150,7 +150,7 @@ defmodule Formex.Builder do
         ```
         form = create_form(TransferType, %Transfer{}, %{}, user: user)
         ```
-        
+
         Filter select options that belongs to this user
         ```
         def build_form(form) do
@@ -162,7 +162,7 @@ defmodule Formex.Builder do
         end
         ```
 
-    * `model` - optional Ecto model in case if `struct` is nil. Used by `Formex.FormexCollection` 
+    * `model` - optional Ecto model in case if `struct` is nil. Used by `Formex.FormexCollection`
       and `Formex.FormNested`
   """
   @spec create_form(module, Ecto.Schema.t, Map.t, List.t, module) :: Form.t
@@ -262,7 +262,7 @@ defmodule Formex.Builder do
 
               nested_form ->
                 subform = nested_form.form
-    
+
                 changeset = create_changeset(subform, subform.type).changeset
                 |> cast(subform.params, [item.delete_field])
 

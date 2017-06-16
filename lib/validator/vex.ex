@@ -6,7 +6,7 @@ defmodule Formex.Validator.Vex do
   def validate(form) do
 
     # errors_struct = if form.type.validate_whole_struct? do
-    #   form.struct
+    #   form.new_struct
     #   |> Vex.errors
     #   |> Enum.reduce([], fn error ->
     #     IO.inspect error
@@ -19,8 +19,8 @@ defmodule Formex.Validator.Vex do
     errors_type = form
     |> Form.get_fields_validatable
     |> Enum.map(fn item ->
-      if item.validation do 
-        errors = Map.from_struct(form.struct)
+      if item.validation do
+        errors = Map.from_struct(form.new_struct)
         |> Vex.errors([{item.name, item.validation}])
         |> Enum.map(fn error ->
           elem(error, 3)

@@ -10,30 +10,30 @@ defmodule Formex.Form do
 
     * `:type` - the module that implements `Formex.Type`, for example: `App.ArticleType`
     * `:struct` - the struct of your data, for example: `%App.Article{}`
+    * `:new_struct` - the `:struct` with `:params` applied
     * `:struct_module` - `struct.__struct__`, for example: `App.Article`
-    * `:struct_info` - additional info about struct, that can differs between implementations 
+    * `:struct_info` - additional info about struct, that can differs between implementations
       of `Formex.BuilderProtocol`
     * `:items` - list of `Formex.Field` and `Button` structs
     * `:params` - params that will be used in `Ecto.Changeset.cast`
-    * `:ext_data` - data stored by `formex` extensions
     * `:phoenix_form` - `%Phoenix.HTML.Form{}`
     * `:template` - the module that implements `Formex.Template`, for example:
       `Formex.Template.BootstrapHorizontal`. Can be set via a `Formex.View.formex_form_for` options
     * `:prepare_form_nested` - callback function used by `Formex.Ecto`
     * `:prepare_form_collection` - callback function used by `Formex.Ecto`
-    * `:method` - `:post`, `:put` etc. May be used by `Formex.View`. 
+    * `:method` - `:post`, `:put` etc. May be used by `Formex.View`.
       E.g. `Formex.Ecto.Builder` sets here `:put` if we editing `struct`, `:post` otherwise.
     * `:opts` - additional data passed in a controller. See: `Formex.Builder.create_form/5`
   """
   defstruct type: nil,
     struct: nil,
+    new_struct: nil,
     struct_module: nil,
     struct_info: nil,
     valid?: false,
     errors: [],
     items: [],
     params: %{},
-    ext_data: nil,
     phoenix_form: nil,
     prepare_form_nested: nil,
     prepare_form_collection: nil,
@@ -112,7 +112,7 @@ defmodule Formex.Form do
   def start_creating(form, type, name, opts \\ []) do
     info = form.struct_info[name]
 
-    if is_tuple(info) && elem(info, 0) == :collection do 
+    if is_tuple(info) && elem(info, 0) == :collection do
       Formex.FormCollection.start_creating(form, type, name, opts)
     else
       Formex.FormNested.start_creating(form, type, name, opts)
@@ -121,7 +121,7 @@ defmodule Formex.Form do
 
   @spec finish_creating(form :: Form.t) :: Form.t
   def finish_creating(form) do
-    new_items = form.items 
+    new_items = form.items
     |> Enum.map(fn item ->
       case item do
         %FormCollection{} ->

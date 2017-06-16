@@ -1,5 +1,4 @@
 defmodule Formex.FormNested do
-  @repo Application.get_env(:formex, :repo)
   alias __MODULE__
   alias Formex.Field
   alias Formex.Form
@@ -23,16 +22,16 @@ defmodule Formex.FormNested do
 
     * `type` - module that implements `Formex.Type`. Required
   """
-  
+
   @spec start_creating(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
   def start_creating(form, type, name, opts) do
 
-    submodule = case form.struct_info[name] do 
+    submodule = case form.struct_info[name] do
       {:nested, submodule} -> submodule
       _ -> nil
     end
 
-    submodule = if !submodule do 
+    submodule = if !submodule do
       Keyword.get(opts, :struct_module) || raise "the :struct_module option is required"
     else
       submodule

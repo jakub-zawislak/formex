@@ -122,7 +122,7 @@ defmodule Formex.View do
     |> Enum.map(fn item ->
       case item do
         %Field{} ->
-          val = Map.get(form.struct, item.name)
+          val = Map.get(form.new_struct, item.name)
 
           new_val = case item.type do
             :multi_select ->
@@ -140,12 +140,15 @@ defmodule Formex.View do
           new_val = Range.new(0, Enum.count(item.forms)-1)
           |> Enum.zip(item.forms)
           |> Enum.map(fn {key, nested_form} ->
-            sub_struct = nested_form.form.struct
+            sub_struct = nested_form.form.new_struct
 
             subparams  = form_to_params(nested_form.form)
             |> Map.put("id", sub_struct.id |> to_string)
             |> Map.put("formex_id", sub_struct.formex_id)
-            |> Map.put(to_string(item.delete_field), Map.get(sub_struct, item.delete_field))
+            |> Map.put(
+              to_string(item.delete_field),
+              Map.get(sub_struct, item.delete_field) |> to_string
+            )
 
             { to_string(key), subparams }
           end)

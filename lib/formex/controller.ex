@@ -1,7 +1,6 @@
 defmodule Formex.Controller do
   alias Formex.Form
   alias Formex.Validator
-  @repo Application.get_env(:formex, :repo)
 
   defmacro __using__(_) do
     quote do
@@ -26,8 +25,6 @@ defmodule Formex.Controller do
 
   # Usage
 
-  ## CRUD
-
   ```
   def new(conn, _params) do
     form = create_form(App.ArticleType, %Article{})
@@ -39,120 +36,30 @@ defmodule Formex.Controller do
   def create(conn, %{"article" => article_params}) do
     App.ArticleType
     |> create_form(%Article{}, article_params)
-    |> insert_form_data
-    |> case do
-      {:ok, _article} ->
-        # ...
-      {:error, form} ->
-        # ...
-    end
-  end
-  ```
-
-  ```
-  def edit(conn, %{"id" => id}) do
-    article = Repo.get!(Article, id)
-    form = create_form(App.ArticleType, article)
-    render(conn, "edit.html", article: article, form: form)
-  end
-  ```
-
-  ```
-  def update(conn, %{"id" => id, "article" => article_params}) do
-    article = Repo.get!(Article, id)
-
-    App.ArticleType
-    |> create_form(article, article_params)
-    |> update_form_data
-    |> case do
-      {:ok, article} ->
-        # ...
-      {:error, form} ->
-        # ...
-    end
-  end
-  ```
-
-  ## Usage without a database
-
-  ```
-  defmodule App.Registration do
-    use App.Web, :model
-
-    embedded_schema do # instead of `schema`
-      field :email
-      field :password
-    end
-  end
-  ```
-
-  ```
-  def register(conn, %{"registration" => registration_params}) do
-    RegistrationType
-    |> create_form(%Registration{}, registration_params)
     |> handle_form
     |> case do
-      {:ok, registration} ->
-        # do something with the `registration`
+      {:ok, article} ->
+        # do something with a new article struct
       {:error, form} ->
         # display errors
         render(conn, "index.html", form: form)
     end
   end
   ```
+
+  For usage with Ecto see `Formex.Ecto.Controller`
   """
 
   @doc """
-  Works similar to `insert_form_data/1` and `update_form_data/1`, but doesn't require a database.
-  Should be used with `embedded_schema`.
+  Validates form. When is valid, returns `{:ok, form.new_struct}`, otherwise, `{:error, form}` with
+  validation errors inside `form.errors`
   """
-  @spec handle_form(Form.t) :: {:ok, Ecto.Schema.t} | {:error, Form.t}
+  @spec handle_form(Form.t) :: {:ok, Map.t} | {:error, Form.t}
   def handle_form(form) do
-    # if form.changeset.valid? do
-    #   {:ok, Ecto.Changeset.apply_changes(form.changeset)}
-    # else
-    #   changeset = %{form.changeset | action: :update}
-    #   {:error, Map.put(form, :changeset, changeset)}
-    # end
-
     form = form |> Validator.validate()
 
     if form.valid? do
-      {:ok, form.struct}
-    else
-      {:error, form}
-    end
-  end
-
-  @doc """
-  Invokes `Repo.insert`. In case of `:error`, returns `{:error, form}` (with new `form.changeset`
-  value) instead of `{:error, changeset}` (as Ecto does)
-  """
-  @spec insert_form_data(Form.t) :: {:ok, Ecto.Schema.t} | {:error, Form.t}
-  def insert_form_data(form) do
-    form = form |> Validator.validate()
-
-    if form.valid? do 
-      struct = @repo.insert(form.changeset)
-
-      {:ok, struct}
-    else
-      {:error, form}
-    end
-  end
-
-  @doc """
-  Invokes `Repo.update`. In case of `:error`, returns `{:error, form}` (with new `form.changeset`
-  value) instead of `{:error, changeset}` (as Ecto does)
-  """
-  @spec update_form_data(Form.t) :: {:ok, Ecto.Schema.t} | {:error, Form.t}
-  def update_form_data(form) do
-    form = form |> Validator.validate()
-
-    if form.valid? do 
-      struct = @repo.update(form.changeset)
-
-      {:ok, struct}
+      {:ok, form.new_struct}
     else
       {:error, form}
     end

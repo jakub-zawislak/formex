@@ -15,7 +15,7 @@ defmodule Formex.Validator do
     |> Enum.map(fn item ->
       case item do
         collection = %FormCollection{} ->
-          %{collection | forms: Enum.map(collection.forms, fn nested -> 
+          %{collection | forms: Enum.map(collection.forms, fn nested ->
             %{nested | form: validate(nested.form)}
           end)}
         nested = %FormNested{} ->
@@ -30,10 +30,10 @@ defmodule Formex.Validator do
     Map.put(form, :valid?, valid?(form))
   end
 
-  # 
+  #
 
   @spec valid?(Form.t) :: boolean
-  defp valid?(form) do 
+  defp valid?(form) do
     valid? = Enum.reduce_while(form.errors, true, fn {k, v}, _acc ->
       if Enum.count(v) > 0,
         do:   {:halt, false},
@@ -44,7 +44,7 @@ defmodule Formex.Validator do
   end
 
   @spec nested_valid?(Form.t) :: boolean
-  defp nested_valid?(form) do 
+  defp nested_valid?(form) do
     Form.get_nested(form)
     |> Enum.reduce_while(true, fn item, _acc ->
       if item.form.valid?,
@@ -54,7 +54,7 @@ defmodule Formex.Validator do
   end
 
   @spec collections_valid?(Form.t) :: boolean
-  defp collections_valid?(form) do 
+  defp collections_valid?(form) do
     Form.get_collections(form)
     |> Enum.reduce_while(true, fn collection, _acc ->
       collection.forms
@@ -63,7 +63,7 @@ defmodule Formex.Validator do
           do:   {:cont, true},
           else: {:halt, false}
       end)
-      |> case do 
+      |> case do
         true  -> {:cont, true}
         false -> {:halt, false}
       end

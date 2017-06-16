@@ -8,7 +8,7 @@ defimpl Formex.BuilderProtocol, for: Formex.BuilderType.Ecto do
   alias Formex.Field
   alias Formex.FormNested
   alias Formex.FormCollection
-  
+
   @repo Application.get_env(:formex, :repo)
 
   @spec create_form(Map.t) :: Map.t
@@ -30,8 +30,8 @@ defimpl Formex.BuilderProtocol, for: Formex.BuilderType.Ecto do
     struct_info = struct
     |> Map.from_struct
     |> Enum.filter(&(elem(&1, 0) !== :__meta__))
-    |> Enum.map(fn {k, v} -> 
-      v = case get_assoc_or_embed(form, k) do 
+    |> Enum.map(fn {k, v} ->
+      v = case get_assoc_or_embed(form, k) do
         %{cardinality: :many, related: module} ->
           {:collection, module}
 
@@ -48,7 +48,7 @@ defimpl Formex.BuilderProtocol, for: Formex.BuilderType.Ecto do
     Map.put(args, :form, form)
   end
 
-  # 
+  #
 
   defp preload_assocs(form) do
 
@@ -57,7 +57,7 @@ defimpl Formex.BuilderProtocol, for: Formex.BuilderType.Ecto do
 
     form.items
     |> Enum.filter(fn item ->
-      case item do 
+      case item do
         %FormNested{}     -> true
         %FormCollection{} -> true
         %Field{}          -> item.type == :multiple_select
@@ -65,12 +65,12 @@ defimpl Formex.BuilderProtocol, for: Formex.BuilderType.Ecto do
       end
     end)
     |> Enum.reduce(form.struct, fn item, struct ->
-      if is_assoc(form, item.name) do 
+      if is_assoc(form, item.name) do
         struct
         |> @repo.preload(item.name)
-      else 
+      else
         struct
-      end 
+      end
     end)
   end
 
