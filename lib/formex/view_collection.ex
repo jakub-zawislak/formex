@@ -206,6 +206,12 @@ defmodule Formex.View.Collection do
 
           html = collection.fun_item.(subform)
 
+          style = if FormCollection.to_be_removed(item, nested_form) do
+            "display: none;"
+          else
+            ""
+          end
+
           if subform.struct.id do
             id_field = Phoenix.HTML.Form.hidden_input f, :id
             delete_field = Phoenix.HTML.Form.hidden_input f, item.delete_field,
@@ -215,14 +221,14 @@ defmodule Formex.View.Collection do
               html,
               id_field,
               delete_field
-            ], class: "formex-collection-item")
+            ], class: "formex-collection-item", style: style)
           else
             formex_id_field = Phoenix.HTML.Form.hidden_input f, :formex_id, "data-formex-id": ""
 
             content_tag(:div, [
               html,
               formex_id_field
-            ], class: "formex-collection-item formex-collection-item-new")
+            ], class: "formex-collection-item formex-collection-item-new", style: style)
           end
       end
     end)

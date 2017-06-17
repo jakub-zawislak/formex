@@ -16,7 +16,11 @@ defmodule Formex.Validator do
       case item do
         collection = %FormCollection{} ->
           %{collection | forms: Enum.map(collection.forms, fn nested ->
-            %{nested | form: validate(nested.form)}
+            if !FormCollection.to_be_removed(item, nested) do
+              %{nested | form: validate(nested.form)}
+            else
+              %{nested | form: %{nested.form | valid?: true}}
+            end
           end)}
         nested = %FormNested{} ->
           %{nested | form: validate(nested.form)}

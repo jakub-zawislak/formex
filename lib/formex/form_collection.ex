@@ -133,4 +133,11 @@ defmodule Formex.FormCollection do
     }
   end
 
+  @spec to_be_removed(form_collection :: t, form_nested :: FormNested.t) :: boolean
+  def to_be_removed(form_collection, form_nested) do
+    val = Map.get(form_nested.form.new_struct, form_collection.delete_field)
+
+    val == "true"
+  end
+
 end
