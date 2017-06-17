@@ -16,6 +16,7 @@ defmodule Formex.Builder2 do
   alias Formex.BuilderProtocol
   alias Formex.FormCollection
   alias Formex.FormNested
+  alias Formex.Field
 
   @spec create_form(module, struct, Map.t, List.t, module) :: Form.t
   def create_form(type, struct, params \\ %{}, opts \\ [], struct_module \\ nil) do
@@ -43,7 +44,9 @@ defmodule Formex.Builder2 do
     |> apply_params()
   end
 
-  # not kosher :D should be written with recursion
+  # Could be done better. In this case it applies params and creates a :new_struct only for the
+  # main form. :form's that are in FormNested and FormCollection are not touched
+  # in objective programming it would be easier :D
   @spec apply_params(form :: Form.t) :: Form.t
   defp apply_params(form) do
     %{struct: struct, params: params, struct_info: struct_info} = form
@@ -55,30 +58,18 @@ defmodule Formex.Builder2 do
       |> Map.update!(key, fn _old_val ->
         case Form.find(form, key) do
           collection = %FormCollection{} ->
-
-            Enum.map(val, fn {_sub_key, sub_val} ->
-
-              sub_struct = collection.struct_module |> struct
-
-              Enum.reduce(sub_val, sub_struct, fn {sub_sub_key, sub_sub_val}, sub_struct ->
-                sub_sub_key = String.to_atom(sub_sub_key)
-
-                sub_struct
-                |> Map.put(sub_sub_key, sub_sub_val)
-              end)
+            Enum.map(collection.forms, fn nested ->
+              apply_params(nested.form).struct
             end)
 
           nested = %FormNested{} ->
-            Enum.reduce(val, struct, fn {sub_key, sub_val}, struct ->
-              sub_key = String.to_atom(sub_key)
+            apply_params(nested.form).struct
 
-              struct
-              |> Map.put(sub_key, sub_val)
-            end)
-
-          field ->
+          field = %Field{} ->
             validate_select(field, val)
             val
+
+          _ -> val
         end
       end)
     end)

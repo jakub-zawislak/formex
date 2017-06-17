@@ -78,6 +78,15 @@ defmodule Formex.Field do
     end
   end
 
+  @doc false
+  def get_value(form, name) do
+    if form.struct do
+      Map.get(form.struct, name)
+    else
+      nil
+    end
+  end
+
   def prepare_opts(opts) do
     Keyword.delete(opts, :phoenix_opts)
   end
