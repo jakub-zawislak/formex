@@ -125,8 +125,16 @@ defmodule Formex.View do
           val = Map.get(form.new_struct, item.name)
 
           new_val = case item.type do
-            :multi_select ->
-              val.map(&(&1.id |> to_string))
+            :multiple_select ->
+              Enum.map(val, fn subval ->
+                case subval do
+                  substruct when is_map(substruct) ->
+                    substruct.id
+                  _ ->
+                    subval
+                end
+                |> to_string
+              end)
             _ ->
               val
           end

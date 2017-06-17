@@ -4,6 +4,7 @@ defmodule Formex.Ecto.Changeset do
   alias Formex.Form
   alias Formex.FormCollection
   alias Formex.FormNested
+  @repo Application.get_env(:formex, :repo)
 
   @spec create_changeset(form :: Form.t) :: Form.t
   def create_changeset(form) do
@@ -11,9 +12,7 @@ defmodule Formex.Ecto.Changeset do
     |> cast(form.params, get_normal_fields_names(form))
     |> cast_multiple_selects(form)
     |> cast_embedded_forms(form)
-    # |> validate_required(get_required_fields_names(form)) - usuwam
-    # |> validate_selects(form) - zrobić w walidatorze
-    # |> form.type.changeset_after_create_callback - do dorobienia
+    |> form.type.changeset_after_create_callback(form)
   end
 
   #
@@ -88,8 +87,6 @@ defmodule Formex.Ecto.Changeset do
 
                 changeset = create_changeset(subform)
                 |> cast(subform.params, [item.delete_field])
-
-                IO.inspect subform.params
 
                 if get_change(changeset, item.delete_field) do
                   %{changeset | action: :delete}

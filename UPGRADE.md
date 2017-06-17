@@ -14,12 +14,10 @@
 
 usunąć translate error z configa
 
-:collection :nested itd.
-
-changeset_after_create_callback - to przecież ecto
-
 <%= if @form.changeset.action do %>(wyświetl błąd) - już nie ma form.changeset
 
 import Formex.Ecto.Controller
 
 opisać brak walidacji z add_error w changeset callback w type
+
+  use Formex.Ecto.Type

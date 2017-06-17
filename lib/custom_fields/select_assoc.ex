@@ -103,19 +103,7 @@ defmodule Formex.CustomField.SelectAssoc do
     opts    = parse_opts(module, opts)
     choices = get_choices(module, opts)
 
-    %Field{
-      name: name_id,
-      type: :select,
-      value: Field.get_value(form, name),
-      label: Field.get_label(name, opts),
-      required: Keyword.get(opts, :required, true),
-      validation: Keyword.get(opts, :validation, []),
-      data: [
-        choices: choices
-      ],
-      opts: Field.prepare_opts(opts),
-      phoenix_opts: Field.prepare_phoenix_opts(opts)
-    }
+    Field.create_field(form, :select, name_id, choices: choices)
   end
 
   defp create_field_multiple(form, name, opts) do
@@ -132,21 +120,9 @@ defmodule Formex.CustomField.SelectAssoc do
       []
     end
 
-    %Field{
-      name: name,
-      type: :multiple_select,
-      value: Field.get_value(form, name),
-      label: Field.get_label(name, opts),
-      required: Keyword.get(opts, :required, true),
-      data: [
-        choices: choices
-      ],
-      opts: Field.prepare_opts(opts),
-      phoenix_opts: Keyword.merge(
-        Field.prepare_phoenix_opts(opts),
-        selected: selected
-      )
-    }
+    Field.create_field(form, :multiple_select, name, choices: choices, phoenix_opts: [
+      selected: selected
+    ])
   end
 
   defp get_choices(module, opts) do

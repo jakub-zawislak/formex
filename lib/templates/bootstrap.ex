@@ -1,6 +1,6 @@
 defmodule Formex.Template.Bootstrap do
   use Formex.Template, :helper
-  
+
   @moduledoc false
 
   defmacro __using__([]) do
@@ -84,7 +84,7 @@ defmodule Formex.Template.Bootstrap do
     if has_error(form, field) do
       error_html  = get_errors(form, field)
       |> Enum.map(&(content_tag(:p, &1)))
-      
+
       error_field = content_tag(:span, error_html, class: "help-block")
       tags ++ [error_field]
     else

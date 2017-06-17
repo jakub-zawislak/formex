@@ -1,5 +1,6 @@
 defmodule Formex.Validator do
   alias Formex.Form
+  alias Formex.Field
   alias Formex.FormCollection
   alias Formex.FormNested
 
@@ -7,7 +8,7 @@ defmodule Formex.Validator do
 
   @spec validate(Form.t) :: Form.t
   def validate(form) do
-    validator = Application.get_env(:formex, :validator)
+    validator = get_validator()
 
     form = validator.validate(form)
 
@@ -35,6 +36,10 @@ defmodule Formex.Validator do
   end
 
   #
+
+  defp get_validator() do
+    Application.get_env(:formex, :validator)
+  end
 
   @spec valid?(Form.t) :: boolean
   defp valid?(form) do

@@ -76,13 +76,41 @@ defmodule Formex.Builder2 do
               |> Map.put(sub_key, sub_val)
             end)
 
-          _ ->
+          field ->
+            validate_select(field, val)
             val
         end
       end)
     end)
 
     Map.put(form, :new_struct, struct)
+  end
+
+  @spec validate_select(field :: Field.t, val :: String.t) :: nil
+  defp validate_select(field, val) do
+    case field.type do
+      x when x in [:select, :multiple_select] ->
+        choices = Enum.map(field.data[:choices], &(&1 |> elem(1) |> to_string))
+
+        case field.type do
+          :select ->
+            String.length(val) > 0 && !(val in choices)
+          :multiple_select ->
+            Enum.reduce_while(val, false, fn val, _ ->
+              if val in choices do
+                {:cont, false}
+              else
+                {:halt, true}
+              end
+            end)
+        end
+        |> if do
+          raise "The "<>inspect(val)<>" value for :"<>to_string(field.name)<>" is invalid. "<>
+            "Possible values: "<>inspect(choices)
+        end
+
+      _ -> nil
+    end
   end
 end
 

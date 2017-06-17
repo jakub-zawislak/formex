@@ -1,5 +1,6 @@
 defmodule Formex.Field do
   alias __MODULE__
+  alias Formex.Validator
 
   @doc """
   Defines the Formex.Field struct.
@@ -8,7 +9,7 @@ defmodule Formex.Field do
     * `:type` - a type of a field that in most cases will be the name of a function from `Phoenix.HTML.Form`
     * `:value` - the value from struct/params
     * `:required` - is field required? Used only in template
-    * `:validation` - validation rules to be passed to a validator 
+    * `:validation` - validation rules to be passed to a validator
     * `:label` - the text label
     * `:data` - additional data used by particular field type (eg. `:select` stores here data
       for `<option>`'s)
@@ -17,7 +18,6 @@ defmodule Formex.Field do
   """
   defstruct name: nil,
     type: nil,
-    value: nil,
     required: true,
     validation: [],
     label: "",
@@ -52,17 +52,17 @@ defmodule Formex.Field do
       ```
   """
   def create_field(form, type, name, opts \\ []) do
-
     data = []
-    data = if opts[:choices], do: Keyword.merge(data, [choices: opts[:choices]]), else: data
+    data = if opts[:choices],
+      do:   Keyword.merge(data, [choices: opts[:choices]]),
+      else: data
 
     %Field{
       name: name,
       type: type,
-      value: get_value(form, name),
       label: get_label(name, opts),
       required: Keyword.get(opts, :required, true),
-      validation: Keyword.get(opts, :validation),
+      validation: Keyword.get(opts, :validation, []),
       data: data,
       opts: prepare_opts(opts),
       phoenix_opts: prepare_phoenix_opts(opts)
@@ -78,15 +78,6 @@ defmodule Formex.Field do
     end
   end
 
-  @doc false
-  def get_value(form, name) do
-    if form.struct do
-      Map.get(form.struct, name)
-    else
-      nil
-    end
-  end
-
   def prepare_opts(opts) do
     Keyword.delete(opts, :phoenix_opts)
   end
@@ -98,6 +89,19 @@ defmodule Formex.Field do
       phoenix_opts
     else
       Keyword.put(phoenix_opts, :class, "")
+    end
+  end
+
+  #
+
+  @spec put_default_validation(field :: t) :: t
+  defp put_default_validation(field) do
+    case field.type do
+      t when t in [:select, :multiple_select] ->
+        field
+        |> Validator.put_select_validation
+      _ ->
+        field
     end
   end
 
