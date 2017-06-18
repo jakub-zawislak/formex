@@ -15,8 +15,11 @@ defimpl Formex.BuilderProtocol, for: Formex.BuilderType.Ecto do
   def create_form(args) do
     form = args.form.type.build_form(args.form)
 
+    method = if form.struct.id, do: :put, else: :post
+
     form = form
     |> Map.put(:struct, preload_assocs(form))
+    |> Map.put(:method, method)
     |> Form.finish_creating
 
     Map.put(args, :form, form)
