@@ -90,19 +90,11 @@ defmodule Formex.View do
     phoenix_options = options
     |> Keyword.delete(:template)
     |> Keyword.delete(:template_options)
-    |> Keyword.put_new(:as, :formex)
+    |> Keyword.put_new(:as, form_for_name(form))
     |> Keyword.put_new(:method, form.method || :post)
 
     fake_params = %{}
     |> Map.put(to_string(phoenix_options[:as]), form_to_params(form))
-
-    # fake_params = %{
-    #   to_string(phoenix_options[:as]) => %{
-    #     "schools" => %{"0" => %{"department_id" => nil, "formex_delete" => nil,
-    #     "formex_id" => nil, "id" => "b1902697-b577-44ae-bbd2-010c84eea0cc",
-    #     "name" => "fgh234aa54"}}
-    #   }
-    # }
 
     fake_conn = %Plug.Conn{params: fake_params, method: "POST"}
 
@@ -113,6 +105,13 @@ defmodule Formex.View do
       |> Map.put(:template_options, options[:template_options])
       |> fun.()
     end)
+  end
+
+  defp form_for_name(%{struct_module: module}) do
+    module
+    |> Module.split()
+    |> List.last()
+    |> Macro.underscore()
   end
 
   @spec form_to_params(form :: Form.t) :: Map.t
