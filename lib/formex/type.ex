@@ -26,12 +26,6 @@ defmodule Formex.Type do
         class: "btn-primary"
       ])
     end
-
-    # optional
-    def changeset_after_create_callback(changeset) do
-      # do an extra validation
-      changeset
-    end
   end
   ```
 
@@ -286,7 +280,7 @@ defmodule Formex.Type do
   Behaviour depends on `type_or_module` argument:
     * if it's a module and
       * implements `Formex.CustomField`, the `c:Formex.CustomField.create_field/3` is called
-      * implements `Formex.Type`, the `Formex.Form.register/4` is called (it's for 
+      * implements `Formex.Type`, the `Formex.Form.register/4` is called (it's for
         nested forms and collections of forms)
     * if it's `:submit` or `:reset`, the `Formex.Button.create_button/3` is called
     * otherwise, the `Formex.Field.create_field/4` is called.
@@ -318,7 +312,7 @@ defmodule Formex.Type do
 
   # @doc """
   # The Vex validator has a `Vex.Struct.validates/2` that is used to define validation inside
-  # a struct's module. `Formex.Vex` can use that validation in addition to a validation set in a form 
+  # a struct's module. `Formex.Vex` can use that validation in addition to a validation set in a form
   # type. Because it is not always a desired behaviour, you can control it in this callback.
 
   # Defaults to `false`.

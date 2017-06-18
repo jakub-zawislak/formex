@@ -35,9 +35,8 @@ defmodule Formex.Field do
   ## Options
 
     * `:label`
-    * `:required` - defaults to true. If set, it will be validated by the
-      `Ecto.Changeset.validate_required/4`. Also, the template helper will use it to generate
-      an additional `.required` CSS class.
+    * `:required` - defaults to true. Used only by the template helper to generate an additional
+      `.required` CSS class.
     * `:choices` - list of `<option>`s for `:select` and `:multiple_select`
       ```
       form

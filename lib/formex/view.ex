@@ -12,7 +12,7 @@ defmodule Formex.View do
   Example of use:
 
       <%= formex_form_for @form, @action, fn f -> %>
-        <%= if @form.changeset.action do %>
+        <%= if @form.submitted? do %>
           <div class="alert alert-danger">
             <p>Oops, something went wrong! Please check the errors below.</p>
           </div>

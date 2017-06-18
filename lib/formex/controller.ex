@@ -61,7 +61,7 @@ defmodule Formex.Controller do
     if form.valid? do
       {:ok, form.new_struct}
     else
-      {:error, form}
+      {:error, %{form | submitted?: true}}
     end
   end
 

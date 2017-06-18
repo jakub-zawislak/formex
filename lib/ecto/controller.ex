@@ -91,7 +91,7 @@ defmodule Formex.Ecto.Controller do
         {:ok, struct} -> {:ok, struct}
       end
     else
-      {:error, form}
+      {:error, %{form | submitted?: true}}
     end
   end
 
@@ -112,7 +112,7 @@ defmodule Formex.Ecto.Controller do
         {:ok, struct} -> {:ok, struct}
       end
     else
-      {:error, form}
+      {:error, %{form | submitted?: true}}
     end
   end
 
@@ -126,11 +126,11 @@ defmodule Formex.Ecto.Controller do
     if errors != %{} do
       raise "Your changeset has errors. Since Formex 0.5, errors added in
       `Type.changeset_after_create_callback` are not being validated. You have to use
-      new validator functionality. Found errors:\n
+      new validator functionality. Errors found:\n
       "<>inspect(errors)
     end
 
-    {:error, form}
+    {:error, %{form | submitted?: true}}
   end
 
 end

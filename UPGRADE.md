@@ -11,10 +11,12 @@
 
   The above change solves that problem. Now it works in the same way as in Symfony
 
+validatory
 
 usunąć translate error z configa
 
 <%= if @form.changeset.action do %>(wyświetl błąd) - już nie ma form.changeset
+form.submitted?
 
 import Formex.Ecto.Controller
 

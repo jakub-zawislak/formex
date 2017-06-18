@@ -15,7 +15,7 @@ defmodule Formex.Form do
     * `:struct_info` - additional info about struct, that can differs between implementations
       of `Formex.BuilderProtocol`
     * `:items` - list of `Formex.Field` and `Button` structs
-    * `:params` - params that will be used in `Ecto.Changeset.cast`
+    * `:params` - sent parameters
     * `:phoenix_form` - `%Phoenix.HTML.Form{}`
     * `:template` - the module that implements `Formex.Template`, for example:
       `Formex.Template.BootstrapHorizontal`. Can be set via a `Formex.View.formex_form_for` options
@@ -23,6 +23,7 @@ defmodule Formex.Form do
     * `:prepare_form_collection` - callback function used by `Formex.Ecto`
     * `:method` - `:post`, `:put` etc. May be used by `Formex.View`.
       E.g. `Formex.Ecto.Builder` sets here `:put` if we editing `struct`, `:post` otherwise.
+    * `:submitted?` - is form submitted? Set by `Formex.Controller.handle_form/1`
     * `:opts` - additional data passed in a controller. See: `Formex.Builder.create_form/5`
   """
   defstruct type: nil,
@@ -40,7 +41,8 @@ defmodule Formex.Form do
     method: nil,
     opts: [],
     template: nil,
-    template_options: nil
+    template_options: nil,
+    submitted?: false
 
   @type t :: %Form{}
 
