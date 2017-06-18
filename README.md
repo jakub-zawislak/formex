@@ -1,25 +1,33 @@
 # Formex
 
-Formex is an abstract layer that helps to build forms in Phoenix and Ecto. With this library you
-don't write changeset, but a separate module that declares fields of form
+Formex is an abstract layer that helps to build forms in Phoenix framework.
+With this library you don't write changeset (as in Ecto), but a separate module that declares
+fields of form
 (like in [Symfony](https://symfony.com/doc/current/forms.html#creating-form-classes)).
-Formex will build changeset and additional Ecto queries (to get options for `<select>`) for itself.
 
-Formex also comes with helper functions for templating. For now there is only a Bootstrap 3 form
+You can also use it with Ecto - see [formex_ecto](https://github.com/jakub-zawislak/formex_ecto).
+That library will build changeset and additional Ecto queries (to get options for `<select>`)
+for itself.
+
+Formex doesn't come with validator - it uses [validation libraries](https://hexdocs.pm/formex/Formex.Validator.html#available-adapters) instead.
+
+Formex comes with helper functions for templating. For now there is only a Bootstrap 3 form
 template, but you can easily create your own templates.
-
-**It doesn't require a database**, although there is an Ecto dependency.
-You can use Ecto's `embedded_schema` (instead of `schema`) to use it without database.
 
 ## TL;DR
 
 <img src="http://i.imgur.com/YIG0R2P.png" width="800px">
 
 ## Installation
+In addition to the main library, you have to install validation adapter.
+In this example we will use Vex.
+[List of available adapters](https://hexdocs.pm/formex/Formex.Validator.html#available-adapters)
+
 `mix.exs`
 ```elixir
 def deps do
   [{:formex, "~> 0.4.0"}]
+  [{:formex_vex, "~> 0.0.1"}]
 end
 
 def application do
@@ -36,7 +44,8 @@ config :formex,
   template_options: [ # optional, also can be overridden in the template
     left_column: "col-sm-2",
     right_column: "col-sm-10"
-  ]
+  ],
+  validator: Formex.Validator.Vex
 ```
 
 `web/web.ex`
@@ -214,4 +223,4 @@ Now you can use tests via `mix test`.
 - [x] tests
 - [x] submit button
 - [x] usage without schemas
-- [ ] make it work without Ecto so everyone will be happy
+- [x] make it work without Ecto so everyone will be happy

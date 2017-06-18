@@ -121,7 +121,7 @@ defmodule Formex.FormCollection do
 
   defp create_subform(form, name, type, substruct, subparams, submodule, opts) do
 
-    subform = Formex.Builder2.create_form(type, substruct, subparams, form.opts, submodule)
+    subform = Formex.Builder.create_form(type, substruct, subparams, form.opts, submodule)
 
     %FormNested{
       form: subform,

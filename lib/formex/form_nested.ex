@@ -54,7 +54,7 @@ defmodule Formex.FormNested do
 
     params  = form.params[to_string(name)] || %{}
 
-    subform = Formex.Builder2.create_form(type, substruct, params, form.opts, struct_module)
+    subform = Formex.Builder.create_form(type, substruct, params, form.opts, struct_module)
 
     form_nested
     |> Map.put(:form, subform)

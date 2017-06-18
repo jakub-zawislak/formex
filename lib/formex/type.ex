@@ -256,7 +256,10 @@ defmodule Formex.Type do
 
       # def validate_whole_struct?, do: false
 
-      # defoverridable [validate_whole_struct?: 0]
+      def validator, do: nil
+
+      defoverridable [validator: 0]
+      # defoverridable [validate_whole_struct?: 0, validator: 0]
     end
   end
 

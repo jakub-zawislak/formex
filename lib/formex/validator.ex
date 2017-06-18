@@ -4,11 +4,48 @@ defmodule Formex.Validator do
   alias Formex.FormCollection
   alias Formex.FormNested
 
+  @moduledoc """
+  Validator behaviour.
+
+  In Formex you can use any validation library. Of course, if proper adapter is already implemented.
+
+  # Available adapters:
+
+  * [Vex](https://github.com/jakub-zawislak/formex_vex)
+
+  # Usage
+
+  Setting default validator:
+
+  `config/config.exs`
+  ```
+  config :formex,
+    validator: Formex.Validator.Vex
+  ```
+
+  Using another validator in a specific form type
+
+  ```
+  def build_form(form) do
+    form
+    |> add(:name, :text_input)
+    # ...
+  end
+
+  def validator, do: Formex.Validator.Vex
+  ```
+
+  # Implementing adapter for another library
+
+  See implementation for [Vex](https://github.com/jakub-zawislak/formex_vex) for example.
+
+  """
+
   @callback validate(form :: Formex.Form.t) :: List.t
 
   @spec validate(Form.t) :: Form.t
   def validate(form) do
-    validator = get_validator()
+    validator = get_validator(form)
 
     form = validator.validate(form)
 
@@ -37,8 +74,9 @@ defmodule Formex.Validator do
 
   #
 
-  defp get_validator() do
-    Application.get_env(:formex, :validator)
+  @spec get_validator(form :: Form.t) :: any
+  defp get_validator(form) do
+    form.type.validator || Application.get_env(:formex, :validator)
   end
 
   @spec valid?(Form.t) :: boolean
