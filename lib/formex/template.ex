@@ -13,7 +13,7 @@ defmodule Formex.Template do
 
     def generate_row(form, field, _options \\\\ []) do
       # code that produces a Phoenix.HTML.safe
-      # you can use here render_phoenix_input/2, translate_error/2, has_error/2
+      # you can use here render_phoenix_input/2, has_error/2
     end
   end
   ```
@@ -50,7 +50,7 @@ defmodule Formex.Template do
     use Formex.Template, :helper # note the :helper argument
 
     # a common code for both versions
-    # you can use here render_phoenix_input/2, translate_error/2, has_error/2
+    # you can use here render_phoenix_input/2, has_error/2
   end
   ```
 

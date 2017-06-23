@@ -1,6 +1,6 @@
 # Upgrade from 0.4 to 0.5
 
-* the `:required` option no longer validates presence of value. It's now used only in template,
+* the `:required` option NO LONGER VALIDATES PRESENCE OF VALUE. It's now used only in template,
   e.g. to generate an asterisk. Validation can be performed via `:validation` option.
 
   Why? For example, you have form for client, and client can be individual or business.
@@ -13,10 +13,11 @@
 
 validatory
 
+* since 0.5 you must to use external validators to validate required fields.
+
 usunąć translate error z configa
 
-<%= if @form.changeset.action do %>(wyświetl błąd) - już nie ma form.changeset
-form.submitted?
+<%= if @form.changeset.action do %>(wyświetl błąd) - już nie ma form.changeset, tylko form.submitted?
 
 import Formex.Ecto.Controller
 

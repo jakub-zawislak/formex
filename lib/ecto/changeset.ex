@@ -15,6 +15,14 @@ defmodule Formex.Ecto.Changeset do
     |> form.type.changeset_after_create_callback(form)
   end
 
+  @spec create_changeset_without_embedded(form :: Form.t) :: Form.t
+  def create_changeset_without_embedded(form) do
+    form.struct
+    |> cast(form.params, get_normal_fields_names(form))
+    |> cast_multiple_selects(form)
+    |> form.type.changeset_after_create_callback(form)
+  end
+
   #
 
   defp get_normal_fields_names(form) do

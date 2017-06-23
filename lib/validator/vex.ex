@@ -23,7 +23,8 @@ defmodule Formex.Validator.Vex do
         errors = Map.from_struct(form.new_struct)
         |> Vex.errors([{item.name, item.validation}])
         |> Enum.map(fn error ->
-          elem(error, 3)
+          message = elem(error, 3)
+          {message, []}
         end)
 
         {item.name, errors}

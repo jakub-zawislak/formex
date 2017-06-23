@@ -9,7 +9,8 @@ You can also use it with Ecto - see [formex_ecto](https://github.com/jakub-zawis
 That library will build changeset and additional Ecto queries (to get options for `<select>`)
 for itself.
 
-Formex doesn't come with validator - it uses [validation libraries](https://hexdocs.pm/formex/Formex.Validator.html#available-adapters) instead.
+Formex doesn't validate data for itself - it uses
+[validation libraries](https://hexdocs.pm/formex/Formex.Validator.html#available-adapters) instead.
 
 Formex comes with helper functions for templating. For now there is only a Bootstrap 3 form
 template, but you can easily create your own templates.
@@ -19,7 +20,7 @@ template, but you can easily create your own templates.
 <img src="http://i.imgur.com/YIG0R2P.png" width="800px">
 
 ## Installation
-In addition to the main library, you have to install validation adapter.
+In addition to the main library, you have to install some validator adapter.
 In this example we will use Vex.
 [List of available adapters](https://hexdocs.pm/formex/Formex.Validator.html#available-adapters)
 
@@ -27,7 +28,7 @@ In this example we will use Vex.
 ```elixir
 def deps do
   [{:formex, "~> 0.4.0"}]
-  [{:formex_vex, "~> 0.0.1"}]
+  [{:formex_vex, "~> 0.1.0"}]
 end
 
 def application do
@@ -39,13 +40,13 @@ end
 ```elixir
 config :formex,
   repo: App.Repo,
-  translate_error: &App.ErrorHelpers.translate_error/1,
-  template: Formex.Template.BootstrapHorizontal, # optional, can be overridden in a .eex template
-  template_options: [ # optional, also can be overridden in the template
+  validator: Formex.Validator.Vex,
+  translate_error: &App.ErrorHelpers.translate_error/1, # optional, from /web/views/error_helpers.ex
+  template: Formex.Template.BootstrapHorizontal,        # optional, can be overridden in a template
+  template_options: [                                   # optional, can be overridden in a template
     left_column: "col-sm-2",
     right_column: "col-sm-10"
-  ],
-  validator: Formex.Validator.Vex
+  ]
 ```
 
 `web/web.ex`

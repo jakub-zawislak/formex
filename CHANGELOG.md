@@ -1,4 +1,11 @@
-## v0.5.0 (2017-05-)
+## v0.5.0 (2017-06-)
+* Added ability to use library without Ecto
+* Ecto functionality moved to `formex_ecto` library
+* Added ability to use external validators
+* `:required` option no longer validates presence of value. It's now used only in template
+* Config option `:translate_error` is no longer required, by default errors are not translated
+
+See CHANGELOG.md for migration instructions
 
 ## v0.4.13 (2017-04-18)
 * Temporarily removed ability to filter collection items, that was added in the 0.4.10
@@ -8,7 +15,7 @@
 
 ## v0.4.10 (2017-04-16)
 * Ability to filter items in form collections
-* Improved code of form collections. It's required to update JS library: 
+* Improved code of form collections. It's required to update JS library:
   Run `npm install formex`.
 
 ## v0.4.8 (2017-04-13)

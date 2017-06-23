@@ -25,12 +25,15 @@ defmodule Formex.Ecto.Type do
       changeset
     end
   ```
+
+  If you want to add errors to changeset, see
+  `c:Formex.Ecto.ChangesetValidator.changeset_validation/2`
+
   """
 
   defmacro __using__([]) do
     quote do
-      @behaviour Formex.Type
-      import Formex.Type
+      @behaviour Formex.Ecto.Type
 
       def changeset_after_create_callback(changeset, _form) do
         changeset
@@ -44,7 +47,9 @@ defmodule Formex.Ecto.Type do
   Callback that will be called after changeset creation.
 
   In this callback you can modify changeset.
-  Since Formex 0.5, you cannot add errors to changeset.
+
+  Since Formex 0.5, you cannot add errors to changeset. If you want to do so, see
+  `c:Formex.Ecto.ChangesetValidator.changeset_validation/2`
   """
   @callback changeset_after_create_callback(changeset :: Ecto.Changeset.t, form :: Formex.Form.t)
     :: Ecto.Changeset.t
