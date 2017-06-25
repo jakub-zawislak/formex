@@ -37,11 +37,15 @@
 
   replace
 
-  `<%= if @form.changeset.action do %>oops, error<% end %>`
+  ```elixir
+  <%= if @form.changeset.action do %>oops, error<% end %>
+  ```
 
   with
 
-  `<%= if @form.submitted? do %>oops, error<% end %>`
+  ```elixir
+  <%= if @form.submitted? do %>oops, error<% end %>
+  ```
 
 * `Formex.CustomField.SelectAssoc` renamed to `Formex.Ecto.CustomField.SelectAssoc` and moved to
   `formex_ecto` package
