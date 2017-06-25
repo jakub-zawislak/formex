@@ -12,7 +12,7 @@ defmodule Formex.View do
   Example of use:
 
       <%= formex_form_for @form, @action, fn f -> %>
-        <%= if @form.changeset.action do %>
+        <%= if @form.submitted? do %>
           <div class="alert alert-danger">
             <p>Oops, something went wrong! Please check the errors below.</p>
           </div>
@@ -80,6 +80,7 @@ defmodule Formex.View do
     * `template` - a form template that implements `Formex.Template`, for example:
       `Formex.Template.BootstrapHorizontal`
     * `template_options` - additional options, supported by the template
+    * `as` - form name, defaults to `:formex`
 
   """
   @spec formex_form_for(form :: Form.t, action :: String.t, options :: Keyword.t,
@@ -89,14 +90,86 @@ defmodule Formex.View do
     phoenix_options = options
     |> Keyword.delete(:template)
     |> Keyword.delete(:template_options)
+    |> Keyword.put_new(:as, form_for_name(form))
+    |> Keyword.put_new(:method, form.method || :post)
 
-    Phoenix.HTML.Form.form_for(form.changeset, action, phoenix_options, fn f ->
+    fake_params = %{}
+    |> Map.put(to_string(phoenix_options[:as]), form_to_params(form))
+
+    fake_conn = %Plug.Conn{params: fake_params, method: "POST"}
+
+    Phoenix.HTML.Form.form_for(fake_conn, action, phoenix_options, fn phx_form ->
       form
-      |> Map.put(:phoenix_form, f)
+      |> Map.put(:phoenix_form, phx_form)
       |> Map.put(:template, options[:template])
       |> Map.put(:template_options, options[:template_options])
       |> fun.()
     end)
+  end
+
+  defp form_for_name(%{struct_module: module}) do
+    module
+    |> Module.split()
+    |> List.last()
+    |> Macro.underscore()
+  end
+
+  @spec form_to_params(form :: Form.t) :: Map.t
+  defp form_to_params(form) do
+
+    form.items
+    |> Enum.map(fn item ->
+      case item do
+        %Field{} ->
+          val = Map.get(form.new_struct, item.name)
+
+          new_val = case item.type do
+            :multiple_select ->
+              Enum.map(val, fn subval ->
+                case subval do
+                  substruct when is_map(substruct) ->
+                    substruct.id
+                  _ ->
+                    subval
+                end
+                |> to_string
+              end)
+            _ ->
+              val
+          end
+
+          { to_string(item.name), new_val }
+
+        %FormNested{} ->
+          { to_string(item.name), form_to_params(item.form) }
+
+        %FormCollection{} ->
+          new_val = Range.new(0, Enum.count(item.forms)-1)
+          |> Enum.zip(item.forms)
+          |> Enum.map(fn {key, nested_form} ->
+            sub_struct = nested_form.form.new_struct
+
+            subparams  = form_to_params(nested_form.form)
+            |> Map.put("id", sub_struct.id |> to_string)
+            |> Map.put("formex_id", sub_struct.formex_id)
+            |> Map.put(
+              to_string(item.delete_field),
+              Map.get(sub_struct, item.delete_field) |> to_string
+            )
+
+            { to_string(key), subparams }
+          end)
+          |> Enum.into(%{})
+
+          { to_string(item.name), new_val }
+
+        _ ->
+          false
+      end
+    end)
+    |> Enum.filter(&(&1))
+    |> Enum.into(%{})
+    # |> IO.inspect
   end
 
   @doc """

@@ -10,7 +10,7 @@ defmodule Formex.Type do
   ```
   defmodule App.ArticleType do
     use Formex.Type
-    alias Formex.CustomField.SelectAssoc
+    alias Formex.Ecto.CustomField.SelectAssoc
 
     def build_form(form) do
       form
@@ -26,12 +26,6 @@ defmodule Formex.Type do
         class: "btn-primary"
       ])
     end
-
-    # optional
-    def changeset_after_create_callback(changeset) do
-      # do an extra validation
-      changeset
-    end
   end
   ```
 
@@ -41,22 +35,16 @@ defmodule Formex.Type do
   want, for some reason, store in the `User` model.
 
   ```
-  schema "users" do
-    field       :first_name, :string
-    field       :last_name, :string
-    belongs_to  :user_info, App.UserInfo
+  defmodule App.User do
+    defstruct [:first_name, :last_name, user_info: %App.UserInfo{}]
   end
   ```
 
   ```
-  schema "user_infos" do
-    field   :section, :string
-    field   :organisation_cell, :string
-    has_one :user, App.User
+  defmodule App.UserInfo do
+    defstruct [:section, :organisation_cell]
   end
   ```
-
-  Note: `belongs_to` can also be placed in `UserInfo` and so on, it doesn't matter in this example.
 
   Our form will consist of two modules:
 
@@ -69,7 +57,7 @@ defmodule Formex.Type do
       form
       |> add(:first_name, :text_input)
       |> add(:last_name, :text_input)
-      |> add(:user_info, App.UserInfoType)
+      |> add(:user_info, App.UserInfoType, struct_module: App.UserInfo)
     end
   end
   ```
@@ -144,23 +132,18 @@ defmodule Formex.Type do
   We have models `User`, and `UserAddress`.
 
   ```
-  schema "users" do
-    field     :first_name, :string
-    field     :last_name, :string
-    has_many  :user_addresses, App.UserAddress
+  defmodule App.User do
+    defstruct [:first_name, :last_name, user_addresses: []]
   end
   ```
 
   ```
-  schema "user_addresses" do
-    field       :street, :string
-    field       :postal_code, :string
-    field       :city, :string
-    belongs_to  :user, App.User
-
-    formex_collection_child() # important!
+  defmodule App.UserAddress do
+    defstruct [:id, :street, :city, :formex_id, :formex_delete]
   end
   ```
+
+  Keys `:id`, `:formex_id` and `:formex_delete` are important in collection child.
 
   ### Form Type
 
@@ -175,7 +158,7 @@ defmodule Formex.Type do
       form
       |> add(:first_name, :text_input)
       |> add(:last_name, :text_input)
-      |> add(:user_addresses, App.UserAddressType)
+      |> add(:user_addresses, App.UserAddressType, struct_module: App.UserAddress)
     end
   end
   ```
@@ -260,11 +243,20 @@ defmodule Formex.Type do
       @behaviour Formex.Type
       import Formex.Type
 
+<<<<<<< HEAD
       def changeset_after_create_callback(changeset, _form) do
         changeset
       end
 
       defoverridable [changeset_after_create_callback: 2]
+=======
+      # def validate_whole_struct?, do: false
+
+      def validator, do: nil
+
+      defoverridable [validator: 0]
+      # defoverridable [validate_whole_struct?: 0, validator: 0]
+>>>>>>> 0.5
     end
   end
 
@@ -281,31 +273,32 @@ defmodule Formex.Type do
   end
 
   @doc """
-  Adds an form item to the form. May be a field, custom field, button, or subform.
+  Adds a form item to the form. May be a field, custom field, button, or subform.
 
   `type_or_module` is `:text_input` by default.
 
   Behaviour depends on `type_or_module` argument:
     * if it's a module and
       * implements `Formex.CustomField`, the `c:Formex.CustomField.create_field/3` is called
-      * implements `Formex.Type`, the `Formex.Form.create_subform/4` is called
+      * implements `Formex.Type`, the `Formex.Form.register/4` is called (it's for
+        nested forms and collections of forms)
     * if it's `:submit` or `:reset`, the `Formex.Button.create_button/3` is called
     * otherwise, the `Formex.Field.create_field/4` is called.
   """
   @spec add(form :: Form.t, name :: Atom.t, type_or_module :: Atom.t, opts :: Map.t) :: Form.t
   def add(form, name, type_or_module, opts) do
 
-    {form, item} = if Formex.Utils.module?(type_or_module) do
+    item = if Formex.Utils.module?(type_or_module) do
       if Formex.Utils.implements?(type_or_module, Formex.CustomField) do
-        {form, type_or_module.create_field(form, name, opts)}
+        type_or_module.create_field(form, name, opts)
       else
-        Formex.Form.create_subform(form, type_or_module, name, opts)
+        Formex.Form.start_creating(form, type_or_module, name, opts)
       end
     else
       if Enum.member?([:submit, :reset], type_or_module) do
-        {form, Formex.Button.create_button(type_or_module, name, opts)}
+        Formex.Button.create_button(type_or_module, name, opts)
       else
-        {form, Formex.Field.create_field(form, type_or_module, name, opts)}
+        Formex.Field.create_field(form, type_or_module, name, opts)
       end
     end
 
@@ -317,11 +310,13 @@ defmodule Formex.Type do
   """
   @callback build_form(form :: Formex.Form.t) :: Formex.Form.t
 
-  @doc """
-  Callback that will be called after changeset creation. In this function you can
-  for example add an extra validation to your changeset.
-  """
-  @callback changeset_after_create_callback(changeset :: Ecto.Changeset.t, form :: Formex.Form.t) 
-    :: Ecto.Changeset.t
+  # @doc """
+  # The Vex validator has a `Vex.Struct.validates/2` that is used to define validation inside
+  # a struct's module. `Formex.Vex` can use that validation in addition to a validation set in a form
+  # type. Because it is not always a desired behaviour, you can control it in this callback.
+
+  # Defaults to `false`.
+  # """
+  # @callback validate_whole_struct?() :: boolean
 
 end

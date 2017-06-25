@@ -1,44 +1,64 @@
 defmodule Formex.FormNested do
-  @repo Application.get_env(:formex, :repo)
   alias __MODULE__
   alias Formex.Field
   alias Formex.Form
 
   defstruct form: nil,
     name: nil,
-    opts: [],
-    required: true
+    struct_module: nil,
+    type: nil,
+    validation: [],
+    opts: []
 
   @type t :: %FormNested{}
 
-  @spec create(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
-  def create(form, type, name, opts) do
-    substruct = Field.get_value(form, name)
+  @moduledoc """
+  ```
+  form
+  |> add(:user_info, :nested, type: App.UserInfoType, struct_module: App.UserInfo)
+  ```
 
-    {form, substruct} = if Ecto.assoc_loaded? substruct do
-      {form, substruct}
-    else
-      struct    = @repo.preload(form.struct, name)
-      substruct = Map.get(struct, name)
+  ## Options
 
-      struct = Map.put(struct, name, substruct)
-      form   = Map.put(form, :struct, struct)
+    * `type` - module that implements `Formex.Type`. Required
+    * `struct_module` - module of struct, e.g. `App.UserInfo`
+  """
 
-      {form, substruct}
+  @spec start_creating(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
+  def start_creating(form, type, name, opts) do
+
+    submodule = case form.struct_info[name] do
+      {:nested, submodule} -> submodule
+      _ -> nil
     end
 
-    submodule = Form.get_assoc_or_embed(form, name).related
-    params    = form.params[to_string(name)] || %{}
+    submodule = if !submodule do
+      Keyword.get(opts, :struct_module) || raise "the :struct_module option is required"
+    else
+      submodule
+    end
 
-    subform = Formex.Builder.create_form(type, substruct, params, form.opts, submodule)
-    item    = %FormNested{
-      form: subform,
+    %FormNested{
       name: name,
-      required: Keyword.get(opts, :required, true),
+      struct_module: submodule,
+      type: type,
+      validation: Keyword.get(opts, :validation, []),
       opts: opts
     }
+  end
 
-    {form, item}
+  @spec finish_creating(form :: Form.t, form_nested :: FormNested.t) :: Form.t
+  def finish_creating(form, form_nested) do
+    %{type: type, name: name, struct_module: struct_module} = form_nested
+
+    substruct = Field.get_value(form, name)
+
+    params  = form.params[to_string(name)] || %{}
+
+    subform = Formex.Builder.create_form(type, substruct, params, form.opts, struct_module)
+
+    form_nested
+    |> Map.put(:form, subform)
   end
 
 end

@@ -4,7 +4,7 @@ defmodule Formex.View.Nested do
   @moduledoc """
   Helper functions for templating nested form.
 
-  Check [Type docs](https://hexdocs.pm/formex/Formex.Type.html#module-nested-forms)
+  See [Type docs](https://hexdocs.pm/formex/Formex.Type.html#module-nested-forms)
   for example of use.
   """
 

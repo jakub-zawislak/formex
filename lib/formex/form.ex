@@ -1,7 +1,7 @@
 defmodule Formex.Form do
-  @repo Application.get_env(:formex, :repo)
   alias __MODULE__
   alias Formex.Field
+  alias Formex.Button
   alias Formex.FormNested
   alias Formex.FormCollection
 
@@ -9,31 +9,41 @@ defmodule Formex.Form do
   Defines the Formex.Form struct.
 
     * `:type` - the module that implements `Formex.Type`, for example: `App.ArticleType`
-    * `:struct` - the struct that will be used in `Ecto.Changeset.cast`, for example: `%App.Article{}`
-    * `:model` - `struct.__struct__`, for example: `App.Article`
-    * `:items` - list of `Formex.Field` and `Formex.Button` structs
-    * `:params` - params that will be used in `Ecto.Changeset.cast`
-    * `:changeset` - `%Ecto.Changeset{}`
+    * `:struct` - the struct of your data, for example: `%App.Article{}`
+    * `:new_struct` - the `:struct` with `:params` applied
+    * `:struct_module` - `struct.__struct__`, for example: `App.Article`
+    * `:struct_info` - additional info about struct, that can differs between implementations
+      of `Formex.BuilderProtocol`
+    * `:items` - list of `Formex.Field` and `Button` structs
+    * `:params` - sent parameters
     * `:phoenix_form` - `%Phoenix.HTML.Form{}`
     * `:template` - the module that implements `Formex.Template`, for example:
       `Formex.Template.BootstrapHorizontal`. Can be set via a `Formex.View.formex_form_for` options
+    * `:method` - `:post`, `:put` etc. May be used by `Formex.View`.
+      E.g. `Formex.Ecto.Builder` sets here `:put` if we editing `struct`, `:post` otherwise.
+    * `:submitted?` - is form submitted? Set by `Formex.Controller.handle_form/1`
     * `:opts` - additional data passed in a controller. See: `Formex.Builder.create_form/5`
   """
   defstruct type: nil,
     struct: nil,
-    model: nil,
+    new_struct: nil,
+    struct_module: nil,
+    struct_info: nil,
+    valid?: false,
+    errors: [],
     items: [],
     params: %{},
-    changeset: nil,
     phoenix_form: nil,
+    method: nil,
     opts: [],
     template: nil,
-    template_options: nil
+    template_options: nil,
+    submitted?: false
 
   @type t :: %Form{}
 
   @doc """
-  Adds field to the form. More: `Formex.Field.create_field/4`, `Formex.Button.create_button/3`
+  Adds field to the form. More: `Formex.Field.create_field/4`, `Button.create_button/3`
   """
   @spec put_item(form :: t, item :: any) :: t
   def put_item(form, item) do
@@ -52,6 +62,15 @@ defmodule Formex.Form do
   end
 
   @doc """
+  Returns list of items which can be validated (all except the `Button`)
+  """
+  @spec get_fields_validatable(form :: t) :: list
+  def get_fields_validatable(form) do
+    form.items
+    |> Enum.filter(&(&1.__struct__ != Button))
+  end
+
+  @doc """
   Returns list of `t:Formex.FormNested.t/0` and `t:Formex.FormCollection.t/0`
   """
   @spec get_subforms(form :: t) :: list
@@ -61,29 +80,59 @@ defmodule Formex.Form do
   end
 
   @doc """
-  Creates a form for assoc.
-
-  Example:
-
-  ```
-  form
-  |> add_form(:user_info, App.UserInfoType)
-  ```
-
-  ## Options
-
-    * `required` - is the subform required.
-
-      Defaults to `true`. This option will be passed to `Ecto.Changeset.cast_assoc/3`
+  Finds form item by name
   """
-  @spec create_subform(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
-  def create_subform(form, type, name, opts \\ []) do
+  @spec find(form :: t, name :: atom) :: list
+  def find(form, name) do
+    form.items
+    |> Enum.find(&(&1.name == name))
+  end
 
-    case get_assoc_or_embed(form, name).cardinality do
-      :one  -> Formex.FormNested.create(form, type, name, opts)
-      :many -> Formex.FormCollection.create(form, type, name, opts)
+  @doc """
+  Returns list of `t:Formex.FormNested.t/0`
+  """
+  @spec get_nested(form :: t) :: list
+  def get_nested(form) do
+    form.items
+    |> Enum.filter(&(&1.__struct__ == FormNested))
+  end
+
+  @doc """
+  Returns list of `t:Formex.FormCollection.t/0`
+  """
+  @spec get_collections(form :: t) :: list
+  def get_collections(form) do
+    form.items
+    |> Enum.filter(&(&1.__struct__ == FormCollection))
+  end
+
+  @spec start_creating(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
+  def start_creating(form, type, name, opts \\ []) do
+    info = form.struct_info[name]
+
+    if is_tuple(info) && elem(info, 0) == :collection do
+      Formex.FormCollection.start_creating(form, type, name, opts)
+    else
+      Formex.FormNested.start_creating(form, type, name, opts)
     end
+  end
 
+  @spec finish_creating(form :: Form.t) :: Form.t
+  def finish_creating(form) do
+    new_items = form.items
+    |> Enum.map(fn item ->
+      case item do
+        %FormCollection{} ->
+          FormCollection.finish_creating(form, item)
+        %FormNested{} ->
+          FormNested.finish_creating(form, item)
+        _ ->
+          item
+      end
+    end)
+
+    form
+    |> Map.put(:items, new_items)
   end
 
   @doc false
@@ -91,9 +140,9 @@ defmodule Formex.Form do
   def get_assoc_or_embed(form, name) do
 
     if is_assoc(form, name) do
-      form.model.__schema__(:association, name)
+      form.struct_module.__schema__(:association, name)
     else
-      form.model.__schema__(:embed, name)
+      form.struct_module.__schema__(:embed, name)
     end
 
   end
@@ -101,7 +150,7 @@ defmodule Formex.Form do
   @doc false
   @spec is_assoc(form :: Form.t, name :: Atom.t) :: boolean
   def is_assoc(form, name) do
-    form.model.__schema__(:association, name) != nil
+    form.struct_module.__schema__(:association, name) != nil
   end
 
 end

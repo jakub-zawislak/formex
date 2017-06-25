@@ -8,7 +8,7 @@ defmodule Formex.View.Collection do
   @moduledoc """
   Helper functions for templating collection of forms.
 
-  Check [Type docs](https://hexdocs.pm/formex/Formex.Type.html#module-collections-of-forms)
+  See [Type docs](https://hexdocs.pm/formex/Formex.Type.html#module-collections-of-forms)
   for example of use.
   """
 
@@ -190,34 +190,45 @@ defmodule Formex.View.Collection do
     template = collection.template
     template_options = collection.template_options
 
-    html = Phoenix.HTML.Form.inputs_for(form.phoenix_form, item.name, fn f ->
+    html = form.phoenix_form
+    |> Phoenix.HTML.Form.inputs_for(item.name, [default: []], fn f ->
+      fake_struct = %{id: f.params["id"], formex_id: f.params["formex_id"]}
+
       item
-      |> FormCollection.get_subform_by_struct(f.data)
-      |> case do 
+      |> FormCollection.get_subform_by_struct(fake_struct)
+      |> case do
         nil -> ""
         nested_form ->
-          subform = nested_form.form 
+          subform = nested_form.form
           |> Map.put(:phoenix_form, f)
           |> Map.put(:template, template)
           |> Map.put(:template_options, template_options)
 
           html = collection.fun_item.(subform)
 
+          style = if FormCollection.to_be_removed(item, nested_form) do
+            "display: none;"
+          else
+            ""
+          end
+
           if subform.struct.id do
-            delete_field = Phoenix.HTML.Form.hidden_input f, item.delete_field, 
+            id_field = Phoenix.HTML.Form.hidden_input f, :id
+            delete_field = Phoenix.HTML.Form.hidden_input f, item.delete_field,
               "data-formex-remove": ""
 
             content_tag(:div, [
               html,
+              id_field,
               delete_field
-            ], class: "formex-collection-item")
+            ], class: "formex-collection-item", style: style)
           else
-            id_field = Phoenix.HTML.Form.hidden_input f, :formex_id, "data-formex-id": ""
+            formex_id_field = Phoenix.HTML.Form.hidden_input f, :formex_id, "data-formex-id": ""
 
             content_tag(:div, [
               html,
-              id_field
-            ], class: "formex-collection-item formex-collection-item-new")
+              formex_id_field
+            ], class: "formex-collection-item formex-collection-item-new", style: style)
           end
       end
     end)
@@ -246,10 +257,10 @@ defmodule Formex.View.Collection do
   end
 
   defp generate_collection_prototype(form, item_name, item, fun_item, options) do
-    substruct = item.model
+    substruct = item.struct_module
     |> struct
 
-    struct = form.model
+    struct = form.struct_module
     |> struct
     |> Map.put(item_name, [substruct])
 
@@ -257,7 +268,7 @@ defmodule Formex.View.Collection do
 
     options = Keyword.put(options, :without_prototype, true)
 
-    {:safe, prot_html} = formex_form_for(prot_form, "", fn f ->
+    {:safe, prot_html} = formex_form_for(prot_form, "", [as: form.phoenix_form.name], fn f ->
       formex_collection(f, item_name, options, fn collection ->
         formex_collection_items(collection)
       end, fun_item)

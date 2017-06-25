@@ -82,7 +82,9 @@ defmodule Formex.Template.Bootstrap do
 
   def attach_error(tags, form, field) do
     if has_error(form, field) do
-      error_html  = prepare_error(form, field)
+      error_html  = get_errors(form, field)
+      |> Enum.map(&(content_tag(:p, &1)))
+
       error_field = content_tag(:span, error_html, class: "help-block")
       tags ++ [error_field]
     else

@@ -1,3 +1,10 @@
+## v0.5.0 (2017-06-)
+* Added ability to use library without Ecto
+* Ecto functionality moved to `formex_ecto` library
+* Added ability to use external validators
+* `:required` option no longer validates presence of value. It's now used only in template
+* Config option `:translate_error` is no longer required, by default errors are not translated
+
 ## v0.4.16 (2017-05-23)
 * Template now converts `\n` to `<br>` in error messages using `Phoenix.HTML.Format.text_to_html\2`
 
@@ -6,6 +13,8 @@
 
 ## v0.4.14 (2017-04-27)
 * Fixed passing `form.opts` to a prototype form in `Formex.View.Collection`
+
+See CHANGELOG.md for migration instructions
 
 ## v0.4.13 (2017-04-18)
 * Temporarily removed ability to filter collection items, that was added in the 0.4.10

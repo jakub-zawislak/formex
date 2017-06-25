@@ -13,7 +13,7 @@ defmodule Formex.Template do
 
     def generate_row(form, field, _options \\\\ []) do
       # code that produces a Phoenix.HTML.safe
-      # you can use here render_phoenix_input/2, translate_error/2, has_error/2
+      # you can use here render_phoenix_input/2, has_error/2
     end
   end
   ```
@@ -50,11 +50,11 @@ defmodule Formex.Template do
     use Formex.Template, :helper # note the :helper argument
 
     # a common code for both versions
-    # you can use here render_phoenix_input/2, translate_error/2, has_error/2
+    # you can use here render_phoenix_input/2, has_error/2
   end
   ```
 
-  Check the source code of
+  See the source code of
   [templates](https://github.com/jakub-zawislak/formex/tree/master/lib/templates)
   for more examples.
   """
@@ -114,33 +114,23 @@ defmodule Formex.Template do
   end
 
   @doc """
-  Translates error using `translate_error/2` and converts it using `Phoenix.HTML.Format.text_to_html/2`
+  Returns list of errors
   """
-  @spec prepare_error(Form.t, Field.t) :: Phoenix.HTML.safe
-  def prepare_error(form, field) do
-    form
-    |> translate_error(field)
-    |> Phoenix.HTML.Format.text_to_html()
+  @spec get_errors(Form.t, Field.t) :: any
+  def get_errors(form, field) do
+    form.errors[field.name] || []
   end
 
   @doc """
-  Translates error using function set in `:formex` config
-  """
-  @spec translate_error(Form.t, Field.t) :: any
-  def translate_error(form, field) do
-    Application.get_env(:formex, :translate_error).(form.phoenix_form.errors[field.name])
-  end
-
-  @doc """
-  Checks if given field has a changeset error
+  Checks if given field has an error
   """
   @spec has_error(Form.t, Field.t) :: any
   def has_error(form, field) do
-    form.phoenix_form.errors[field.name]
+    Enum.count(get_errors(form, field)) > 0
   end
 
   @doc """
-  Adds a CSS class to a `:phoenix_opts` keyword
+  Adds a CSS class to the `:phoenix_opts` keyword
   """
   @spec add_class(phoenix_opts :: Keyword.t, class :: String.t) :: Keyword.t
   def add_class(phoenix_opts, class) do
