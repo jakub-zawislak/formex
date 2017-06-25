@@ -22,12 +22,12 @@
 
   You have two options to migrate validations:
   1. Use any available validator and:
-    - move your validation from `changeset_after_create_callback` to `:validation`
-      option of `Formex.Type.add`
-    - rewrite translation for error messages, if had any
+      - move your validation from `changeset_after_create_callback` to `:validation`
+        option of `Formex.Type.add`
+      - rewrite translation for error messages, if had any
   2. Use `Formex.Ecto.ChangesetValidator` (from `formex_ecto` package) and:
-    - move your validation from `changeset_after_create_callback` to a new callback -
-    `changeset_validation` from `Formex.Ecto.ChangesetValidator`.
+      - move your validation from `changeset_after_create_callback` to a new callback -
+      `changeset_validation` from `Formex.Ecto.ChangesetValidator`.
 
   The second option is faster.
 
