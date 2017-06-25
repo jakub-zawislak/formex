@@ -290,7 +290,7 @@ defmodule Formex.Type do
       if Enum.member?([:submit, :reset], type_or_module) do
         Formex.Button.create_button(type_or_module, name, opts)
       else
-        Formex.Field.create_field(form, type_or_module, name, opts)
+        Formex.Field.create_field(type_or_module, name, opts)
       end
     end
 

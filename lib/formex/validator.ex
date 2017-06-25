@@ -1,6 +1,5 @@
 defmodule Formex.Validator do
   alias Formex.Form
-  alias Formex.Field
   alias Formex.FormCollection
   alias Formex.FormNested
 
@@ -107,7 +106,7 @@ defmodule Formex.Validator do
 
   @spec valid?(Form.t) :: boolean
   defp valid?(form) do
-    valid? = Enum.reduce_while(form.errors, true, fn {k, v}, _acc ->
+    valid? = Enum.reduce_while(form.errors, true, fn {_k, v}, _acc ->
       if Enum.count(v) > 0,
         do:   {:halt, false},
         else: {:cont, true}

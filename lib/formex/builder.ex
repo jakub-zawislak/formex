@@ -49,7 +49,7 @@ defmodule Formex.Builder do
   # in objective programming it would be easier :D
   @spec apply_params(form :: Form.t) :: Form.t
   defp apply_params(form) do
-    %{struct: struct, params: params, struct_info: struct_info} = form
+    %{struct: struct, params: params} = form
 
     struct = Enum.reduce(params, struct, fn {key, val}, struct ->
       key = String.to_atom(key)

@@ -1,6 +1,5 @@
 defmodule Formex.Field do
   alias __MODULE__
-  alias Formex.Validator
 
   @doc """
   Defines the Formex.Field struct.
@@ -50,7 +49,7 @@ defmodule Formex.Field do
       ])
       ```
   """
-  def create_field(form, type, name, opts \\ []) do
+  def create_field(type, name, opts \\ []) do
     data = []
     data = if opts[:choices],
       do:   Keyword.merge(data, [choices: opts[:choices]]),
@@ -97,19 +96,6 @@ defmodule Formex.Field do
       phoenix_opts
     else
       Keyword.put(phoenix_opts, :class, "")
-    end
-  end
-
-  #
-
-  @spec put_default_validation(field :: t) :: t
-  defp put_default_validation(field) do
-    case field.type do
-      t when t in [:select, :multiple_select] ->
-        field
-        |> Validator.put_select_validation
-      _ ->
-        field
     end
   end
 
