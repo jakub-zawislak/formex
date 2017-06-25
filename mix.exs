@@ -3,7 +3,7 @@ defmodule Formex.Mixfile do
 
   def project do
     [app: :formex,
-     version: "0.5.0",
+     version: "0.5.1",
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -12,7 +12,7 @@ defmodule Formex.Mixfile do
      description: description(),
 
      docs: [main: "readme",
-          extras: ["README.md"]],
+          extras: ["README.md", "UPGRADE.md"]],
      source_url: "https://github.com/jakub-zawislak/formex",
      elixirc_paths: elixirc_paths(Mix.env),
      aliases: aliases()
