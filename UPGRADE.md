@@ -57,3 +57,13 @@ with
 ## Custom fields
 
 `Formex.CustomField.SelectAssoc` rename to `Formex.Ecto.CustomField.SelectAssoc`
+
+## web.ex
+
+```elixir
+def model do
+  quote do
+    use Formex.Ecto.Schema # renamed from Formex.Schema
+  end
+end
+```
