@@ -8,7 +8,7 @@ defmodule Formex.View.Collection do
   @moduledoc """
   Helper functions for templating collection of forms.
 
-  Check [Type docs](https://hexdocs.pm/formex/Formex.Type.html#module-collections-of-forms)
+  See [Type docs](https://hexdocs.pm/formex/Formex.Type.html#module-collections-of-forms)
   for example of use.
   """
 

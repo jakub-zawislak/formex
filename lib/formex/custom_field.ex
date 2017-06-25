@@ -3,8 +3,8 @@ defmodule Formex.CustomField do
   @moduledoc """
   A behaviour module for implementing the custom field.
 
-  Check the source of
-  [SelectAssoc](https://github.com/jakub-zawislak/formex/blob/master/lib/custom_fields/select_assoc.ex)
+  See the source of
+  [SelectAssoc](https://github.com/jakub-zawislak/formex_ecto/blob/master/lib/custom_fields/select_assoc.ex)
   for an example of use
   """
 

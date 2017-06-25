@@ -54,7 +54,7 @@ defmodule Formex.Template do
   end
   ```
 
-  Check the source code of
+  See the source code of
   [templates](https://github.com/jakub-zawislak/formex/tree/master/lib/templates)
   for more examples.
   """

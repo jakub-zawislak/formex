@@ -28,7 +28,7 @@ defmodule Formex.Controller do
   ```
   def new(conn, _params) do
     form = create_form(App.ArticleType, %Article{})
-    render(conn, "new.html", form: form)
+    render(conn, "form.html", form: form)
   end
   ```
 
@@ -42,7 +42,7 @@ defmodule Formex.Controller do
         # do something with a new article struct
       {:error, form} ->
         # display errors
-        render(conn, "index.html", form: form)
+        render(conn, "form.html", form: form)
     end
   end
   ```

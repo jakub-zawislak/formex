@@ -8,7 +8,7 @@ defmodule Formex.Field do
     * `:name` - a field name, for example: `:title`
     * `:type` - a type of a field that in most cases will be the name of a function from `Phoenix.HTML.Form`
     * `:value` - the value from struct/params
-    * `:required` - is field required? Used only in template
+    * `:required` - is field required? Used only in template, not validated
     * `:validation` - validation rules to be passed to a validator
     * `:label` - the text label
     * `:data` - additional data used by particular field type (eg. `:select` stores here data

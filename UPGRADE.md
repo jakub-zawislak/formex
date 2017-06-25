@@ -24,3 +24,5 @@ import Formex.Ecto.Controller
 opisać brak walidacji z add_error w changeset callback w type
 
   use Formex.Ecto.Type
+
+Formex.CustomField.SelectAssoc -> Formex.Ecto.CustomField.SelectAssoc

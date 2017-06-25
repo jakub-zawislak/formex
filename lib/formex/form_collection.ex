@@ -23,6 +23,8 @@ defmodule Formex.FormCollection do
 
   ## Options
 
+  * `type` - module that implements `Formex.Type`. Required
+  * `struct_module` - module of struct, e.g. `App.UserAddress`
   * `delete_field` - defaults to `:formex_delete`. Defines input that will be set to true
     if we click &times;. Behaviours depends on value:
       * `:formex_delete` - if `formex_delete` is true, this collection item

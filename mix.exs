@@ -3,7 +3,7 @@ defmodule Formex.Mixfile do
 
   def project do
     [app: :formex,
-     version: "0.4.13",
+     version: "0.5.0",
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -25,17 +25,14 @@ defmodule Formex.Mixfile do
 
   defp deps do
     [{:phoenix_html, "~> 2.0"},
-     {:ecto, "~> 2.1"},
      {:ex_doc, ">= 0.0.0", only: :dev},
-     {:postgrex, ">= 0.0.0", only: [:dev, :test]}, # without a :dev the jakub-zawislak/phoenix-forms won't start. maybe should be removed
      {:phoenix, "~> 1.2", only: [:dev, :test]},
-     {:phoenix_ecto, "~> 3.0", only: [:dev, :test]}
     ]
   end
 
   defp description do
     """
-    Formex is an abstract layer that helps to build forms in Phoenix and Ecto
+    Form library for Phoenix with Ecto support
     """
   end
 

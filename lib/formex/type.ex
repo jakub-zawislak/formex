@@ -10,7 +10,7 @@ defmodule Formex.Type do
   ```
   defmodule App.ArticleType do
     use Formex.Type
-    alias Formex.CustomField.SelectAssoc
+    alias Formex.Ecto.CustomField.SelectAssoc
 
     def build_form(form) do
       form
@@ -35,22 +35,16 @@ defmodule Formex.Type do
   want, for some reason, store in the `User` model.
 
   ```
-  schema "users" do
-    field       :first_name, :string
-    field       :last_name, :string
-    belongs_to  :user_info, App.UserInfo
+  defmodule App.User do
+    defstruct [:first_name, :last_name, user_info: %App.UserInfo{}]
   end
   ```
 
   ```
-  schema "user_infos" do
-    field   :section, :string
-    field   :organisation_cell, :string
-    has_one :user, App.User
+  defmodule App.UserInfo do
+    defstruct [:section, :organisation_cell]
   end
   ```
-
-  Note: `belongs_to` can also be placed in `UserInfo` and so on, it doesn't matter in this example.
 
   Our form will consist of two modules:
 
@@ -63,7 +57,7 @@ defmodule Formex.Type do
       form
       |> add(:first_name, :text_input)
       |> add(:last_name, :text_input)
-      |> add(:user_info, App.UserInfoType)
+      |> add(:user_info, App.UserInfoType, struct_module: App.UserInfo)
     end
   end
   ```
@@ -138,23 +132,18 @@ defmodule Formex.Type do
   We have models `User`, and `UserAddress`.
 
   ```
-  schema "users" do
-    field     :first_name, :string
-    field     :last_name, :string
-    has_many  :user_addresses, App.UserAddress
+  defmodule App.User do
+    defstruct [:first_name, :last_name, user_addresses: []]
   end
   ```
 
   ```
-  schema "user_addresses" do
-    field       :street, :string
-    field       :postal_code, :string
-    field       :city, :string
-    belongs_to  :user, App.User
-
-    formex_collection_child() # important!
+  defmodule App.UserAddress do
+    defstruct [:id, :street, :city, :formex_id, :formex_delete]
   end
   ```
+
+  Keys `:id`, `:formex_id` and `:formex_delete` are important in collection child.
 
   ### Form Type
 
@@ -169,7 +158,7 @@ defmodule Formex.Type do
       form
       |> add(:first_name, :text_input)
       |> add(:last_name, :text_input)
-      |> add(:user_addresses, App.UserAddressType)
+      |> add(:user_addresses, App.UserAddressType, struct_module: App.UserAddress)
     end
   end
   ```

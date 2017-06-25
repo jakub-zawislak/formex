@@ -12,8 +12,9 @@ defmodule Formex.Validator do
   # Available adapters:
 
   * [Vex](https://github.com/jakub-zawislak/formex_vex)
+  * [Ecto.Changeset](https://github.com/jakub-zawislak/formex_ecto)
 
-  # Usage
+  # Installation
 
   Setting default validator:
 

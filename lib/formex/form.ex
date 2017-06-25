@@ -19,8 +19,6 @@ defmodule Formex.Form do
     * `:phoenix_form` - `%Phoenix.HTML.Form{}`
     * `:template` - the module that implements `Formex.Template`, for example:
       `Formex.Template.BootstrapHorizontal`. Can be set via a `Formex.View.formex_form_for` options
-    * `:prepare_form_nested` - callback function used by `Formex.Ecto`
-    * `:prepare_form_collection` - callback function used by `Formex.Ecto`
     * `:method` - `:post`, `:put` etc. May be used by `Formex.View`.
       E.g. `Formex.Ecto.Builder` sets here `:put` if we editing `struct`, `:post` otherwise.
     * `:submitted?` - is form submitted? Set by `Formex.Controller.handle_form/1`
@@ -36,8 +34,6 @@ defmodule Formex.Form do
     items: [],
     params: %{},
     phoenix_form: nil,
-    prepare_form_nested: nil,
-    prepare_form_collection: nil,
     method: nil,
     opts: [],
     template: nil,

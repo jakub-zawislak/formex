@@ -21,6 +21,7 @@ defmodule Formex.FormNested do
   ## Options
 
     * `type` - module that implements `Formex.Type`. Required
+    * `struct_module` - module of struct, e.g. `App.UserInfo`
   """
 
   @spec start_creating(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
