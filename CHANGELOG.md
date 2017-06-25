@@ -1,4 +1,4 @@
-## v0.5.0 (2017-06-)
+## v0.5.0 (2017-06-25)
 * Added ability to use library without Ecto
 * Ecto functionality moved to `formex_ecto` library
 * Added ability to use external validators
