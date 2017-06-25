@@ -243,20 +243,12 @@ defmodule Formex.Type do
       @behaviour Formex.Type
       import Formex.Type
 
-<<<<<<< HEAD
-      def changeset_after_create_callback(changeset, _form) do
-        changeset
-      end
-
-      defoverridable [changeset_after_create_callback: 2]
-=======
       # def validate_whole_struct?, do: false
 
       def validator, do: nil
 
       defoverridable [validator: 0]
       # defoverridable [validate_whole_struct?: 0, validator: 0]
->>>>>>> 0.5
     end
   end
 
