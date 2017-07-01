@@ -3,9 +3,8 @@ defmodule Formex.BuilderTestType do
 
   def build_form(form) do
     form
-    |> add(:title, :text_input)
-    |> add(:content, :textarea)
-    |> add(:visible, :checkbox, required: false)
+    |> add(:title, :text_input, validation: [:required])
+    |> add(:content, :textarea, validation: [:required])
     |> add(:save, :submit)
   end
 end
@@ -15,7 +14,6 @@ defmodule Formex.BuilderTest do
   use Formex.Controller
   alias Formex.BuilderTestType
   alias Formex.TestModel.Article
-  alias Formex.TestRepo
 
   test "create a form" do
     form = create_form(BuilderTestType, %Article{}, %{}, [some: :data])
@@ -24,33 +22,27 @@ defmodule Formex.BuilderTest do
   end
 
   test "field not required" do
-    params = %{title: "twoja", content: "stara"}
+    params = %{"title" => "twoja", "content" => "stara"}
     form = create_form(BuilderTestType, %Article{}, params)
 
-    assert form.changeset.valid?
+    {:ok, _} = handle_form(form)
   end
 
   test "field required" do
-    params = %{title: "szynka"}
+    params = %{"title" => "szynka"}
     form = create_form(BuilderTestType, %Article{}, params)
 
-    refute form.changeset.valid?
+    {:error, _} = handle_form(form)
   end
 
-  test "database insert" do
-    params = %{title: "twoja", content: "stara"}
+  test "handle form" do
+    params = %{"title" => "twoja", "content" => "stara"}
     form = create_form(BuilderTestType, %Article{}, params)
 
-    {:ok, _} = insert_form_data(form)
+    {:ok, article} = handle_form(form)
+
+    assert article.title == "twoja"
+    assert article.content == "stara"
   end
 
-  test "database update" do
-
-    article = TestRepo.insert!(%Article{title: "asd", content: "szynka"})
-
-    params = %{content: "cebula"}
-    form = create_form(BuilderTestType, article, params)
-
-    {:ok, _} = update_form_data(form)
-  end
 end

@@ -8,7 +8,7 @@ defmodule Formex.TestErrorHelpers do
   @doc """
   Translates an error message using gettext.
   """
-  def translate_error({_msg, _opts}) do
-    "błond"
+  def translate_error({msg, _opts}) do
+    msg
   end
 end
