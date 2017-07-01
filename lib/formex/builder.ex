@@ -18,6 +18,10 @@ defmodule Formex.Builder do
   alias Formex.FormNested
   alias Formex.Field
 
+  # for those who want to know how `create_form` function knows is it normal struct or Ecto schema
+  # when you call `use Formex.Ecto.Schema` in `web/web.ex`, in every model is created
+  # `formex_wrapper` function, which returns wrapper module.
+  # `Formex.BuilderProtocol` is implemented for this wrapper
   @spec create_form(module, struct, Map.t, List.t, module) :: Form.t
   def create_form(type, struct, params \\ %{}, opts \\ [], struct_module \\ nil) do
 
@@ -59,11 +63,11 @@ defmodule Formex.Builder do
         case Form.find(form, key) do
           collection = %FormCollection{} ->
             Enum.map(collection.forms, fn nested ->
-              apply_params(nested.form).struct
+              apply_params(nested.form).new_struct
             end)
 
           nested = %FormNested{} ->
-            apply_params(nested.form).struct
+            apply_params(nested.form).new_struct
 
           field = %Field{} ->
             validate_select(field, val)

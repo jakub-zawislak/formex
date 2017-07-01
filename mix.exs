@@ -3,7 +3,7 @@ defmodule Formex.Mixfile do
 
   def project do
     [app: :formex,
-     version: "0.5.1",
+     version: "0.5.2",
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -14,8 +14,7 @@ defmodule Formex.Mixfile do
      docs: [main: "readme",
           extras: ["README.md", "UPGRADE.md"]],
      source_url: "https://github.com/jakub-zawislak/formex",
-     elixirc_paths: elixirc_paths(Mix.env),
-     aliases: aliases()
+     elixirc_paths: elixirc_paths(Mix.env)
    ]
   end
 
@@ -45,8 +44,4 @@ defmodule Formex.Mixfile do
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
-
-  defp aliases do
-    ["test": ["ecto.migrate", "test"]]
-  end
 end

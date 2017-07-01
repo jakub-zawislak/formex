@@ -1,3 +1,7 @@
+## v0.5.2 (2017-07-01)
+* Fixed applying new params to struct for nested forms and collections
+* Created simple validator that only have one option: `:required`
+
 ## v0.5.0 (2017-06-25)
 * Added ability to use library without Ecto
 * Ecto functionality moved to `formex_ecto` library

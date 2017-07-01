@@ -10,6 +10,7 @@ defmodule Formex.Validator do
 
   # Available adapters:
 
+  * `Formex.Validator.Simple`
   * [Vex](https://github.com/jakub-zawislak/formex_vex)
   * [Ecto.Changeset](https://github.com/jakub-zawislak/formex_ecto)
 
