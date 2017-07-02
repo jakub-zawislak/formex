@@ -129,6 +129,14 @@ defmodule Formex.Template do
     Enum.count(get_errors(form, field)) > 0
   end
 
+   @doc """
+   Formats error using `Phoenix.HTML.Format.text_to_html/2`
+   """
+  def format_error(error) do
+    error
+    |> Phoenix.HTML.Format.text_to_html()
+  end
+
   @doc """
   Adds a CSS class to the `:phoenix_opts` keyword
   """
