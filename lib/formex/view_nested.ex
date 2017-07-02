@@ -72,7 +72,17 @@ defmodule Formex.View.Nested do
       |> Map.put(:phoenix_form, f)
       |> Map.put(:template, template)
       |> Map.put(:template_options, template_options)
-      |> fun.()
+      |> (fn f ->
+        html = if !fun do
+          formex_rows(f)
+        else
+          fun.(f)
+        end
+
+        id_field = Phoenix.HTML.Form.hidden_input f.phoenix_form, :id
+
+        [html, id_field]
+      end).()
     end)
   end
 end

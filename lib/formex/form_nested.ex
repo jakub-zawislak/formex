@@ -55,6 +55,12 @@ defmodule Formex.FormNested do
 
     params  = form.params[to_string(name)] || %{}
 
+    substruct = if !substruct do
+      struct(struct_module)
+    else
+      substruct
+    end
+
     subform = Formex.Builder.create_form(type, substruct, params, form.opts, struct_module)
 
     form_nested

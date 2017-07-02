@@ -141,7 +141,17 @@ defmodule Formex.View do
           { to_string(item.name), new_val }
 
         %FormNested{} ->
-          { to_string(item.name), form_to_params(item.form) }
+          sub_params = form_to_params(item.form)
+          sub_struct = item.form.new_struct
+
+          sub_params = if Map.has_key?(sub_struct, :id) do
+            sub_params
+            |> Map.put("id", sub_struct.id |> to_string)
+          else
+            sub_params
+          end
+
+          { to_string(item.name), sub_params }
 
         %FormCollection{} ->
           new_val = Range.new(0, Enum.count(item.forms)-1)

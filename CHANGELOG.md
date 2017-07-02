@@ -1,3 +1,6 @@
+## v0.5.3 (2017-07-02)
+* Fixed nested forms when using with Ecto
+
 ## v0.5.2 (2017-07-01)
 * Fixed applying new params to struct for nested forms and collections
 * Created simple validator that only have one option: `:required`
