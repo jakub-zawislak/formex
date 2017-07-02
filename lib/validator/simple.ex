@@ -2,7 +2,7 @@ defmodule Formex.Validator.Simple do
   @behaviour Formex.Validator
   alias Formex.Form
 
-  @defmodule """
+  @moduledoc """
   Very simple validator.
 
   # Usage:
