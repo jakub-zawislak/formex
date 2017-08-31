@@ -106,7 +106,8 @@ defmodule Formex.Template do
   #
 
   @doc """
-  Runs function from `Phoenix.HTML.Form` defined in a `Field.type` or `Button.type`
+  Runs function from [`Phoenix.HTML.Form`](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html)
+  defined in a `Field.type` or `Button.type`
   """
   @spec render_phoenix_input(item :: any, args :: Keyword.t) :: any
   def render_phoenix_input(item, args) do
@@ -129,9 +130,11 @@ defmodule Formex.Template do
     Enum.count(get_errors(form, field)) > 0
   end
 
-   @doc """
-   Formats error using `Phoenix.HTML.Format.text_to_html/2`
-   """
+  @doc """
+  Formats error using
+  [`Phoenix.HTML.Format.text_to_html/2`](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Format.html#text_to_html/2)
+
+  """
   def format_error(error) do
     error
     |> Phoenix.HTML.Format.text_to_html()

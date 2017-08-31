@@ -6,7 +6,8 @@ defmodule Formex.Button do
   Defines the Formex.Button struct.
 
     * `:name` - a field name. By default the same as `:type`
-    * `:type` - a type of a field that in most cases will be the name of a function from `Phoenix.HTML.Form`
+    * `:type` - a type of a field that in most cases will be the name of a function from
+      [`Phoenix.HTML.Form`](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html)
     * `:label` - the text label
     * `:opts` - options
   """

@@ -125,7 +125,7 @@ end
 
 `form.html.eex`
 ```elixir
-<%= formex_form_for @form, article_path(@conn, :create), fn f -> %>
+<%= formex_form_for @form, article_path(@conn, :create), [class: "form-horizontal"], fn f -> %>
   <%= if @form.submitted? do %>Oops, something went wrong!<% end %>
 
   <%= formex_row f, :title %>

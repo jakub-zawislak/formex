@@ -5,7 +5,8 @@ defmodule Formex.Field do
   Defines the Formex.Field struct.
 
     * `:name` - a field name, for example: `:title`
-    * `:type` - a type of a field that in most cases will be the name of a function from `Phoenix.HTML.Form`
+    * `:type` - a type of a field that in most cases will be the name of a function from
+      [`Phoenix.HTML.Form`](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html)
     * `:value` - the value from struct/params
     * `:required` - is field required? Used only in template, not validated
     * `:validation` - validation rules to be passed to a validator
@@ -13,7 +14,8 @@ defmodule Formex.Field do
     * `:data` - additional data used by particular field type (eg. `:select` stores here data
       for `<option>`'s)
     * `:opts` - options
-    * `:phoenix_opts` - options that will be passed to `Phoenix.HTML.Form`
+    * `:phoenix_opts` - options that will be passed to
+      [`Phoenix.HTML.Form`](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html)
   """
   defstruct name: nil,
     type: nil,
@@ -29,7 +31,8 @@ defmodule Formex.Field do
   @doc """
   Creates a new field.
 
-  `type` is the name of function from `Phoenix.HTML.Form`.
+  `type` is the name of function from
+  [`Phoenix.HTML.Form`](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html).
 
   ## Options
 
@@ -41,7 +44,8 @@ defmodule Formex.Field do
       form
       |> add(:field, :select, choices: ["Option 1": 1, "Options 2": 2])
       ```
-    * `:phoenix_opts` - options that will be passed to `Phoenix.HTML.Form`, for example:
+    * `:phoenix_opts` - options that will be passed to
+      [`Phoenix.HTML.Form`](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html), for example:
       ```
       form
       |> add(:content, :textarea, phoenix_opts: [
