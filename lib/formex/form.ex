@@ -33,6 +33,7 @@ defmodule Formex.Form do
     errors: [],
     items: [],
     params: %{},
+    mapped_params: %{},
     phoenix_form: nil,
     method: nil,
     opts: [],
@@ -86,6 +87,24 @@ defmodule Formex.Form do
   def find(form, name) do
     form.items
     |> Enum.find(&(&1.name == name))
+  end
+
+  @doc """
+  Finds form item by struct name
+  """
+  @spec find_by_struct_name(form :: t, name :: atom) :: list
+  def find_by_struct_name(form, name) do
+    form.items
+    |> Enum.find(&(&1.struct_name == name))
+  end
+
+  @doc """
+  Finds form item by struct name
+  """
+  @spec get_struct_name_by_name(form :: t, name :: atom) :: list
+  def get_struct_name_by_name(form, name) do
+    find(form, name)
+    |> Map.get(:struct_name)
   end
 
   @doc """

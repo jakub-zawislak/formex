@@ -121,7 +121,7 @@ defmodule Formex.View do
     |> Enum.map(fn item ->
       case item do
         %Field{} ->
-          val = Map.get(form.new_struct, item.name)
+          val = Map.get(form.new_struct, item.struct_name)
 
           new_val = case item.type do
             :multiple_select ->

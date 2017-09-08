@@ -1,3 +1,6 @@
+## v0.5.5 (2017-09-08)
+* Added ability to use a different field name than in a structure
+
 ## v0.5.4 (2017-07-02)
 * Restored `\n` to `<br>` conversion in error messages, which was removed in 0.5.0
 

@@ -5,6 +5,7 @@ defmodule Formex.Field do
   Defines the Formex.Field struct.
 
     * `:name` - a field name, for example: `:title`
+    * `:struct_name` - a name of a key in your struct. By default the same as `:name`
     * `:type` - a type of a field that in most cases will be the name of a function from
       [`Phoenix.HTML.Form`](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html)
     * `:value` - the value from struct/params
@@ -18,6 +19,7 @@ defmodule Formex.Field do
       [`Phoenix.HTML.Form`](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html)
   """
   defstruct name: nil,
+    struct_name: nil,
     type: nil,
     required: true,
     validation: [],
@@ -38,7 +40,8 @@ defmodule Formex.Field do
 
     * `:label`
     * `:required` - defaults to true. Used only by the template helper to generate an additional
-      `.required` CSS class.
+    `.required` CSS class.
+    * `:struct_name` - a name of a key in your struct. Defaults to the `name` variable
     * `:choices` - list of `<option>`s for `:select` and `:multiple_select`
       ```
       form
@@ -61,6 +64,7 @@ defmodule Formex.Field do
 
     %Field{
       name: name,
+      struct_name: Keyword.get(opts, :struct_name, name),
       type: type,
       label: get_label(name, opts),
       required: Keyword.get(opts, :required, true),

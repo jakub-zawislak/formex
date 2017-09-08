@@ -45,7 +45,45 @@ defmodule Formex.Builder do
     |> BuilderProtocol.create_struct_info()
     |> BuilderProtocol.create_form()
     |> Map.get(:form)
+    |> map_params()
     |> apply_params()
+  end
+
+  defp map_params(form) do
+    params = form.params
+
+    new_params = Enum.reduce(params, %{}, fn {key, val}, new_params ->
+      key  = String.to_atom(key)
+      item = Form.find(form, key)
+
+      {new_name, new_val} = if item do
+        case Form.find(form, key) do
+          collection = %FormCollection{} ->
+            items = Enum.map(collection.forms, fn nested ->
+              map_params(nested.form).mapped_params
+            end)
+
+            subparams = Range.new(0, Enum.count(items)-1)
+            |> Enum.zip(items)
+            |> Enum.map(fn {key, item} -> { to_string(key), item } end)
+            |> Enum.into(%{})
+
+            {key, subparams}
+
+          nested = %FormNested{} ->
+            {key, map_params(nested.form).mapped_params}
+
+          _ -> {item.struct_name, val}
+        end
+      else
+        {key, val}
+      end
+
+      new_params
+      |> Map.put_new(new_name |> to_string, new_val)
+    end)
+
+    Map.put(form, :mapped_params, new_params)
   end
 
   # Could be done better. In this case it applies params and creates a :new_struct only for the
@@ -53,7 +91,7 @@ defmodule Formex.Builder do
   # in objective programming it would be easier :D
   @spec apply_params(form :: Form.t) :: Form.t
   defp apply_params(form) do
-    %{struct: struct, params: params} = form
+    %{struct: struct, mapped_params: params} = form
 
     struct = Enum.reduce(params, struct, fn {key, val}, struct ->
       key = String.to_atom(key)
