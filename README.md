@@ -141,7 +141,7 @@ Put an asterisk to required fields:
 ```css
 .required .control-label:after {
   content: '*';
-  margin-right: 3px;
+  margin-left: 3px;
 }
 ```
 
