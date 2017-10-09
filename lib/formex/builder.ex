@@ -123,7 +123,17 @@ defmodule Formex.Builder do
   defp validate_select(field, val) do
     case field.type do
       x when x in [:select, :multiple_select] ->
-        choices = Enum.map(field.data[:choices], &(&1 |> elem(1) |> to_string))
+        choices = Enum.map(field.data[:choices], fn choice ->
+          case choice do
+            opts when is_list(opts) ->
+              opts[:value]
+            {_, value} ->
+              value
+            value ->
+              value
+          end
+        end)
+        |> Enum.map(&(&1 |> to_string))
 
         case field.type do
           :select ->

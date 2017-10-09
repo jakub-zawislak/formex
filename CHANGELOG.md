@@ -1,3 +1,6 @@
+## v0.5.6 (2017-10-09)
+* Fixed select validation when using another format for `<option>`'s than `[key: value]`
+
 ## v0.5.5 (2017-09-08)
 * Added ability to use a different field name than in a structure
 
