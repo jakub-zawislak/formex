@@ -7,6 +7,7 @@ defmodule Formex.FormCollection do
   defstruct forms: [],
     struct_module: nil,
     name: nil,
+    struct_name: nil, # added only for compability with validation libs which look for `struct_name`
     opts: [],
     delete_field: nil,
     validation: [],
@@ -50,6 +51,8 @@ defmodule Formex.FormCollection do
 
     form_collection = %FormCollection{
       name: name,
+      # struct_name: Keyword.get(opts, :struct_name, name), # not handled yet
+      struct_name: name,
       type: type,
       opts: opts,
       struct_module: submodule,
