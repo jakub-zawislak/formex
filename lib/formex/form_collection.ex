@@ -49,7 +49,7 @@ defmodule Formex.FormCollection do
 
     {delete_field, opts} = Keyword.pop(opts, :delete_field)
 
-    form_collection = %FormCollection{
+    %FormCollection{
       name: name,
       # struct_name: Keyword.get(opts, :struct_name, name), # not handled yet
       struct_name: name,
@@ -59,8 +59,6 @@ defmodule Formex.FormCollection do
       validation: Keyword.get(opts, :validation, []),
       delete_field: delete_field || :formex_delete
     }
-
-    form_collection
   end
 
   # called when substruct are ready
@@ -126,7 +124,13 @@ defmodule Formex.FormCollection do
 
   defp create_subform(form, name, type, substruct, subparams, submodule, opts) do
 
-    subform = Formex.Builder.create_form(type, substruct, subparams, form.opts, submodule)
+    subform = Formex.Builder.create_form(
+      type,
+      substruct,
+      subparams,
+      form.opts,
+      submodule
+    )
 
     %FormNested{
       form: subform,

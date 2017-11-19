@@ -1,3 +1,6 @@
+## v0.5.8 (2017-11-19)
+* Partially rewritten JS library. Now it supports multi-level nested forms.
+
 ## v0.5.7 (2017-11-12)
 * Added `:struct_name` key in form collection struct for compability with validation libraries which
     (since 0.5.5) looks for `:struct_name` in form item instead of `:name`.
