@@ -1,3 +1,7 @@
+## v0.5.9 (2017-12-05)
+* Added support for ajax selects plugins, such as
+  [Ajax-Bootstrap-Select](https://github.com/truckingsim/Ajax-Bootstrap-Select)
+
 ## v0.5.8 (2017-11-19)
 * Partially rewritten JS library. Now it supports multi-level nested forms.
 

@@ -2,19 +2,23 @@ defmodule Formex.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :formex,
-     version: "0.5.8",
-     elixir: "~> 1.3",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps(),
-     package: package(),
-     description: description(),
+    [
+      app: :formex,
+      version: "0.5.9",
+      elixir: "~> 1.3",
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      deps: deps(),
+      package: package(),
+      description: description(),
 
-     docs: [main: "readme",
-          extras: ["README.md", "UPGRADE.md"]],
-     source_url: "https://github.com/jakub-zawislak/formex",
-     elixirc_paths: elixirc_paths(Mix.env)
+      name: "Formex",
+      docs: [
+        main: "readme",
+        extras: ["README.md", "UPGRADE.md", "guides.md"]
+      ],
+      source_url: "https://github.com/jakub-zawislak/formex",
+      elixirc_paths: elixirc_paths(Mix.env)
    ]
   end
 

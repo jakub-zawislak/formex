@@ -11,11 +11,17 @@ defmodule Formex.CollectionCase do
       def get_user(index) do
         [
           %User{first_name: "Grażyna", last_name: "Kowalska", user_addresses: [
-            %UserAddress{id: 1, street: "Księżycowa", postal_code: "10-699", city: "Olsztyn"},
+            %UserAddress{
+              id: 1, street: "Księżycowa", postal_code: "10-699", city: "Olsztyn", country_id: "1"
+            },
           ]},
           %User{first_name: "Wiesio", last_name: "Nowak", user_addresses: [
-            %UserAddress{id: 2, street: "Mazurska", postal_code: "11-700", city: "Mrągowo"},
-            %UserAddress{id: 1, street: "Księżycowa", postal_code: "10-699", city: "Olsztyn"},
+            %UserAddress{
+              id: 2, street: "Mazurska", postal_code: "11-700", city: "Mrągowo", country_id: "1"
+            },
+            %UserAddress{
+              id: 1, street: "Księżycowa", postal_code: "10-699", city: "Olsztyn", country_id: "1"
+            },
           ], user_accounts: [
             %UserAccount{id: 3, number: "number1"},
             %UserAccount{id: 7, number: "number2"},

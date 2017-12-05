@@ -17,6 +17,8 @@ defmodule Formex.Builder do
   alias Formex.FormCollection
   alias Formex.FormNested
   alias Formex.Field
+  alias Formex.Field.Select
+  alias Formex.Validator
 
   # for those who want to know how `create_form` function knows is it normal struct or Ecto schema
   # when you call `use Formex.Ecto.Schema` in `web/web.ex`, in every model is created
@@ -47,7 +49,18 @@ defmodule Formex.Builder do
     |> Map.get(:form)
     |> map_params()
     |> apply_params()
+    |> handle_selects_on_create()
   end
+
+  # Called from controller, only on the main form
+  @spec handle_submit(Form.t) :: Form.t
+  def handle_submit(form) do
+    form
+    |> handle_selects_on_submit()
+    |> Validator.validate()
+  end
+
+  #
 
   defp map_params(form) do
     params = form.params
@@ -89,6 +102,7 @@ defmodule Formex.Builder do
   # Could be done better. In this case it applies params and creates a :new_struct only for the
   # main form. :form's that are in FormNested and FormCollection are not touched
   # in objective programming it would be easier :D
+  # Anyway, the FormNested and FormCollections also applies this function to their subforms
   @spec apply_params(form :: Form.t) :: Form.t
   defp apply_params(form) do
     %{struct: struct, mapped_params: params} = form
@@ -107,10 +121,6 @@ defmodule Formex.Builder do
           nested = %FormNested{} ->
             apply_params(nested.form).new_struct
 
-          field = %Field{} ->
-            validate_select(field, val)
-            val
-
           _ -> val
         end
       end)
@@ -119,42 +129,29 @@ defmodule Formex.Builder do
     Map.put(form, :new_struct, struct)
   end
 
-  @spec validate_select(field :: Field.t, val :: String.t) :: nil
-  defp validate_select(field, val) do
-    case field.type do
-      x when x in [:select, :multiple_select] ->
-        choices = Enum.map(field.data[:choices], fn choice ->
-          case choice do
-            opts when is_list(opts) ->
-              opts[:value]
-            {_, value} ->
-              value
-            value ->
-              value
-          end
-        end)
-        |> Enum.map(&(&1 |> to_string))
+  @spec handle_selects_on_create(form :: Form.t) :: Form.t
+  defp handle_selects_on_create(form) do
+    form
+    |> Form.modify_selects_recursively(fn form_of_field, field ->
+      val = Map.get(form_of_field.struct, field.struct_name)
 
-        case field.type do
-          :select ->
-            String.length(val) > 0 && !(val in choices)
-          :multiple_select ->
-            Enum.reduce_while(val, false, fn val, _ ->
-              if val in choices do
-                {:cont, false}
-              else
-                {:halt, true}
-              end
-            end)
-        end
-        |> if do
-          raise "The "<>inspect(val)<>" value for :"<>to_string(field.name)<>" is invalid. "<>
-            "Possible values: "<>inspect(choices)
-        end
-
-      _ -> nil
-    end
+      field
+      |> Select.handle_select_without_choices(val)
+    end)
   end
+
+  @spec handle_selects_on_submit(form :: Form.t) :: Form.t
+  defp handle_selects_on_submit(form) do
+    form
+    |> Form.modify_selects_recursively(fn form_of_field, field ->
+      val = Map.get(form_of_field.new_struct, field.struct_name)
+
+      field
+      |> Select.handle_select_without_choices(val)
+      |> Select.validate(val)
+    end)
+  end
+
 end
 
 defimpl Formex.BuilderProtocol, for: Formex.BuilderType.Struct do

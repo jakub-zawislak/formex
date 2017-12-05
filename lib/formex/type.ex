@@ -19,8 +19,11 @@ defmodule Formex.Type do
         rows: 4
       ])
       |> add(:hidden, :checkbox, label: "Is hidden", required: false)
-      |> add(:category_id, SelectAssoc, label: "Category", phoenix_opts: [
-        prompt: "Choose category"
+      |> add(:category_id, :select, label: "Category", phoenix_opts: [
+        prompt: "Select a category"
+      ], choices: [
+        "Category A": 1,
+        "Category B": 2
       ])
       |> add(:save, :submit, label: if(form.struct.id, do: "Edit", else: "Add"), phoenix_opts: [
         class: "btn-primary"

@@ -24,6 +24,7 @@ defmodule Formex.FormNested do
     * `struct_module` - module of struct, e.g. `App.UserInfo`
   """
 
+  @doc false
   @spec start_creating(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
   def start_creating(form, type, name, opts) do
 
@@ -47,6 +48,7 @@ defmodule Formex.FormNested do
     }
   end
 
+  @doc false
   @spec finish_creating(form :: Form.t, form_nested :: FormNested.t) :: Form.t
   def finish_creating(form, form_nested) do
     %{type: type, name: name, struct_module: struct_module} = form_nested

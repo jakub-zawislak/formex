@@ -36,6 +36,7 @@ defmodule Formex.FormCollection do
         `delete_field: :removed` option.
   """
 
+  @doc false
   @spec start_creating(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Map.t
   def start_creating(form, type, name, opts) do
 
@@ -61,7 +62,8 @@ defmodule Formex.FormCollection do
     }
   end
 
-  # called when substruct are ready
+  # called when substructs are ready
+  @doc false
   @spec finish_creating(form :: Form.t, form_collection :: FormCollection.t) :: Form.t
   def finish_creating(form, form_collection) do
     %{name: name, struct_module: struct_module, type: type, opts: opts} = form_collection
@@ -143,6 +145,7 @@ defmodule Formex.FormCollection do
   end
 
   @spec to_be_removed(form_collection :: t, form_nested :: FormNested.t) :: boolean
+  @doc false
   def to_be_removed(form_collection, form_nested) do
     val = Map.get(form_nested.form.new_struct, form_collection.delete_field)
 

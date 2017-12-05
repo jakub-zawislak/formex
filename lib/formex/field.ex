@@ -42,11 +42,6 @@ defmodule Formex.Field do
     * `:required` - defaults to true. Used only by the template helper to generate an additional
     `.required` CSS class.
     * `:struct_name` - a name of a key in your struct. Defaults to the `name` variable
-    * `:choices` - list of `<option>`s for `:select` and `:multiple_select`
-      ```
-      form
-      |> add(:field, :select, choices: ["Option 1": 1, "Options 2": 2])
-      ```
     * `:phoenix_opts` - options that will be passed to
       [`Phoenix.HTML.Form`](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html), for example:
       ```
@@ -55,12 +50,56 @@ defmodule Formex.Field do
         rows: 4
       ])
       ```
+
+  ## Options for `<select>`
+
+    * `:choices` - list of `<option>`s. Named "choices", not "options", because we don't want to
+      confuse it with the rest of options
+        ```
+        form
+        |> add(:field, :select, choices: ["Option 1": 1, "Options 2": 2])
+        ```
+        ```
+        form
+        |> add(:country, :select, choices: [
+          "Europe": ["UK": 1, "Sweden": 2, "Poland": 3],
+          "Asia": [...]
+        ])
+        ```
+    * `:without_choices` - set this option to true if you want to render select without
+      any `<option>`s and provide them in another way (for example, using
+      [Ajax-Bootstrap-Select](https://github.com/truckingsim/Ajax-Bootstrap-Select)).
+
+      It disables choices rendering in `Formex.Ecto.CustomField.SelectAssoc`.
+    * `:choice_label_provider` - used along with `:select_without_choices`.
+
+      When form is sent but it's displayed again (because of some errors), we have to render
+      <select>` with a single `<option>`, previously chosen by user.
+
+      This option expects a function that receives id and returns some label.
+
+        ```
+        form
+        |> add(:customer, :select, without_choices: true, choice_label_provider: fn id ->
+          Repo.get(Customer, id).name
+        end)
+        ```
+      `Formex.Ecto.CustomField.SelectAssoc` will set this option for you
   """
   def create_field(type, name, opts \\ []) do
     data = []
-    data = if opts[:choices],
-      do:   Keyword.merge(data, [choices: opts[:choices]]),
-      else: data
+
+    {opts, data} = if type in [:select, :multiple_select] do
+      opts = opts
+      |> Keyword.put_new(:without_choices, false)
+
+      data = data
+      |> Keyword.merge([choices: Keyword.get(opts, :choices, [])])
+
+      {opts, data}
+    else
+      {opts, []}
+    end
 
     %Field{
       name: name,
@@ -93,10 +132,12 @@ defmodule Formex.Field do
     end
   end
 
+  @doc false
   def prepare_opts(opts) do
     Keyword.delete(opts, :phoenix_opts)
   end
 
+  @doc false
   def prepare_phoenix_opts(opts) do
     phoenix_opts = if opts[:phoenix_opts], do: opts[:phoenix_opts], else: []
 

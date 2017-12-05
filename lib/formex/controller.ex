@@ -1,6 +1,6 @@
 defmodule Formex.Controller do
   alias Formex.Form
-  alias Formex.Validator
+  alias Formex.Builder
 
   defmacro __using__(_) do
     quote do
@@ -56,7 +56,7 @@ defmodule Formex.Controller do
   """
   @spec handle_form(Form.t) :: {:ok, Map.t} | {:error, Form.t}
   def handle_form(form) do
-    form = form |> Validator.validate()
+    form = Builder.handle_submit(form)
 
     if form.valid? do
       {:ok, form.new_struct}

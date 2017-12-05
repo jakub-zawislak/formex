@@ -5,6 +5,10 @@ defmodule Formex.BuilderTestType do
     form
     |> add(:title, :text_input, validation: [:required])
     |> add(:content, :textarea, validation: [:required])
+    |> add(:category_id, :select, choices: [
+      "Category A": "1",
+      "Category B": "2"
+    ], validation: [:required])
     |> add(:save, :submit)
   end
 end
@@ -22,7 +26,7 @@ defmodule Formex.BuilderTest do
   end
 
   test "field not required" do
-    params = %{"title" => "twoja", "content" => "stara"}
+    params = %{"title" => "twoja", "content" => "stara", "category_id" => "1"}
     form = create_form(BuilderTestType, %Article{}, params)
 
     {:ok, _} = handle_form(form)
@@ -36,7 +40,7 @@ defmodule Formex.BuilderTest do
   end
 
   test "handle form" do
-    params = %{"title" => "twoja", "content" => "stara"}
+    params = %{"title" => "twoja", "content" => "stara", "category_id" => "1"}
     form = create_form(BuilderTestType, %Article{}, params)
 
     {:ok, article} = handle_form(form)
