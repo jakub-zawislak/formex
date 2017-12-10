@@ -58,3 +58,7 @@ and you want to enable ajax search, you have to do these steps:.
       ```javascript
       $('.select').selectpicker().ajaxSelectPicker()
       ```
+
+  4. (Optional) If you are using the `SelectAssoc`, use
+    [SelectAssoc.search/3](https://hexdocs.pm/formex_ecto/Formex.Ecto.CustomField.SelectAssoc.html#search/3)
+    function inside your controller.
