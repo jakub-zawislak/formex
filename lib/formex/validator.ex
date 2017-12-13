@@ -60,6 +60,7 @@ defmodule Formex.Validator do
 
     form = form
     |> validator.validate
+    |> add_invalid_select_errors
     |> translate_errors
 
     items = form.items
@@ -141,5 +142,30 @@ defmodule Formex.Validator do
         false -> {:halt, false}
       end
     end)
+  end
+
+  @spec add_invalid_select_errors(Form.t) :: Form.t
+  defp add_invalid_select_errors(form) do
+
+    select_errors = form.items
+    |> Enum.filter(&(&1.type in [:select, :multiple_select]))
+    |> Enum.map(fn item ->
+      if item.data[:invalid_select] do
+        {item.name, [{"invalid value", []}]}
+      end
+    end)
+    |> Enum.filter(&(&1))
+
+    add_errors(form, select_errors)
+  end
+
+  @spec add_errors(Form.t, List.t) :: Form.t
+  defp add_errors(form, new_errors) do
+
+    new_errors = Keyword.merge(form.errors, new_errors, fn _k, field_errors1, field_errors2 ->
+      field_errors1 ++ field_errors2
+    end)
+
+    %{form | errors: new_errors}
   end
 end

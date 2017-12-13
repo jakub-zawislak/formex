@@ -69,7 +69,6 @@ defmodule Formex.Select do
   alias Formex.Select.WithoutChoicesCollectionType
   alias Formex.TestModel.Article
   alias Formex.TestModel.User
-  alias Formex.Field.Select.ValidationError
 
   test "valid value" do
     params = %{"title" => "test", "category_id" => "1"}
@@ -81,10 +80,10 @@ defmodule Formex.Select do
   test "invalid value" do
     params = %{"title" => "test", "category_id" => "3"}
 
-    assert_raise ValidationError, fn ->
-      form = create_form(NormalType, %Article{}, params)
-      handle_form(form)
-    end
+    form = create_form(NormalType, %Article{}, params)
+    {:error, form} = handle_form(form)
+
+    assert form.errors[:category_id] == ["invalid value"]
   end
 
   test ":without_choices valid value" do
@@ -97,10 +96,10 @@ defmodule Formex.Select do
   test ":without_choices invalid value" do
     params = %{"title" => "test", "category_id" => "", "user_id" => "3"}
 
-    assert_raise ValidationError, fn ->
-      form = create_form(WithoutChoicesType, %Article{}, params)
-      handle_form(form)
-    end
+    form = create_form(WithoutChoicesType, %Article{}, params)
+    {:error, form} = handle_form(form)
+
+    assert form.errors[:user_id] == ["invalid value"]
   end
 
   test ":without_choices loading label" do
@@ -150,10 +149,16 @@ defmodule Formex.Select do
       "0" => %{"id" => Enum.at(user.user_addresses, 0).id |> to_string, "country_id" => "3"}
     }}
 
-    assert_raise ValidationError, fn ->
-      form = create_form(WithoutChoicesCollectionType, user, params)
-      handle_form(form)
-    end
+    form = create_form(WithoutChoicesCollectionType, user, params)
+    {:error, form} = handle_form(form)
+
+    collection_item_form = form
+    |> Formex.Form.find(:user_addresses)
+    |> Map.get(:forms)
+    |> Enum.at(0)
+    |> Map.get(:form)
+
+    assert collection_item_form.errors[:country_id] == ["invalid value"]
   end
 
 end

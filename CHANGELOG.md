@@ -1,3 +1,9 @@
+## v0.5.10 (2017-12-13)
+* Changed behaviour of select validation. When user tried to provide an invalid select value
+    (that wasn't in list of available options), an elixir error was raised.
+    Since now user will see message `"invalid value"` attached to field, instead of server error.
+    This message can be translated via gettext.
+
 ## v0.5.9 (2017-12-05)
 * Added support for ajax selects plugins, such as
   [Ajax-Bootstrap-Select](https://github.com/truckingsim/Ajax-Bootstrap-Select)

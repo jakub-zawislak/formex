@@ -1,7 +1,3 @@
-defmodule Formex.Field.Select.ValidationError do
-  defexception [:message]
-end
-
 defmodule Formex.Field.Select do
   @moduledoc false
 
@@ -78,15 +74,13 @@ defmodule Formex.Field.Select do
         end)
     end
 
-    # TODO: add an error to the field, instead of raising error
-
     if invalid do
-      raise Field.Select.ValidationError,
-        message: "The "<>inspect(val)<>" value for :"<>to_string(field.name)<>" is invalid. "<>
-          "Possible values: "<>inspect(choices)
+      Map.update!(field, :data, fn data ->
+        Keyword.put(data, :invalid_select, true)
+      end)
+    else
+      field
     end
-
-    field
   end
 
 end
