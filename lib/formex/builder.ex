@@ -62,38 +62,61 @@ defmodule Formex.Builder do
 
   #
 
+  defp map_params(form = %{params: params}) when params == %{} do
+    Map.put(form, :mapped_params, params)
+  end
+
   defp map_params(form) do
     params = form.params
 
-    new_params = Enum.reduce(params, %{}, fn {key, val}, new_params ->
-      key  = String.to_atom(key)
-      item = Form.find(form, key)
+    new_params = form
+    |> Form.get_fields_controllable
+    |> Enum.reduce(%{}, fn item, new_params ->
+      key = item.name |> to_string
+      val = params[key]
 
-      {new_name, new_val} = if item do
-        case Form.find(form, key) do
-          collection = %FormCollection{} ->
-            items = Enum.map(collection.forms, fn nested ->
-              map_params(nested.form).mapped_params
-            end)
+      {new_name, new_val} = case item do
+        collection = %FormCollection{} ->
+          items = Enum.map(collection.forms, fn nested ->
+            map_params(nested.form).mapped_params
+          end)
 
-            subparams = Range.new(0, Enum.count(items)-1)
-            |> Enum.zip(items)
-            |> Enum.map(fn {key, item} -> { to_string(key), item } end)
-            |> Enum.into(%{})
+          subparams = Range.new(0, Enum.count(items)-1)
+          |> Enum.zip(items)
+          |> Enum.map(fn {key, item} -> { to_string(key), item } end)
+          |> Enum.into(%{})
 
-            {key, subparams}
+          {key, subparams}
 
-          nested = %FormNested{} ->
-            {key, map_params(nested.form).mapped_params}
+        nested = %FormNested{} ->
+          {key, map_params(nested.form).mapped_params}
 
-          _ -> {item.struct_name, val}
-        end
-      else
-        {key, val}
+        field ->
+          new_val = if val !== nil do
+            val
+          else
+            case field.type do
+              :multiple_select ->
+                []
+              :select ->
+                nil
+              _ ->
+                ""
+            end
+          end
+
+          {item.struct_name |> to_string, new_val}
       end
 
-      new_params
-      |> Map.put_new(new_name |> to_string, new_val)
+      new_params = Map.put(new_params, new_name, new_val)
+
+      to_remove = Form.get_items_with_changed_name(form)
+
+      new_params = Map.merge(params, new_params)
+      |> Enum.filter(fn {key, value} ->
+        String.to_atom(key) not in to_remove
+      end)
+      |> Map.new
     end)
 
     Map.put(form, :mapped_params, new_params)

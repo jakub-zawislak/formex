@@ -63,12 +63,20 @@ defmodule Formex.Form do
   end
 
   @doc """
-  Returns list of items which can be validated (all except the `Button`)
+  Returns list of items which user can control (all except the `Button`)
+  """
+  @spec get_fields_controllable(form :: t) :: list
+  def get_fields_controllable(form) do
+    form.items
+    |> Enum.filter(&(&1.__struct__ != Button))
+  end
+
+  @doc """
+  Returns list of items which can be validated (alias for `get_fields_controllable/1`)
   """
   @spec get_fields_validatable(form :: t) :: list
   def get_fields_validatable(form) do
-    form.items
-    |> Enum.filter(&(&1.__struct__ != Button))
+    get_fields_controllable(form)
   end
 
   @doc """
@@ -123,6 +131,17 @@ defmodule Formex.Form do
   def get_collections(form) do
     form.items
     |> Enum.filter(&(&1.__struct__ == FormCollection))
+  end
+
+  @doc """
+  Returns list of names of items with changed name (`item.name` != `item.struct_name`)
+  """
+  @spec get_items_with_changed_name(form :: t) :: list
+  def get_items_with_changed_name(form) do
+    form
+    |> get_fields_controllable
+    |> Enum.filter(&(&1.name != &1.struct_name))
+    |> Enum.map(&(&1.name))
   end
 
   @doc false

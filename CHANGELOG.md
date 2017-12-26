@@ -1,3 +1,21 @@
+## v0.6.0 (2017-12-26)
+* Changed behaviour when user sends no value for field.
+
+    ### Example
+    You have a form with `first_name` and `last_name` fields, and user manually removes
+    in browser the `first_name` field.
+
+    What happens after form submit:
+    * Prior to formex 0.6.0, the `first_name` value will be unchanged.
+    * Since 0.6.0, the `first_name` value will be `""`.
+
+    This new behaviour is the same as in the Symfony form library. It was necessary to change,
+    because browser sends no value in `multiple_select` if there is nothing selected, or even
+    there may be no value in normal `select` when we using Ajax Bootstrap Select plugin and
+    was nothing selected.
+* Fixed deselecting all options in multiple select
+    [jakub-zawislak/formex_ecto#2](https://github.com/jakub-zawislak/formex_ecto/issues/2)
+
 ## v0.5.10 (2017-12-13)
 * Changed behaviour of select validation. When user tried to provide an invalid select value
     (that wasn't in list of available options), an elixir error was raised.

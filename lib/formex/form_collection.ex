@@ -66,9 +66,7 @@ defmodule Formex.FormCollection do
   @doc false
   @spec finish_creating(form :: Form.t, form_collection :: FormCollection.t) :: Form.t
   def finish_creating(form, form_collection) do
-    %{name: name, struct_module: struct_module, type: type, opts: opts} = form_collection
-
-    substructs = Field.get_value(form, name)
+    substructs = Field.get_value(form, form_collection.name)
 
     # substructs = if opts[:filter] do
     #   Enum.filter(substructs, opts[:filter])
@@ -76,10 +74,10 @@ defmodule Formex.FormCollection do
     #   substructs
     # end
 
-    params = form.params[to_string(name)] || []
+    params = form.params[to_string(form_collection.name)] || []
 
-    subforms_old = create_existing_subforms(form, name, substructs, params, type, struct_module, opts)
-    subforms_new = create_new_subforms(form, name, params, type, struct_module, opts)
+    subforms_old = create_existing_subforms(form, form_collection, params, substructs)
+    subforms_new = create_new_subforms(form, form_collection, params)
 
     form_collection
     |> Map.put(:forms, subforms_old ++ subforms_new)
@@ -98,7 +96,7 @@ defmodule Formex.FormCollection do
     end)
   end
 
-  defp create_existing_subforms(form, name, substructs, params, type, submodule, opts) do
+  defp create_existing_subforms(form, form_collection, params, substructs) do
     substructs
     |> Enum.map(fn substruct ->
       {_, subparams} = Enum.find(params, {nil, %{}}, fn {_k, v} ->
@@ -110,21 +108,25 @@ defmodule Formex.FormCollection do
         substruct.id == id
       end)
 
-      create_subform(form, name, type, substruct, subparams, submodule, opts)
+      create_subform(form, form_collection, substruct, subparams)
     end)
   end
 
-  defp create_new_subforms(form, name, params, type, submodule, opts) do
+  defp create_new_subforms(form, form_collection, params) do
+    %{struct_module: submodule} = form_collection
+
     params
     |> Enum.filter(fn {_key, val} -> !val["id"] end)
     |> Enum.map(fn {_key, subparams} ->
       substruct = struct(submodule, [formex_id: subparams["formex_id"]])
 
-      create_subform(form, name, type, substruct, subparams, submodule, opts)
+      create_subform(form, form_collection, substruct, subparams)
     end)
   end
 
-  defp create_subform(form, name, type, substruct, subparams, submodule, opts) do
+  defp create_subform(form, form_collection, substruct, subparams) do
+
+    %{name: name, type: type, struct_module: submodule, opts: opts} = form_collection
 
     subform = Formex.Builder.create_form(
       type,

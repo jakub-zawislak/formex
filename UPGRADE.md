@@ -1,3 +1,12 @@
+# Upgrade from 0.5 to 0.6
+
+There is only one big (maybe) change.
+Prior to formex 0.6.0, when you will manually remove a input tag
+in browser and send a form, then value for that input will be unchanged.
+Since formex 0.6.0, that value will be set to `""`.
+
+If you didn't do any JS hacks in your form, then you don't have to care about that change.
+
 # Upgrade from 0.4 to 0.5
 
 ## Ecto

@@ -5,6 +5,7 @@ defmodule Formex.FormNested do
 
   defstruct form: nil,
     name: nil,
+    struct_name: nil, # added only for compability with validation libs which look for `struct_name`
     struct_module: nil,
     type: nil,
     validation: [],
@@ -41,6 +42,8 @@ defmodule Formex.FormNested do
 
     %FormNested{
       name: name,
+      # struct_name: Keyword.get(opts, :struct_name, name), # not handled yet
+      struct_name: name,
       struct_module: submodule,
       type: type,
       validation: Keyword.get(opts, :validation, []),

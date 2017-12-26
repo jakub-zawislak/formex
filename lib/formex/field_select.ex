@@ -6,7 +6,7 @@ defmodule Formex.Field.Select do
 
   @spec handle_select_without_choices(field :: Field.t, val :: String.t) :: Field.t
   def handle_select_without_choices(field, val) do
-    if field.opts[:choice_label_provider] && val do
+    if field.opts[:choice_label_provider] && val && val != "" do
 
       choices = case field.type do
         :select ->

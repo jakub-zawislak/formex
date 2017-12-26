@@ -81,13 +81,13 @@ defmodule Formex.Collection.OneToManyTest do
   test "edit user and user_address" do
     user = get_user(0)
 
-    params      = %{"user_addresses" => %{
+    params      = %{"first_name" => "a", "last_name" => "a", "user_addresses" => %{
       "0" => %{"id" => Enum.at(user.user_addresses, 0).id |> to_string, "street" => ""}
     }}
     form        = create_form(UserType, user, params)
     {:error, _} = handle_form(form)
 
-    params      = %{"user_addresses" => %{
+    params      = %{"first_name" => "a", "last_name" => "a", "user_addresses" => %{
       "0" => %{"id" => Enum.at(user.user_addresses, 0).id |> to_string,
         "street" => "Księżycowa", "postal_code" => "10-699", "city" => "Szczebrzeszyn"},
       "1" => %{"formex_id" => "1",
