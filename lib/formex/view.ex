@@ -69,18 +69,33 @@ defmodule Formex.View do
   end
 
   @doc """
-  Works similar to a `Phoenix.HTML.Form.form_for/4`
+  Works similar to a
+  [Phoenix.HTML.Form](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#form_for/4)
 
   In the callback function the first argument is `t:Formex.Form.t/0` instead of a
   `t:Phoenix.HTML.Form.t/0`.
   This argument contains the `t:Phoenix.HTML.Form.t/0` under a `:phoenix_form` key
 
   ## Options
+    In `options` argument you are passing together options for `Formex.View` and for `Phoenix.HTML`.
+
+  ### Formex options
 
     * `template` - a form template that implements `Formex.Template`, for example:
       `Formex.Template.BootstrapHorizontal`
     * `template_options` - additional options, supported by the template
-    * `as` - form name, defaults to `:formex`
+
+  ### Phoenix options
+
+    Options not mentioned before will be passed to a
+    [Phoenix.HTML.Form](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#form_for/4)
+    function. Options below are already set by Formex and can be overriden.
+
+    * `as` - form name, defaults to struct name
+    * `method` - method, defaults to `:post`
+
+  For rest of options, see
+  [Phoenix.HTML.Form](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#form_for/4) docs.
 
   """
   @spec formex_form_for(form :: Form.t, action :: String.t, options :: Keyword.t,
