@@ -170,6 +170,11 @@ The final effect after submit:
 * [Bootstrap Vertical](https://hexdocs.pm/formex/Formex.Template.BootstrapVertical.html)
 * [Bootstrap Horizontal](https://hexdocs.pm/formex/Formex.Template.BootstrapHorizontal.html)
 
+### Guides
+* [Using a select picker plugin with ajax search](https://hexdocs.pm/formex/guides.html#using-a-select-picker-plugin-with-ajax-search)
+* [Uploading files with Arc.Ecto](https://hexdocs.pm/formex_ecto/guides.html#uploading-files-with-arc-ecto) (Formex.Ecto)
+
+
 # Extensions
 
 * [formex_ecto](https://github.com/jakub-zawislak/formex_ecto) - Ecto integration
