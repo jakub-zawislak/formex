@@ -26,7 +26,7 @@ In this example we will use Vex.
 `mix.exs`
 ```elixir
 def deps do
-  [{:formex, "~> 0.5.0"},
+  [{:formex, "~> 0.6.0"},
    {:formex_vex, "~> 0.1.0"}]
 end
 
