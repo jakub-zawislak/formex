@@ -274,10 +274,18 @@ defmodule Formex.View.Collection do
 
     prot_form = Formex.Builder.create_form(form.type, struct, %{}, form.opts)
 
-    options = Keyword.put(options, :without_prototype, true)
+    collection_options = Keyword.put(options, :without_prototype, true)
 
-    {:safe, prot_html} = formex_form_for(prot_form, "", [as: form.phoenix_form.name], fn f ->
-      formex_collection(f, item_name, options, fn collection ->
+    form_for_options = [
+      as: form.phoenix_form.name,
+      # Added only to suppress a Phoenix error about lack of "multipart: true" when using file
+      # uploads in collections. We are using only content of the generated <form>,
+      # so this extra parameter doesn't change anything
+      multipart: true
+    ]
+
+    {:safe, prot_html} = formex_form_for(prot_form, "", form_for_options, fn f ->
+      formex_collection(f, item_name, collection_options, fn collection ->
         formex_collection_items(collection)
       end, fun_item)
     end)

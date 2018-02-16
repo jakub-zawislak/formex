@@ -1,3 +1,6 @@
+## v0.6.1 (2017-02-16)
+* Fixed file uploads in collections
+
 ## v0.6.0 (2017-12-26)
 * Changed behaviour when user sends no value for field.
 
