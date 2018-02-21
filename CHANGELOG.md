@@ -1,3 +1,9 @@
+## v0.6.2 (2017-02-21)
+* Added another way to define the `translate_error` function, to fix usage with Distillery.
+  Details are in Formex.Validator docs.
+* Added a default `translate_error` implementation, so you don't need to set it in config.ex,
+  when you don't want to translate error messages.
+
 ## v0.6.1 (2017-02-16)
 * Fixed file uploads in collections
 

@@ -24,7 +24,7 @@ defmodule Formex.Builder do
   # when you call `use Formex.Ecto.Schema` in `web/web.ex`, in every model is created
   # `formex_wrapper` function, which returns wrapper module.
   # `Formex.BuilderProtocol` is implemented for this wrapper
-  @spec create_form(module, struct, Map.t, List.t, module) :: Form.t
+  @spec create_form(module, struct, Map.t, Keyword.t, module) :: Form.t
   def create_form(type, struct, params \\ %{}, opts \\ [], struct_module \\ nil) do
 
     struct_module = if(struct_module, do: struct_module, else: struct.__struct__)

@@ -250,7 +250,9 @@ defmodule Formex.Type do
 
       def validator, do: nil
 
-      defoverridable [validator: 0]
+      def translate_error, do: nil
+
+      defoverridable [validator: 0, translate_error: 0]
       # defoverridable [validate_whole_struct?: 0, validator: 0]
     end
   end

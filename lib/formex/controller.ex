@@ -10,7 +10,8 @@ defmodule Formex.Controller do
   end
 
   @moduledoc """
-  Helpers for controller. Imports `Formex.Builder`.
+  Helpers for controller. Imports `Formex.Builder`. Probably you are looking for
+  `Formex.Builder.create_form/5`.
 
   # Installation:
 
