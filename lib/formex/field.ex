@@ -6,6 +6,7 @@ defmodule Formex.Field do
 
     * `:name` - a field name, for example: `:title`
     * `:struct_name` - a name of a key in your struct. By default the same as `:name`
+    * `:custom_value` - custom function that extracts a value that will be used in view
     * `:type` - a type of a field that in most cases will be the name of a function from
       [`Phoenix.HTML.Form`](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html)
     * `:value` - the value from struct/params
@@ -20,6 +21,7 @@ defmodule Formex.Field do
   """
   defstruct name: nil,
     struct_name: nil,
+    custom_value: nil,
     type: nil,
     required: true,
     validation: [],
@@ -104,6 +106,7 @@ defmodule Formex.Field do
     %Field{
       name: name,
       struct_name: Keyword.get(opts, :struct_name, name),
+      custom_value: Keyword.get(opts, :custom_value),
       type: type,
       label: get_label(name, opts),
       required: Keyword.get(opts, :required, true),
@@ -134,7 +137,9 @@ defmodule Formex.Field do
 
   @doc false
   def prepare_opts(opts) do
-    Keyword.delete(opts, :phoenix_opts)
+    opts
+    |> Keyword.delete(:phoenix_opts)
+    |> Keyword.delete(:custom_value)
   end
 
   @doc false

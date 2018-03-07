@@ -1,3 +1,6 @@
+## v0.6.3 (2017-03-07)
+* Added a `custom_value` option in fields
+
 ## v0.6.2 (2017-02-21)
 * Added another way to define the `translate_error` function, to fix usage with Distillery.
   Details are in Formex.Validator docs.
