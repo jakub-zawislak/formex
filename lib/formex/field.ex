@@ -44,6 +44,17 @@ defmodule Formex.Field do
     * `:required` - defaults to true. Used only by the template helper to generate an additional
     `.required` CSS class.
     * `:struct_name` - a name of a key in your struct. Defaults to the `name` variable
+    * `:custom_value` - use this, if you need to change value that will be used in view.
+      For example, field of `Money.Ecto.Type` type casted to string returns a formatted number,
+      when we may need a raw number. In this case we should use:
+      ```
+      form
+      |> add(:money, :text_input, custom_value: fn value ->
+        if value do
+          value.amount
+        end
+      end)
+      ```
     * `:phoenix_opts` - options that will be passed to
       [`Phoenix.HTML.Form`](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html), for example:
       ```

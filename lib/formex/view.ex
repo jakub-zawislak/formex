@@ -139,7 +139,8 @@ defmodule Formex.View do
           val = if !item.custom_value do
             Map.get(form.new_struct, item.struct_name)
           else
-            item.custom_value.(form.new_struct)
+            value = Map.get(form.new_struct, item.struct_name)
+            item.custom_value.(value)
           end
 
           new_val = case item.type do
