@@ -1,3 +1,6 @@
+## v0.6.4 (2017-03-08)
+* Changed argument of `custom_value` callback
+
 ## v0.6.3 (2017-03-07)
 * Added a `custom_value` option in fields
 
