@@ -1,3 +1,6 @@
+## v0.6.5 (2017-04-01)
+* Fixed using `multi_select` with array field when value of field is `nil`
+
 ## v0.6.4 (2017-03-08)
 * Changed argument of `custom_value` callback
 

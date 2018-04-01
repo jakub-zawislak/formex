@@ -145,7 +145,7 @@ defmodule Formex.View do
 
           new_val = case item.type do
             :multiple_select ->
-              Enum.map(val, fn subval ->
+              Enum.map(val || [], fn subval ->
                 case subval do
                   substruct when is_map(substruct) ->
                     substruct.id
