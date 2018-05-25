@@ -88,7 +88,7 @@ defmodule Formex.FormCollection do
   def get_subform_by_struct(form_collection, struct) do
     form_collection.forms
     |> Enum.find(fn form_nested ->
-      if struct.id do
+      if struct.id && struct.id !== "" do
         to_string(form_nested.form.struct.id) == to_string(struct.id)
       else
         form_nested.form.struct.formex_id == struct.formex_id
