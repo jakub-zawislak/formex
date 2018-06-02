@@ -102,7 +102,8 @@ defmodule Formex.Validator do
 
   #
 
-  defp translate_errors(form) do
+  @doc false
+  def translate_errors(form) do
     translate_error =
       form.type.translate_error
       || Application.get_env(:formex, :translate_error)

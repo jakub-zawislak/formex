@@ -68,7 +68,15 @@ defmodule Formex.Form do
   @spec get_fields_controllable(form :: t) :: list
   def get_fields_controllable(form) do
     form.items
-    |> Enum.filter(&(&1.__struct__ != Button))
+    |> Enum.filter(&is_controllable/1)
+  end
+
+  @doc """
+  Is controllable (all except the `Button`)
+  """
+  @spec is_controllable(item :: any) :: boolean
+  def is_controllable(item) do
+    item.__struct__ != Button
   end
 
   @doc """
@@ -107,12 +115,22 @@ defmodule Formex.Form do
   end
 
   @doc """
-  Finds form item by struct name
+  Finds form item by `name` and returns `struct_name`
   """
-  @spec get_struct_name_by_name(form :: t, name :: atom) :: list
+  @spec get_struct_name_by_name(form :: t, name :: atom) :: atom
   def get_struct_name_by_name(form, name) do
     find(form, name)
     |> Map.get(:struct_name)
+  end
+
+  @doc """
+  Finds form item by `struct_name` and returns `name`
+  """
+  @spec get_name_by_struct_name(form :: t, struct_name :: atom) :: atom
+  def get_name_by_struct_name(form, struct_name) do
+    form.items
+    |> Enum.find(&(&1.struct_name == struct_name))
+    |> Map.get(:name)
   end
 
   @doc """
@@ -203,8 +221,7 @@ defmodule Formex.Form do
       case item do
         collection = %FormCollection{} ->
           forms = collection.forms
-          |> Enum.with_index()
-          |> Enum.map(fn {nested, index} ->
+          |> Enum.map(fn nested ->
             form = modify_selects_recursively(nested.form, fun)
 
             %{nested | form: form}
@@ -222,8 +239,8 @@ defmodule Formex.Form do
           end
 
         _ -> item
-        end
-      end)
+      end
+    end)
 
     Map.put(form, :items, form_items)
   end

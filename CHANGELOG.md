@@ -1,5 +1,6 @@
 ## v0.6.6 (2017-05-25)
 * Fixed #15 - issue in collections, when `id` of struct was `""` instead of `nil`
+* Changed Validator module to be compatible with `Formex.Ecto` `0.2`
 
 ## v0.6.5 (2017-04-01)
 * Fixed using `multi_select` with array field when value of field is `nil`
