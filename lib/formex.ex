@@ -1,3 +1,2 @@
 defmodule Formex do
-
 end

@@ -25,21 +25,21 @@ defmodule Formex.Form do
     * `:opts` - additional data passed in a controller. See: `Formex.Builder.create_form/5`
   """
   defstruct type: nil,
-    struct: nil,
-    new_struct: nil,
-    struct_module: nil,
-    struct_info: nil,
-    valid?: false,
-    items: [],
-    params: %{},
-    phoenix_form: nil,
-    template: nil,
-    method: nil,
-    submitted?: false,
-    opts: [],
-    errors: [],
-    template_options: nil,
-    mapped_params: %{}
+            struct: nil,
+            new_struct: nil,
+            struct_module: nil,
+            struct_info: nil,
+            valid?: false,
+            items: [],
+            params: %{},
+            phoenix_form: nil,
+            template: nil,
+            method: nil,
+            submitted?: false,
+            opts: [],
+            errors: [],
+            template_options: nil,
+            mapped_params: %{}
 
   @type t :: %Form{}
 
@@ -159,11 +159,12 @@ defmodule Formex.Form do
     form
     |> get_fields_controllable
     |> Enum.filter(&(&1.name != &1.struct_name))
-    |> Enum.map(&(&1.name))
+    |> Enum.map(& &1.name)
   end
 
   @doc false
-  @spec start_creating(form :: Form.t, type :: any, name :: Atom.t, opts :: Map.t) :: Form.t
+  @spec start_creating(form :: Form.t(), type :: any, name :: Atom.t(), opts :: Map.t()) ::
+          Form.t()
   def start_creating(form, type, name, opts \\ []) do
     info = form.struct_info[name]
 
@@ -175,74 +176,77 @@ defmodule Formex.Form do
   end
 
   @doc false
-  @spec finish_creating(form :: Form.t) :: Form.t
+  @spec finish_creating(form :: Form.t()) :: Form.t()
   def finish_creating(form) do
-    new_items = form.items
-    |> Enum.map(fn item ->
-      case item do
-        %FormCollection{} ->
-          FormCollection.finish_creating(form, item)
-        %FormNested{} ->
-          FormNested.finish_creating(form, item)
-        _ ->
-          item
-      end
-    end)
+    new_items =
+      form.items
+      |> Enum.map(fn item ->
+        case item do
+          %FormCollection{} ->
+            FormCollection.finish_creating(form, item)
+
+          %FormNested{} ->
+            FormNested.finish_creating(form, item)
+
+          _ ->
+            item
+        end
+      end)
 
     form
     |> Map.put(:items, new_items)
   end
 
   @doc false
-  @spec get_assoc_or_embed(form :: Form.t, name :: Atom.t) :: any
+  @spec get_assoc_or_embed(form :: Form.t(), name :: Atom.t()) :: any
   def get_assoc_or_embed(form, name) do
-
     if is_assoc(form, name) do
       form.struct_module.__schema__(:association, name)
     else
       form.struct_module.__schema__(:embed, name)
     end
-
   end
 
   @doc false
-  @spec is_assoc(form :: Form.t, name :: Atom.t) :: boolean
+  @spec is_assoc(form :: Form.t(), name :: Atom.t()) :: boolean
   def is_assoc(form, name) do
     form.struct_module.__schema__(:association, name) != nil
   end
 
   # applies function for every select field
   @doc false
-  @spec modify_selects_recursively(form :: Form.t, fun :: (Field.t, Form.t -> Field.t)) :: Form.t
+  @spec modify_selects_recursively(form :: Form.t(), fun :: (Field.t(), Form.t() -> Field.t())) ::
+          Form.t()
   def modify_selects_recursively(form, fun) do
+    form_items =
+      Enum.map(form.items, fn item ->
+        case item do
+          collection = %FormCollection{} ->
+            forms =
+              collection.forms
+              |> Enum.map(fn nested ->
+                form = modify_selects_recursively(nested.form, fun)
 
-    form_items = Enum.map(form.items, fn item ->
+                %{nested | form: form}
+              end)
 
-      case item do
-        collection = %FormCollection{} ->
-          forms = collection.forms
-          |> Enum.map(fn nested ->
-            form = modify_selects_recursively(nested.form, fun)
+            %{collection | forms: forms}
 
-            %{nested | form: form}
-          end)
-          %{collection | forms: forms}
+          nested = %FormNested{} ->
+            %{nested | form: modify_selects_recursively(nested.form, fun)}
 
-        nested = %FormNested{} ->
-          %{nested | form: modify_selects_recursively(nested.form, fun)}
+          field = %Field{} ->
+            if field.type in [:select, :multiple_select] do
+              fun.(form, field)
+            else
+              field
+            end
 
-        field = %Field{} ->
-          if field.type in [:select, :multiple_select] do
-            fun.(form, field)
-          else
-            field
-          end
-
-        _ -> item
-      end
-    end)
+          _ ->
+            item
+        end
+      end)
 
     Map.put(form, :items, form_items)
   end
-
 end

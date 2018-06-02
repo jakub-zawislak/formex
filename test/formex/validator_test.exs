@@ -46,5 +46,4 @@ defmodule Formex.ValidatorTest do
 
     assert form.errors == [title: ["custom error"]]
   end
-
 end

@@ -19,43 +19,43 @@ defmodule Formex.Validator.Simple do
   ```
   """
 
-  @spec validate(Form.t) :: Form.t
+  @spec validate(Form.t()) :: Form.t()
   def validate(form) do
+    errors =
+      form
+      |> Form.get_fields_validatable()
+      |> Enum.map(fn item ->
+        if item.validation do
+          errors =
+            form.new_struct
+            |> Map.from_struct()
+            |> Map.get(item.name)
+            |> do_validation(item.validation)
 
-    errors = form
-    |> Form.get_fields_validatable
-    |> Enum.map(fn item ->
-      if item.validation do
-        errors = form.new_struct
-        |> Map.from_struct()
-        |> Map.get(item.name)
-        |> do_validation(item.validation)
-
-        {item.name, errors}
-      else
-        {item.name, []}
-      end
-    end)
+          {item.name, errors}
+        else
+          {item.name, []}
+        end
+      end)
 
     form
     |> Map.put(:errors, errors)
   end
 
-  @spec do_validation(value :: any, rules :: List.t) :: List.t
+  @spec do_validation(value :: any, rules :: List.t()) :: List.t()
   defp do_validation(value, rules) do
     rules
     |> Enum.map(fn rule ->
       case rule do
         :required ->
-          if (is_binary(value) && value == "") || (!value) do
+          if (is_binary(value) && value == "") || !value do
             "This field is required"
           end
       end
     end)
-    |> Enum.filter(&(&1))
+    |> Enum.filter(& &1)
     |> Enum.map(fn message ->
       {message, []}
     end)
   end
-
 end

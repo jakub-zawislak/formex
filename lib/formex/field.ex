@@ -20,15 +20,15 @@ defmodule Formex.Field do
       [`Phoenix.HTML.Form`](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html)
   """
   defstruct name: nil,
-    struct_name: nil,
-    custom_value: nil,
-    type: nil,
-    required: true,
-    validation: [],
-    label: "",
-    data: [],
-    opts: [],
-    phoenix_opts: []
+            struct_name: nil,
+            custom_value: nil,
+            type: nil,
+            required: true,
+            validation: [],
+            label: "",
+            data: [],
+            opts: [],
+            phoenix_opts: []
 
   @type t :: %Field{}
 
@@ -102,17 +102,20 @@ defmodule Formex.Field do
   def create_field(type, name, opts \\ []) do
     data = []
 
-    {opts, data} = if type in [:select, :multiple_select] do
-      opts = opts
-      |> Keyword.put_new(:without_choices, false)
+    {opts, data} =
+      if type in [:select, :multiple_select] do
+        opts =
+          opts
+          |> Keyword.put_new(:without_choices, false)
 
-      data = data
-      |> Keyword.merge([choices: Keyword.get(opts, :choices, [])])
+        data =
+          data
+          |> Keyword.merge(choices: Keyword.get(opts, :choices, []))
 
-      {opts, data}
-    else
-      {opts, []}
-    end
+        {opts, data}
+      else
+        {opts, []}
+      end
 
     %Field{
       name: name,
@@ -133,7 +136,7 @@ defmodule Formex.Field do
     if opts[:label] do
       opts[:label]
     else
-      Atom.to_string name
+      Atom.to_string(name)
     end
   end
 
@@ -163,5 +166,4 @@ defmodule Formex.Field do
       Keyword.put(phoenix_opts, :class, "")
     end
   end
-
 end

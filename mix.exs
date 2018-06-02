@@ -6,20 +6,19 @@ defmodule Formex.Mixfile do
       app: :formex,
       version: "0.6.6",
       elixir: "~> 1.3",
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
       description: description(),
-
       name: "Formex",
       docs: [
         main: "readme",
         extras: ["README.md", "UPGRADE.md", "guides.md"]
       ],
       source_url: "https://github.com/jakub-zawislak/formex",
-      elixirc_paths: elixirc_paths(Mix.env)
-   ]
+      elixirc_paths: elixirc_paths(Mix.env())
+    ]
   end
 
   def application do
@@ -27,9 +26,10 @@ defmodule Formex.Mixfile do
   end
 
   defp deps do
-    [{:phoenix_html, "~> 2.0"},
-     {:ex_doc, ">= 0.0.0", only: :dev},
-     {:phoenix, "~> 1.3", only: [:dev, :test]},
+    [
+      {:phoenix_html, "~> 2.0"},
+      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:phoenix, "~> 1.3", only: [:dev, :test]}
     ]
   end
 
@@ -40,10 +40,12 @@ defmodule Formex.Mixfile do
   end
 
   defp package do
-    [maintainers: ["Jakub Zawiślak"],
-     licenses: ["MIT"],
-     files: ~w(lib priv web CHANGELOG.md LICENSE.md mix.exs package.json README.md),
-     links: %{github: "https://github.com/jakub-zawislak/formex"}]
+    [
+      maintainers: ["Jakub Zawiślak"],
+      licenses: ["MIT"],
+      files: ~w(lib priv web CHANGELOG.md LICENSE.md mix.exs package.json README.md),
+      links: %{github: "https://github.com/jakub-zawislak/formex"}
+    ]
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]

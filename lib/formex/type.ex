@@ -1,5 +1,4 @@
 defmodule Formex.Type do
-
   @moduledoc """
   In order to create a form, you need to create the Type file. It's similar to
   [Symfony's](https://symfony.com/doc/current/forms.html#creating-form-classes)
@@ -252,7 +251,7 @@ defmodule Formex.Type do
 
       def translate_error, do: nil
 
-      defoverridable [validator: 0, translate_error: 0]
+      defoverridable validator: 0, translate_error: 0
       # defoverridable [validate_whole_struct?: 0, validator: 0]
     end
   end
@@ -282,22 +281,23 @@ defmodule Formex.Type do
     * if it's `:submit` or `:reset`, the `Formex.Button.create_button/3` is called
     * otherwise, the `Formex.Field.create_field/4` is called.
   """
-  @spec add(form :: Form.t, name :: Atom.t, type_or_module :: Atom.t, opts :: Map.t) :: Form.t
+  @spec add(form :: Form.t(), name :: Atom.t(), type_or_module :: Atom.t(), opts :: Map.t()) ::
+          Form.t()
   def add(form, name, type_or_module, opts) do
-
-    item = if Formex.Utils.module?(type_or_module) do
-      if Formex.Utils.implements?(type_or_module, Formex.CustomField) do
-        type_or_module.create_field(form, name, opts)
+    item =
+      if Formex.Utils.module?(type_or_module) do
+        if Formex.Utils.implements?(type_or_module, Formex.CustomField) do
+          type_or_module.create_field(form, name, opts)
+        else
+          Formex.Form.start_creating(form, type_or_module, name, opts)
+        end
       else
-        Formex.Form.start_creating(form, type_or_module, name, opts)
+        if Enum.member?([:submit, :reset], type_or_module) do
+          Formex.Button.create_button(type_or_module, name, opts)
+        else
+          Formex.Field.create_field(type_or_module, name, opts)
+        end
       end
-    else
-      if Enum.member?([:submit, :reset], type_or_module) do
-        Formex.Button.create_button(type_or_module, name, opts)
-      else
-        Formex.Field.create_field(type_or_module, name, opts)
-      end
-    end
 
     Formex.Form.put_item(form, item)
   end
@@ -305,7 +305,7 @@ defmodule Formex.Type do
   @doc """
   In this callback you have to add fields to the form.
   """
-  @callback build_form(form :: Formex.Form.t) :: Formex.Form.t
+  @callback build_form(form :: Formex.Form.t()) :: Formex.Form.t()
 
   # @doc """
   # The Vex validator has a `Vex.Struct.validates/2` that is used to define validation inside
@@ -315,5 +315,4 @@ defmodule Formex.Type do
   # Defaults to `false`.
   # """
   # @callback validate_whole_struct?() :: boolean
-
 end

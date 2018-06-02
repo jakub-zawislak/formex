@@ -12,10 +12,10 @@ defmodule Formex.Button do
     * `:opts` - options
   """
   defstruct name: nil,
-    type: nil,
-    label: "",
-    opts: [],
-    phoenix_opts: []
+            type: nil,
+            label: "",
+            opts: [],
+            phoenix_opts: []
 
   @type t :: %Button{}
 
@@ -39,11 +39,12 @@ defmodule Formex.Button do
   def create_button(type, name, opts \\ []) do
     phoenix_opts = Field.prepare_phoenix_opts(opts)
 
-    {type, phoenix_opts} = if type == :button do
-      {:submit, Keyword.put(phoenix_opts, :type, :button)}
-    else
-      {type, phoenix_opts}
-    end
+    {type, phoenix_opts} =
+      if type == :button do
+        {:submit, Keyword.put(phoenix_opts, :type, :button)}
+      else
+        {type, phoenix_opts}
+      end
 
     %Button{
       name: name,
@@ -53,5 +54,4 @@ defmodule Formex.Button do
       phoenix_opts: phoenix_opts
     }
   end
-
 end

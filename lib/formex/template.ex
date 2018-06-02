@@ -90,9 +90,11 @@ defmodule Formex.Template do
       `:template_options` inside a `Formex.View` functions, or in the `:formex` config.
       For example, `Formex.Template.BootstrapHorizontal` uses options that stores columns sizes.
   """
-  @callback generate_row(form :: Form.t, field :: Formex.Field.t, options :: Keyword.t) :: Phoenix.HTML.safe
-  @callback generate_input(form :: Form.t, field_or_button :: any) :: Phoenix.HTML.safe
-  @callback generate_label(form :: Form.t, field :: Field.t, class :: String.t) :: Phoenix.HTML.safe
+  @callback generate_row(form :: Form.t(), field :: Formex.Field.t(), options :: Keyword.t()) ::
+              Phoenix.HTML.safe()
+  @callback generate_input(form :: Form.t(), field_or_button :: any) :: Phoenix.HTML.safe()
+  @callback generate_label(form :: Form.t(), field :: Field.t(), class :: String.t()) ::
+              Phoenix.HTML.safe()
 
   defmacro __using__(which) when is_atom(which) do
     apply(__MODULE__, which, [])
@@ -109,7 +111,7 @@ defmodule Formex.Template do
   Runs function from [`Phoenix.HTML.Form`](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html)
   defined in a `Field.type` or `Button.type`
   """
-  @spec render_phoenix_input(item :: any, args :: Keyword.t) :: any
+  @spec render_phoenix_input(item :: any, args :: Keyword.t()) :: any
   def render_phoenix_input(item, args) do
     apply(Phoenix.HTML.Form, item.type, args)
   end
@@ -117,7 +119,7 @@ defmodule Formex.Template do
   @doc """
   Returns list of errors
   """
-  @spec get_errors(Form.t, Field.t) :: any
+  @spec get_errors(Form.t(), Field.t()) :: any
   def get_errors(form, field) do
     form.errors[field.name] || []
   end
@@ -125,7 +127,7 @@ defmodule Formex.Template do
   @doc """
   Checks if given field has an error
   """
-  @spec has_error(Form.t, Field.t) :: any
+  @spec has_error(Form.t(), Field.t()) :: any
   def has_error(form, field) do
     Enum.count(get_errors(form, field)) > 0
   end
@@ -143,9 +145,8 @@ defmodule Formex.Template do
   @doc """
   Adds a CSS class to the `:phoenix_opts` keyword
   """
-  @spec add_class(phoenix_opts :: Keyword.t, class :: String.t) :: Keyword.t
+  @spec add_class(phoenix_opts :: Keyword.t(), class :: String.t()) :: Keyword.t()
   def add_class(phoenix_opts, class) do
-    Keyword.merge(phoenix_opts, [class: class<>" "<>phoenix_opts[:class]])
+    Keyword.merge(phoenix_opts, class: class <> " " <> phoenix_opts[:class])
   end
-
 end

@@ -55,7 +55,7 @@ defmodule Formex.Controller do
   Validates form. When is valid, returns `{:ok, form.new_struct}`, otherwise, `{:error, form}` with
   validation errors inside `form.errors`
   """
-  @spec handle_form(Form.t) :: {:ok, Map.t} | {:error, Form.t}
+  @spec handle_form(Form.t()) :: {:ok, Map.t()} | {:error, Form.t()}
   def handle_form(form) do
     form = Builder.handle_submit(form)
 
@@ -65,5 +65,4 @@ defmodule Formex.Controller do
       {:error, %{form | submitted?: true}}
     end
   end
-
 end

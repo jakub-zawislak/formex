@@ -137,35 +137,45 @@ defmodule Formex.View.Collection do
   ```
 
   """
-  @spec formex_collection(Form.t, Atom.t, List.t, fun :: (t -> Phoenix.HTML.unsafe),
-    fun_item :: (Formex.t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
+  @spec formex_collection(
+          Form.t(),
+          Atom.t(),
+          List.t(),
+          fun :: (t -> Phoenix.HTML.unsafe()),
+          fun_item :: (Formex.t() -> Phoenix.HTML.unsafe())
+        ) :: Phoenix.HTML.safe()
   def formex_collection(form, item_name, options, fun, fun_item) do
-    item             = Enum.find(form.items, &(&1.name == item_name))
-    template         = Formex.View.get_template(form, options)
+    item = Enum.find(form.items, &(&1.name == item_name))
+    template = Formex.View.get_template(form, options)
     template_options = Formex.View.get_template_options(form, options)
 
     if !item do
-      throw("Key :"<>to_string(item_name)<>" not found in form "<>to_string(form.type))
+      throw("Key :" <> to_string(item_name) <> " not found in form " <> to_string(form.type))
     end
 
-    prototype = if !options[:without_prototype] do
-      generate_collection_prototype(form, item_name, item, fun_item, options)
-    end
+    prototype =
+      if !options[:without_prototype] do
+        generate_collection_prototype(form, item_name, item, fun_item, options)
+      end
 
-    html = fun.(%Collection{
-      form: form,
-      item: item,
-      template: template,
-      template_options: template_options,
-      fun_item: fun_item
-    })
+    html =
+      fun.(%Collection{
+        form: form,
+        item: item,
+        template: template,
+        template_options: template_options,
+        fun_item: fun_item
+      })
 
     if prototype do
-      content_tag :div, html,
+      content_tag(
+        :div,
+        html,
         class: "formex-collection",
         data: [
-          "formex-prototype": prototype |> elem(1) |> to_string,
+          "formex-prototype": prototype |> elem(1) |> to_string
         ]
+      )
     else
       html
     end
@@ -185,70 +195,106 @@ defmodule Formex.View.Collection do
     ]
   end
 
-  @spec formex_collection_items(t) :: Phoenix.HTML.safe
+  @spec formex_collection_items(t) :: Phoenix.HTML.safe()
   def formex_collection_items(collection) do
     form = collection.form
     item = collection.item
     template = collection.template
     template_options = collection.template_options
 
-    html = form.phoenix_form
-    |> Phoenix.HTML.Form.inputs_for(item.name, [default: []], fn phoenix_form ->
-      fake_struct = %{id: phoenix_form.params["id"], formex_id: phoenix_form.params["formex_id"]}
+    html =
+      form.phoenix_form
+      |> Phoenix.HTML.Form.inputs_for(item.name, [default: []], fn phoenix_form ->
+        fake_struct = %{
+          id: phoenix_form.params["id"],
+          formex_id: phoenix_form.params["formex_id"]
+        }
 
-      item
-      |> FormCollection.get_subform_by_struct(fake_struct)
-      |> case do
-        nil -> ""
-        nested_form ->
-          subform = nested_form.form
-          |> Map.put(:phoenix_form, phoenix_form)
-          |> Map.put(:template, template)
-          |> Map.put(:template_options, template_options)
-
-          html = collection.fun_item.(subform)
-
-          style = if FormCollection.to_be_removed(item, nested_form) do
-            "display: none;"
-          else
+        item
+        |> FormCollection.get_subform_by_struct(fake_struct)
+        |> case do
+          nil ->
             ""
-          end
 
-          if subform.struct.id do
-            id_field = Phoenix.HTML.Form.hidden_input phoenix_form, :id
-            delete_field = Phoenix.HTML.Form.hidden_input phoenix_form, item.delete_field,
-              "data-formex-remove": ""
+          nested_form ->
+            subform =
+              nested_form.form
+              |> Map.put(:phoenix_form, phoenix_form)
+              |> Map.put(:template, template)
+              |> Map.put(:template_options, template_options)
 
-            content_tag(:div, [
-              html,
-              id_field,
-              delete_field
-            ], class: "formex-collection-item", style: style, data: [
-              formex_index: phoenix_form.index
-            ])
-          else
-            formex_id_field = Phoenix.HTML.Form.hidden_input phoenix_form, :formex_id, data: [
-              formex_id: ""
-            ]
+            html = collection.fun_item.(subform)
 
-            content_tag(:div, [
-              html,
-              formex_id_field
-            ], class: "formex-collection-item formex-collection-item-new", style: style, data: [
-              formex_index: phoenix_form.index
-            ])
-          end
-      end
-    end)
+            style =
+              if FormCollection.to_be_removed(item, nested_form) do
+                "display: none;"
+              else
+                ""
+              end
+
+            if subform.struct.id do
+              id_field = Phoenix.HTML.Form.hidden_input(phoenix_form, :id)
+
+              delete_field =
+                Phoenix.HTML.Form.hidden_input(
+                  phoenix_form,
+                  item.delete_field,
+                  "data-formex-remove": ""
+                )
+
+              content_tag(
+                :div,
+                [
+                  html,
+                  id_field,
+                  delete_field
+                ],
+                class: "formex-collection-item",
+                style: style,
+                data: [
+                  formex_index: phoenix_form.index
+                ]
+              )
+            else
+              formex_id_field =
+                Phoenix.HTML.Form.hidden_input(
+                  phoenix_form,
+                  :formex_id,
+                  data: [
+                    formex_id: ""
+                  ]
+                )
+
+              content_tag(
+                :div,
+                [
+                  html,
+                  formex_id_field
+                ],
+                class: "formex-collection-item formex-collection-item-new",
+                style: style,
+                data: [
+                  formex_index: phoenix_form.index
+                ]
+              )
+            end
+        end
+      end)
 
     content_tag(:div, html, class: "formex-collection-items")
   end
 
-  @spec formex_collection_add(t, String.t, String.t) :: Phoenix.HTML.safe
+  @spec formex_collection_add(t, String.t(), String.t()) :: Phoenix.HTML.safe()
   def formex_collection_add(form_collection, label \\ "Add", class \\ "") do
-    button = Formex.Button.create_button(:button, :add, label: label, phoenix_opts: [
-      class: "formex-collection-add "<>class
-    ])
+    button =
+      Formex.Button.create_button(
+        :button,
+        :add,
+        label: label,
+        phoenix_opts: [
+          class: "formex-collection-add " <> class
+        ]
+      )
 
     template_options = form_collection.template_options
     template = form_collection.template
@@ -257,20 +303,28 @@ defmodule Formex.View.Collection do
     template.generate_row(form, button, template_options)
   end
 
-  @spec formex_collection_remove(String.t, String.t) :: Phoenix.HTML.safe
+  @spec formex_collection_remove(String.t(), String.t()) :: Phoenix.HTML.safe()
   def formex_collection_remove(label \\ {:safe, "&times;"}, confirm \\ "Are you sure?") do
-    content_tag(:a, [
-      label
-    ], href: "#", class: "formex-collection-item-remove", "data-formex-confirm": confirm)
+    content_tag(
+      :a,
+      [
+        label
+      ],
+      href: "#",
+      class: "formex-collection-item-remove",
+      "data-formex-confirm": confirm
+    )
   end
 
   defp generate_collection_prototype(form, item_name, item, fun_item, options) do
-    substruct = item.struct_module
-    |> struct
+    substruct =
+      item.struct_module
+      |> struct
 
-    struct = form.struct_module
-    |> struct
-    |> Map.put(item_name, [substruct])
+    struct =
+      form.struct_module
+      |> struct
+      |> Map.put(item_name, [substruct])
 
     prot_form = Formex.Builder.create_form(form.type, struct, %{}, form.opts)
 
@@ -284,34 +338,42 @@ defmodule Formex.View.Collection do
       multipart: true
     ]
 
-    {:safe, prot_html} = formex_form_for(prot_form, "", form_for_options, fn f ->
-      formex_collection(f, item_name, collection_options, fn collection ->
-        formex_collection_items(collection)
-      end, fun_item)
-    end)
+    {:safe, prot_html} =
+      formex_form_for(prot_form, "", form_for_options, fn f ->
+        formex_collection(
+          f,
+          item_name,
+          collection_options,
+          fn collection ->
+            formex_collection_items(collection)
+          end,
+          fun_item
+        )
+      end)
 
-    html = Enum.at(prot_html, 1)
-    |> to_string
-    |> replace_indexes_in_prototype
+    html =
+      Enum.at(prot_html, 1)
+      |> to_string
+      |> replace_indexes_in_prototype
 
     {:safe, html}
   end
 
   defp replace_indexes_in_prototype(html) do
     Regex.replace(~r/(for|id|name)(\=")(.*?)(")/i, html, fn _match, a, b, name, c ->
+      replaced_name =
+        Regex.split(~r/_[0-9]+_|\[[0-9]+\]/, name, include_captures: true)
+        |> Enum.with_index()
+        |> Enum.map(fn {val, index} ->
+          if rem(index, 2) == 0 do
+            val
+          else
+            Regex.replace(~r/[0-9]+/, val, "__idx" <> to_string(div(index + 1, 2) - 1) <> "__")
+          end
+        end)
+        |> Enum.join()
 
-      replaced_name = Regex.split(~r/_[0-9]+_|\[[0-9]+\]/, name, include_captures: true)
-      |> Enum.with_index
-      |> Enum.map(fn {val, index} ->
-        if rem(index, 2) == 0 do
-          val
-        else
-          Regex.replace(~r/[0-9]+/, val, "__idx"<>to_string(div(index + 1, 2)-1)<>"__")
-        end
-      end)
-      |> Enum.join
-
-      a<>b<>replaced_name<>c
+      a <> b <> replaced_name <> c
     end)
   end
 end

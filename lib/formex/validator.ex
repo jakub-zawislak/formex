@@ -66,34 +66,42 @@ defmodule Formex.Validator do
 
   """
 
-  @callback validate(form :: Formex.Form.t) :: List.t
+  @callback validate(form :: Formex.Form.t()) :: List.t()
 
-  @spec validate(Form.t) :: Form.t
+  @spec validate(Form.t()) :: Form.t()
   def validate(form) do
     validator = get_validator(form)
 
-    form = form
-    |> validator.validate
-    |> add_invalid_select_errors
-    |> translate_errors
+    form =
+      form
+      |> validator.validate
+      |> add_invalid_select_errors
+      |> translate_errors
 
-    items = form.items
-    |> Enum.map(fn item ->
-      case item do
-        collection = %FormCollection{} ->
-          %{collection | forms: Enum.map(collection.forms, fn nested ->
-            if !FormCollection.to_be_removed(item, nested) do
-              %{nested | form: validate(nested.form)}
-            else
-              %{nested | form: %{nested.form | valid?: true}}
-            end
-          end)}
-        nested = %FormNested{} ->
-          %{nested | form: validate(nested.form)}
-        _ ->
-          item
-      end
-    end)
+    items =
+      form.items
+      |> Enum.map(fn item ->
+        case item do
+          collection = %FormCollection{} ->
+            %{
+              collection
+              | forms:
+                  Enum.map(collection.forms, fn nested ->
+                    if !FormCollection.to_be_removed(item, nested) do
+                      %{nested | form: validate(nested.form)}
+                    else
+                      %{nested | form: %{nested.form | valid?: true}}
+                    end
+                  end)
+            }
+
+          nested = %FormNested{} ->
+            %{nested | form: validate(nested.form)}
+
+          _ ->
+            item
+        end
+      end)
 
     form = %{form | items: items}
 
@@ -105,84 +113,85 @@ defmodule Formex.Validator do
   @doc false
   def translate_errors(form) do
     translate_error =
-      form.type.translate_error
-      || Application.get_env(:formex, :translate_error)
-      || fn {msg, _opts} -> msg end
+      form.type.translate_error || Application.get_env(:formex, :translate_error) ||
+        fn {msg, _opts} -> msg end
 
-    errors = form.errors
-    |> Enum.map(fn {key, suberrors} ->
-      suberrors = Enum.map(suberrors, &(translate_error.(&1)))
+    errors =
+      form.errors
+      |> Enum.map(fn {key, suberrors} ->
+        suberrors = Enum.map(suberrors, &translate_error.(&1))
 
-      {key, suberrors}
-    end)
+        {key, suberrors}
+      end)
 
     %{form | errors: errors}
   end
 
-  @spec get_validator(form :: Form.t) :: any
+  @spec get_validator(form :: Form.t()) :: any
   defp get_validator(form) do
     form.type.validator || Application.get_env(:formex, :validator)
   end
 
-  @spec valid?(Form.t) :: boolean
+  @spec valid?(Form.t()) :: boolean
   defp valid?(form) do
-    valid? = Enum.reduce_while(form.errors, true, fn {_k, v}, _acc ->
-      if Enum.count(v) > 0,
-        do:   {:halt, false},
-        else: {:cont, true}
-    end)
+    valid? =
+      Enum.reduce_while(form.errors, true, fn {_k, v}, _acc ->
+        if Enum.count(v) > 0,
+          do: {:halt, false},
+          else: {:cont, true}
+      end)
 
     valid? && nested_valid?(form) && collections_valid?(form)
   end
 
-  @spec nested_valid?(Form.t) :: boolean
+  @spec nested_valid?(Form.t()) :: boolean
   defp nested_valid?(form) do
     Form.get_nested(form)
     |> Enum.reduce_while(true, fn item, _acc ->
       if item.form.valid?,
-        do:   {:cont, true},
+        do: {:cont, true},
         else: {:halt, false}
     end)
   end
 
-  @spec collections_valid?(Form.t) :: boolean
+  @spec collections_valid?(Form.t()) :: boolean
   defp collections_valid?(form) do
     Form.get_collections(form)
     |> Enum.reduce_while(true, fn collection, _acc ->
       collection.forms
       |> Enum.reduce_while(true, fn item, _sub_acc ->
         if item.form.valid?,
-          do:   {:cont, true},
+          do: {:cont, true},
           else: {:halt, false}
       end)
       |> case do
-        true  -> {:cont, true}
+        true -> {:cont, true}
         false -> {:halt, false}
       end
     end)
   end
 
-  @spec add_invalid_select_errors(Form.t) :: Form.t
+  @spec add_invalid_select_errors(Form.t()) :: Form.t()
   defp add_invalid_select_errors(form) do
-
-    select_errors = form.items
-    |> Enum.filter(&(&1.type in [:select, :multiple_select]))
-    |> Enum.map(fn item ->
-      if item.data[:invalid_select] do
-        {item.name, [{"invalid value", []}]}
-      end
-    end)
-    |> Enum.filter(&(&1))
+    select_errors =
+      form.items
+      |> Enum.filter(&(&1.type in [:select, :multiple_select]))
+      |> Enum.map(fn item ->
+        if item.data[:invalid_select] do
+          {item.name, [{"invalid value", []}]}
+        end
+      end)
+      |> Enum.filter(& &1)
 
     add_errors(form, select_errors)
   end
 
-  @spec add_errors(Form.t, List.t) :: Form.t
+  @spec add_errors(Form.t(), List.t()) :: Form.t()
   defp add_errors(form, new_errors) do
-
-    new_errors = Keyword.merge(form.errors, new_errors, fn _k, field_errors1, field_errors2 ->
-      field_errors1 ++ field_errors2
-    end)
+    new_errors =
+      Keyword.merge(form.errors, new_errors, fn _k, field_errors1, field_errors2 ->
+        field_errors1 ++ field_errors2
+      end)
 
     %{form | errors: new_errors}
   end

@@ -5,10 +5,15 @@ defmodule Formex.BuilderTestType do
     form
     |> add(:title, :text_input, validation: [:required])
     |> add(:content, :textarea, validation: [:required])
-    |> add(:category_id, :select, choices: [
-      "Category A": "1",
-      "Category B": "2"
-    ], validation: [:required])
+    |> add(
+      :category_id,
+      :select,
+      choices: [
+        "Category A": "1",
+        "Category B": "2"
+      ],
+      validation: [:required]
+    )
     |> add(:save, :submit)
   end
 end
@@ -20,7 +25,7 @@ defmodule Formex.BuilderTest do
   alias Formex.TestModel.Article
 
   test "create a form" do
-    form = create_form(BuilderTestType, %Article{}, %{}, [some: :data])
+    form = create_form(BuilderTestType, %Article{}, %{}, some: :data)
     assert Enum.at(form.items, 0).name == :title
     assert form.opts[:some] == :data
   end
@@ -48,5 +53,4 @@ defmodule Formex.BuilderTest do
     assert article.title == "twoja"
     assert article.content == "stara"
   end
-
 end

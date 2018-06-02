@@ -98,18 +98,23 @@ defmodule Formex.View do
   [Phoenix.HTML.Form](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#form_for/4) docs.
 
   """
-  @spec formex_form_for(form :: Form.t, action :: String.t, options :: Keyword.t,
-                        fun :: (Formex.t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
+  @spec formex_form_for(
+          form :: Form.t(),
+          action :: String.t(),
+          options :: Keyword.t(),
+          fun :: (Formex.t() -> Phoenix.HTML.unsafe())
+        ) :: Phoenix.HTML.safe()
   def formex_form_for(form, action, options \\ [], fun) do
+    phoenix_options =
+      options
+      |> Keyword.delete(:template)
+      |> Keyword.delete(:template_options)
+      |> Keyword.put_new(:as, form_for_name(form))
+      |> Keyword.put_new(:method, form.method || :post)
 
-    phoenix_options = options
-    |> Keyword.delete(:template)
-    |> Keyword.delete(:template_options)
-    |> Keyword.put_new(:as, form_for_name(form))
-    |> Keyword.put_new(:method, form.method || :post)
-
-    fake_params = %{}
-    |> Map.put(to_string(phoenix_options[:as]), form_to_params(form))
+    fake_params =
+      %{}
+      |> Map.put(to_string(phoenix_options[:as]), form_to_params(form))
 
     fake_conn = %Plug.Conn{params: fake_params, method: "POST"}
 
@@ -129,76 +134,83 @@ defmodule Formex.View do
     |> Macro.underscore()
   end
 
-  @spec form_to_params(form :: Form.t) :: Map.t
+  @spec form_to_params(form :: Form.t()) :: Map.t()
   defp form_to_params(form) do
-
     form.items
     |> Enum.map(fn item ->
       case item do
         %Field{} ->
-          val = if !item.custom_value do
-            Map.get(form.new_struct, item.struct_name)
-          else
-            value = Map.get(form.new_struct, item.struct_name)
-            item.custom_value.(value)
-          end
+          val =
+            if !item.custom_value do
+              Map.get(form.new_struct, item.struct_name)
+            else
+              value = Map.get(form.new_struct, item.struct_name)
+              item.custom_value.(value)
+            end
 
-          new_val = case item.type do
-            :multiple_select ->
-              Enum.map(val || [], fn subval ->
-                case subval do
-                  substruct when is_map(substruct) ->
-                    substruct.id
-                  _ ->
-                    subval
-                end
-                |> to_string
-              end)
-            _ ->
-              val
-          end
+          new_val =
+            case item.type do
+              :multiple_select ->
+                Enum.map(val || [], fn subval ->
+                  case subval do
+                    substruct when is_map(substruct) ->
+                      substruct.id
 
-          { to_string(item.name), new_val }
+                    _ ->
+                      subval
+                  end
+                  |> to_string
+                end)
+
+              _ ->
+                val
+            end
+
+          {to_string(item.name), new_val}
 
         %FormNested{} ->
           sub_params = form_to_params(item.form)
           sub_struct = item.form.new_struct
 
-          sub_params = if Map.has_key?(sub_struct, :id) do
-            sub_params
-            |> Map.put("id", sub_struct.id |> to_string)
-          else
-            sub_params
-          end
+          sub_params =
+            if Map.has_key?(sub_struct, :id) do
+              sub_params
+              |> Map.put("id", sub_struct.id |> to_string)
+            else
+              sub_params
+            end
 
-          { to_string(item.name), sub_params }
+          {to_string(item.name), sub_params}
 
         %FormCollection{} ->
-          new_val = Range.new(0, Enum.count(item.forms)-1)
-          |> Enum.zip(item.forms)
-          |> Enum.map(fn {key, nested_form} ->
-            sub_struct = nested_form.form.new_struct
+          new_val =
+            Range.new(0, Enum.count(item.forms) - 1)
+            |> Enum.zip(item.forms)
+            |> Enum.map(fn {key, nested_form} ->
+              sub_struct = nested_form.form.new_struct
 
-            subparams  = form_to_params(nested_form.form)
-            |> Map.put("id", sub_struct.id |> to_string)
-            |> Map.put("formex_id", sub_struct.formex_id)
-            |> Map.put(
-              to_string(item.delete_field),
-              Map.get(sub_struct, item.delete_field) |> to_string
-            )
+              subparams =
+                form_to_params(nested_form.form)
+                |> Map.put("id", sub_struct.id |> to_string)
+                |> Map.put("formex_id", sub_struct.formex_id)
+                |> Map.put(
+                  to_string(item.delete_field),
+                  Map.get(sub_struct, item.delete_field) |> to_string
+                )
 
-            { to_string(key), subparams }
-          end)
-          |> Enum.into(%{})
+              {to_string(key), subparams}
+            end)
+            |> Enum.into(%{})
 
-          { to_string(item.name), new_val }
+          {to_string(item.name), new_val}
 
         _ ->
           false
       end
     end)
-    |> Enum.filter(&(&1))
+    |> Enum.filter(& &1)
     |> Enum.into(%{})
+
     # |> IO.inspect
   end
 
@@ -211,7 +223,7 @@ defmodule Formex.View do
       `Formex.Template.BootstrapHorizontal`
     * `template_options` - additional options, supported by the template
   """
-  @spec formex_rows(Form.t, Keyword.t) :: Phoenix.HTML.safe
+  @spec formex_rows(Form.t(), Keyword.t()) :: Phoenix.HTML.safe()
   def formex_rows(form, options \\ []) do
     Enum.map(form.items, fn item ->
       formex_row(form, item.name, options)
@@ -233,46 +245,47 @@ defmodule Formex.View do
       `Formex.Template.BootstrapHorizontal`
     * `template_options` - additional options, supported by the template
   """
-  @spec formex_row(Form.t, Atom.t, Keyword.t) :: Phoenix.HTML.safe
+  @spec formex_row(Form.t(), Atom.t(), Keyword.t()) :: Phoenix.HTML.safe()
   def formex_row(form, item_name, options \\ []) do
-    item             = get_item(form, item_name)
-    template         = get_template(form, options)
+    item = get_item(form, item_name)
+    template = get_template(form, options)
     template_options = get_template_options(form, options)
 
     case item do
       %Field{} ->
         template.generate_row(form, item, template_options)
+
       %Button{} ->
         template.generate_row(form, item, template_options)
+
       %FormNested{} ->
         Formex.View.Nested.formex_nested(form, item_name, options)
+
       %FormCollection{} ->
         Formex.View.Collection.formex_collection(form, item_name, options)
     end
   end
 
-  @spec formex_input(Form.t, Atom.t, Keyword.t) :: Phoenix.HTML.safe
+  @spec formex_input(Form.t(), Atom.t(), Keyword.t()) :: Phoenix.HTML.safe()
   def formex_input(form, item_name, options \\ []) do
-    item     = get_item(form, item_name)
+    item = get_item(form, item_name)
     template = get_template(form, options)
 
     template.generate_input(form, item)
   end
 
-  @spec formex_label(Form.t, Atom.t, Keyword.t) :: Phoenix.HTML.safe
+  @spec formex_label(Form.t(), Atom.t(), Keyword.t()) :: Phoenix.HTML.safe()
   def formex_label(form, item_name, options \\ []) do
-    item     = get_item(form, item_name)
+    item = get_item(form, item_name)
     template = get_template(form, options)
-    class    = options[:class] && options[:class] || ""
+    class = (options[:class] && options[:class]) || ""
 
     template.generate_label(form, item, class)
   end
 
   def get_template(form, row_options) do
-    row_options[:template]
-      || form.template
-      || Application.get_env(:formex, :template)
-      || Formex.Template.BootstrapVertical
+    row_options[:template] || form.template || Application.get_env(:formex, :template) ||
+      Formex.Template.BootstrapVertical
   end
 
   def get_template_options(form, row_options) do
@@ -286,10 +299,9 @@ defmodule Formex.View do
     item = Enum.find(form.items, &(&1.name == item_name))
 
     if !item do
-      throw("Key :"<>to_string(item_name)<>" not found in form "<>to_string(form.type))
+      throw("Key :" <> to_string(item_name) <> " not found in form " <> to_string(form.type))
     end
 
     item
   end
-
 end

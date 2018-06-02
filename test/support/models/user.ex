@@ -22,7 +22,12 @@
 
 defmodule Formex.TestModel.User do
   defstruct [
-    :id, :first_name, :last_name, :department_id, user_info: %Formex.TestModel.UserInfo{},
-    user_accounts: [], user_addresses: []
+    :id,
+    :first_name,
+    :last_name,
+    :department_id,
+    user_info: %Formex.TestModel.UserInfo{},
+    user_accounts: [],
+    user_addresses: []
   ]
 end

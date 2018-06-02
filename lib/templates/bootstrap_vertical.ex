@@ -14,12 +14,14 @@ defmodule Formex.Template.BootstrapVertical do
 
     input = attach_addon(input, field)
 
-    tags = [label, input]
-    |> attach_error(form, field)
+    tags =
+      [label, input]
+      |> attach_error(form, field)
 
-    wrapper_class = ["form-group"]
-    |> attach_error_class(form, field)
-    |> attach_required_class(field)
+    wrapper_class =
+      ["form-group"]
+      |> attach_error_class(form, field)
+      |> attach_required_class(field)
 
     content_tag(:div, tags, class: Enum.join(wrapper_class, " "))
   end
@@ -27,5 +29,4 @@ defmodule Formex.Template.BootstrapVertical do
   def generate_row(form, button = %Button{}, _options) do
     generate_input(form, button)
   end
-
 end

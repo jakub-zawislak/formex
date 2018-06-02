@@ -25,7 +25,9 @@ defmodule Formex.Collection.OneToMany.UserType do
     form
     |> add(:first_name, :text_input, label: "Imię", validation: [:required])
     |> add(:last_name, :text_input, label: "Nazwisko", validation: [:required])
-    |> add(:user_addresses, Formex.Collection.OneToMany.UserAddressType,
+    |> add(
+      :user_addresses,
+      Formex.Collection.OneToMany.UserAddressType,
       struct_module: Formex.TestModel.UserAddress
     )
   end
@@ -52,9 +54,10 @@ defmodule Formex.Collection.OneToManyTest do
   test "view" do
     form = create_form(UserType, %User{})
 
-    {:safe, form_html} = Formex.View.formex_form_for(form, "", fn f ->
-      Formex.View.formex_rows(f)
-    end)
+    {:safe, form_html} =
+      Formex.View.formex_form_for(form, "", fn f ->
+        Formex.View.formex_rows(f)
+      end)
 
     form_str = form_html |> to_string
 
@@ -63,16 +66,26 @@ defmodule Formex.Collection.OneToManyTest do
   end
 
   test "insert user and user_address" do
-    params      = %{"first_name" => "a", "last_name" => "a", "user_addresses" => %{
-      "0" => %{"street" => "", "formex_id" => "9"}
-    }}
-    form        = create_form(UserType, %User{}, params)
+    params = %{
+      "first_name" => "a",
+      "last_name" => "a",
+      "user_addresses" => %{
+        "0" => %{"street" => "", "formex_id" => "9"}
+      }
+    }
+
+    form = create_form(UserType, %User{}, params)
     {:error, _} = handle_form(form)
 
-    params      = %{"first_name" => "a", "last_name" => "a", "user_addresses" => %{
-      "0" => %{"street" => "s", "postal_code" => "p", "city" => "c", "formex_id" => "nine"}
-    }}
-    form        = create_form(UserType, %User{}, params)
+    params = %{
+      "first_name" => "a",
+      "last_name" => "a",
+      "user_addresses" => %{
+        "0" => %{"street" => "s", "postal_code" => "p", "city" => "c", "formex_id" => "nine"}
+      }
+    }
+
+    form = create_form(UserType, %User{}, params)
     {:ok, user} = handle_form(form)
 
     assert Enum.at(user.user_addresses, 0).city == "c"
@@ -81,21 +94,33 @@ defmodule Formex.Collection.OneToManyTest do
   test "edit user and user_address" do
     user = get_user(0)
 
-    params      = %{"first_name" => "a", "last_name" => "a", "user_addresses" => %{
-      "0" => %{"id" => Enum.at(user.user_addresses, 0).id |> to_string, "street" => ""}
-    }}
-    form        = create_form(UserType, user, params)
+    params = %{
+      "first_name" => "a",
+      "last_name" => "a",
+      "user_addresses" => %{
+        "0" => %{"id" => Enum.at(user.user_addresses, 0).id |> to_string, "street" => ""}
+      }
+    }
+
+    form = create_form(UserType, user, params)
     {:error, _} = handle_form(form)
 
-    params      = %{"first_name" => "a", "last_name" => "a", "user_addresses" => %{
-      "0" => %{"id" => Enum.at(user.user_addresses, 0).id |> to_string,
-        "street" => "Księżycowa", "postal_code" => "10-699", "city" => "Szczebrzeszyn"},
-      "1" => %{"formex_id" => "1",
-        "street" => "s1", "postal_code" => "p1", "city" => "c1"},
-      "2" => %{"formex_id" => "2",
-        "street" => "s2", "postal_code" => "p2", "city" => "c2"}
-    }}
-    form        = create_form(UserType, user, params)
+    params = %{
+      "first_name" => "a",
+      "last_name" => "a",
+      "user_addresses" => %{
+        "0" => %{
+          "id" => Enum.at(user.user_addresses, 0).id |> to_string,
+          "street" => "Księżycowa",
+          "postal_code" => "10-699",
+          "city" => "Szczebrzeszyn"
+        },
+        "1" => %{"formex_id" => "1", "street" => "s1", "postal_code" => "p1", "city" => "c1"},
+        "2" => %{"formex_id" => "2", "street" => "s2", "postal_code" => "p2", "city" => "c2"}
+      }
+    }
+
+    form = create_form(UserType, user, params)
     {:ok, user} = handle_form(form)
 
     assert Enum.at(user.user_addresses, 0).city == "Szczebrzeszyn"
