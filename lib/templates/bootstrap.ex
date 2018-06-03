@@ -18,40 +18,26 @@ defmodule Formex.Template.Bootstrap do
 
         args =
           args ++
-            cond do
-              Enum.member?([:select, :multiple_select], type) ->
-                [data[:choices]]
-
-              true ->
-                []
+            if Enum.member?([:select, :multiple_select], type) do
+              [data[:choices]]
+            else
+              []
             end
 
         args =
           args ++
-            cond do
-              Enum.member?([:checkbox, :file_input], type) ->
-                [phoenix_opts]
-
-              true ->
-                [add_class(phoenix_opts, "form-control")]
+            if Enum.member?([:checkbox, :file_input], type) do
+              [phoenix_opts]
+            else
+              [add_class(phoenix_opts, "form-control")]
             end
 
         input = render_phoenix_input(field, args)
 
-        cond do
-          Enum.member?([:checkbox], type) ->
-            content_tag(
-              :div,
-              [
-                content_tag(:label, [
-                  input
-                ])
-              ],
-              class: "checkbox"
-            )
-
-          true ->
-            input
+        if Enum.member?([:checkbox], type) do
+          content_tag(:div, [content_tag(:label, [input])], class: "checkbox")
+        else
+          input
         end
       end
 
@@ -94,7 +80,8 @@ defmodule Formex.Template.Bootstrap do
   def attach_error(tags, form, field) do
     if has_error(form, field) do
       error_html =
-        get_errors(form, field)
+        form
+        |> get_errors(field)
         |> Enum.map(fn error ->
           content_tag(:p, format_error(error))
         end)

@@ -119,7 +119,8 @@ defmodule Formex.Form do
   """
   @spec get_struct_name_by_name(form :: t, name :: atom) :: atom
   def get_struct_name_by_name(form, name) do
-    find(form, name)
+    form
+    |> find(name)
     |> Map.get(:struct_name)
   end
 
@@ -163,8 +164,7 @@ defmodule Formex.Form do
   end
 
   @doc false
-  @spec start_creating(form :: Form.t(), type :: any, name :: Atom.t(), opts :: Map.t()) ::
-          Form.t()
+  @spec start_creating(form :: Form.t(), type :: any, name :: Atom.t(), opts :: Map.t()) :: Form.t()
   def start_creating(form, type, name, opts \\ []) do
     info = form.struct_info[name]
 

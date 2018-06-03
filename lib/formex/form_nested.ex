@@ -27,8 +27,7 @@ defmodule Formex.FormNested do
   """
 
   @doc false
-  @spec start_creating(form :: Form.t(), type :: any, name :: Atom.t(), opts :: Map.t()) ::
-          Form.t()
+  @spec start_creating(form :: Form.t(), type :: any, name :: Atom.t(), opts :: Map.t()) :: Form.t()
   def start_creating(form, type, name, opts) do
     submodule =
       case form.struct_info[name] do
@@ -37,10 +36,10 @@ defmodule Formex.FormNested do
       end
 
     submodule =
-      if !submodule do
-        Keyword.get(opts, :struct_module) || raise "the :struct_module option is required"
-      else
+      if submodule do
         submodule
+      else
+        Keyword.get(opts, :struct_module) || raise "the :struct_module option is required"
       end
 
     %FormNested{
@@ -64,10 +63,10 @@ defmodule Formex.FormNested do
     params = form.params[to_string(name)] || %{}
 
     substruct =
-      if !substruct do
-        struct(struct_module)
-      else
+      if substruct do
         substruct
+      else
+        struct(struct_module)
       end
 
     subform = Formex.Builder.create_form(type, substruct, params, form.opts, struct_module)

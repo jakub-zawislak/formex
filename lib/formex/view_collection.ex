@@ -352,7 +352,8 @@ defmodule Formex.View.Collection do
       end)
 
     html =
-      Enum.at(prot_html, 1)
+      prot_html
+      |> Enum.at(1)
       |> to_string
       |> replace_indexes_in_prototype
 
@@ -362,7 +363,8 @@ defmodule Formex.View.Collection do
   defp replace_indexes_in_prototype(html) do
     Regex.replace(~r/(for|id|name)(\=")(.*?)(")/i, html, fn _match, a, b, name, c ->
       replaced_name =
-        Regex.split(~r/_[0-9]+_|\[[0-9]+\]/, name, include_captures: true)
+        name
+        |> (&Regex.split(~r/_[0-9]+_|\[[0-9]+\]/, &1, include_captures: true)).()
         |> Enum.with_index()
         |> Enum.map(fn {val, index} ->
           if rem(index, 2) == 0 do

@@ -65,8 +65,6 @@ defmodule Formex.View.Nested do
       throw("Key :" <> to_string(item_name) <> " not found in form " <> to_string(form.type))
     end
 
-    fun = if !fun, do: &formex_rows(&1), else: fun
-
     Phoenix.HTML.Form.inputs_for(form.phoenix_form, item.name, fn f ->
       item.form
       |> Map.put(:phoenix_form, f)
@@ -74,10 +72,10 @@ defmodule Formex.View.Nested do
       |> Map.put(:template_options, template_options)
       |> (fn f ->
             html =
-              if !fun do
-                formex_rows(f)
-              else
+              if fun do
                 fun.(f)
+              else
+                formex_rows(f)
               end
 
             id_field = Phoenix.HTML.Form.hidden_input(f.phoenix_form, :id)

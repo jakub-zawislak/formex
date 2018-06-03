@@ -87,10 +87,10 @@ defmodule Formex.Validator do
               collection
               | forms:
                   Enum.map(collection.forms, fn nested ->
-                    if !FormCollection.to_be_removed(item, nested) do
-                      %{nested | form: validate(nested.form)}
-                    else
+                    if FormCollection.to_be_removed(item, nested) do
                       %{nested | form: %{nested.form | valid?: true}}
+                    else
+                      %{nested | form: validate(nested.form)}
                     end
                   end)
             }
@@ -146,7 +146,8 @@ defmodule Formex.Validator do
 
   @spec nested_valid?(Form.t()) :: boolean
   defp nested_valid?(form) do
-    Form.get_nested(form)
+    form
+    |> Form.get_nested()
     |> Enum.reduce_while(true, fn item, _acc ->
       if item.form.valid?,
         do: {:cont, true},
@@ -156,7 +157,8 @@ defmodule Formex.Validator do
 
   @spec collections_valid?(Form.t()) :: boolean
   defp collections_valid?(form) do
-    Form.get_collections(form)
+    form
+    |> Form.get_collections()
     |> Enum.reduce_while(true, fn collection, _acc ->
       collection.forms
       |> Enum.reduce_while(true, fn item, _sub_acc ->

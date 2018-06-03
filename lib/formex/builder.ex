@@ -43,7 +43,8 @@ defmodule Formex.Builder do
       opts: opts
     }
 
-    struct(wrapper, form: form)
+    wrapper
+    |> struct(form: form)
     |> BuilderProtocol.create_struct_info()
     |> BuilderProtocol.create_form()
     |> Map.get(:form)
@@ -85,7 +86,9 @@ defmodule Formex.Builder do
                 end)
 
               subparams =
-                Range.new(0, Enum.count(items) - 1)
+                items
+                |> Enum.count
+                |> (&Range.new(0, &1 - 1)).()
                 |> Enum.zip(items)
                 |> Enum.map(fn {key, item} -> {to_string(key), item} end)
                 |> Enum.into(%{})
@@ -120,7 +123,8 @@ defmodule Formex.Builder do
         to_remove = Form.get_items_with_changed_name(form)
 
         new_params =
-          Map.merge(params, new_params)
+          params
+          |> Map.merge(new_params)
           |> Enum.filter(fn {key, value} ->
             String.to_atom(key) not in to_remove
           end)
@@ -192,7 +196,8 @@ defimpl Formex.BuilderProtocol, for: Formex.BuilderType.Struct do
   @spec create_form(Map.t()) :: Map.t()
   def create_form(args) do
     form =
-      args.form.type.build_form(args.form)
+      args.form
+      |> args.form.type.build_form()
       |> Form.finish_creating()
 
     Map.put(args, :form, form)

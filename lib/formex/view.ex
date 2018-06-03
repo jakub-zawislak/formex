@@ -140,69 +140,13 @@ defmodule Formex.View do
     |> Enum.map(fn item ->
       case item do
         %Field{} ->
-          val =
-            if !item.custom_value do
-              Map.get(form.new_struct, item.struct_name)
-            else
-              value = Map.get(form.new_struct, item.struct_name)
-              item.custom_value.(value)
-            end
-
-          new_val =
-            case item.type do
-              :multiple_select ->
-                Enum.map(val || [], fn subval ->
-                  case subval do
-                    substruct when is_map(substruct) ->
-                      substruct.id
-
-                    _ ->
-                      subval
-                  end
-                  |> to_string
-                end)
-
-              _ ->
-                val
-            end
-
-          {to_string(item.name), new_val}
+          form_to_params_field(form, item)
 
         %FormNested{} ->
-          sub_params = form_to_params(item.form)
-          sub_struct = item.form.new_struct
-
-          sub_params =
-            if Map.has_key?(sub_struct, :id) do
-              sub_params
-              |> Map.put("id", sub_struct.id |> to_string)
-            else
-              sub_params
-            end
-
-          {to_string(item.name), sub_params}
+          form_to_params_nested(form, item)
 
         %FormCollection{} ->
-          new_val =
-            Range.new(0, Enum.count(item.forms) - 1)
-            |> Enum.zip(item.forms)
-            |> Enum.map(fn {key, nested_form} ->
-              sub_struct = nested_form.form.new_struct
-
-              subparams =
-                form_to_params(nested_form.form)
-                |> Map.put("id", sub_struct.id |> to_string)
-                |> Map.put("formex_id", sub_struct.formex_id)
-                |> Map.put(
-                  to_string(item.delete_field),
-                  Map.get(sub_struct, item.delete_field) |> to_string
-                )
-
-              {to_string(key), subparams}
-            end)
-            |> Enum.into(%{})
-
-          {to_string(item.name), new_val}
+          form_to_params_collection(form, item)
 
         _ ->
           false
@@ -210,8 +154,84 @@ defmodule Formex.View do
     end)
     |> Enum.filter(& &1)
     |> Enum.into(%{})
+  end
 
-    # |> IO.inspect
+  @spec form_to_params_field(form :: Form.t(), item :: Field.t()) :: Map.t()
+  defp form_to_params_field(form, item) do
+    val =
+      if item.custom_value do
+        value = Map.get(form.new_struct, item.struct_name)
+        item.custom_value.(value)
+      else
+        Map.get(form.new_struct, item.struct_name)
+      end
+
+    new_val =
+      case item.type do
+        :multiple_select ->
+          (val || [])
+          |> Enum.map(fn subval ->
+            subval
+            |> case do
+              substruct when is_map(substruct) ->
+                substruct.id
+
+              _ ->
+                subval
+            end
+            |> to_string
+          end)
+
+        _ ->
+          val
+      end
+
+    {to_string(item.name), new_val}
+  end
+
+  @spec form_to_params_nested(form :: Form.t(), item :: FormNested.t()) :: Map.t()
+  defp form_to_params_nested(form, item) do
+    sub_params = form_to_params(item.form)
+    sub_struct = item.form.new_struct
+
+    sub_params =
+      if Map.has_key?(sub_struct, :id) do
+        sub_params
+        |> Map.put("id", sub_struct.id |> to_string)
+      else
+        sub_params
+      end
+
+    {to_string(item.name), sub_params}
+  end
+
+  @spec form_to_params_collection(form :: Form.t(), item :: FormCollection.t()) :: Map.t()
+  defp form_to_params_collection(form, item) do
+    new_val =
+      item.forms
+      |> Enum.count()
+      |> (&Range.new(0, &1 - 1)).()
+      |> Enum.zip(item.forms)
+      |> Enum.map(fn {key, nested_form} ->
+        sub_struct = nested_form.form.new_struct
+
+        subparams =
+          nested_form.form
+          |> form_to_params()
+          |> Map.put("id", sub_struct.id |> to_string)
+          |> Map.put("formex_id", sub_struct.formex_id)
+          |> Map.put(
+            to_string(item.delete_field),
+            sub_struct
+            |> Map.get(item.delete_field)
+            |> to_string
+          )
+
+        {to_string(key), subparams}
+      end)
+      |> Enum.into(%{})
+
+    {to_string(item.name), new_val}
   end
 
   @doc """

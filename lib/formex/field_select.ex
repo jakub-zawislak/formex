@@ -19,7 +19,8 @@ defmodule Formex.Field.Select do
             end
 
           :multiple_select ->
-            Enum.map(val, fn subval ->
+            val
+            |> Enum.map(fn subval ->
               # dirty fix for Ecto (and maybe others?) implementations,
               # where at first there is a preloaded struct, and after submit there is just an id.
               subval =
@@ -52,7 +53,8 @@ defmodule Formex.Field.Select do
   @spec validate(field :: Field.t(), val :: String.t()) :: Field.t()
   def validate(field, val) do
     choices =
-      Enum.map(field.data[:choices], fn choice ->
+      field.data[:choices]
+      |> Enum.map(fn choice ->
         case choice do
           opts when is_list(opts) ->
             opts[:value]

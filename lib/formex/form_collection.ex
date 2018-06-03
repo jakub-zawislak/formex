@@ -38,16 +38,15 @@ defmodule Formex.FormCollection do
   """
 
   @doc false
-  @spec start_creating(form :: Form.t(), type :: any, name :: Atom.t(), opts :: Map.t()) ::
-          Map.t()
+  @spec start_creating(form :: Form.t(), type :: any, name :: Atom.t(), opts :: Map.t()) :: Map.t()
   def start_creating(form, type, name, opts) do
     {:collection, submodule} = form.struct_info[name]
 
     submodule =
-      if !submodule do
-        Keyword.get(opts, :struct_module) || raise "the :struct_module option is required"
-      else
+      if submodule do
         submodule
+      else
+        Keyword.get(opts, :struct_module) || raise "the :struct_module option is required"
       end
 
     {delete_field, opts} = Keyword.pop(opts, :delete_field)

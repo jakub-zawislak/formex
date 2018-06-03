@@ -6,5 +6,4 @@ config :formex,
   validator: Formex.Validator.Simple,
   translate_error: &Formex.TestErrorHelpers.translate_error/1
 
-config :logger, :console,
-  level: :info
+config :logger, :console, level: :info
