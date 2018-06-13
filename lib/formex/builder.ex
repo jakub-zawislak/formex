@@ -87,10 +87,8 @@ defmodule Formex.Builder do
 
               subparams =
                 items
-                |> Enum.count
-                |> (&Range.new(0, &1 - 1)).()
-                |> Enum.zip(items)
-                |> Enum.map(fn {key, item} -> {to_string(key), item} end)
+                |> Enum.with_index()
+                |> Enum.map(fn {item, key} -> {to_string(key), item} end)
                 |> Enum.into(%{})
 
               {key, subparams}

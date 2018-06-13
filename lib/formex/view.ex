@@ -209,10 +209,8 @@ defmodule Formex.View do
   defp form_to_params_collection(_form, item) do
     new_val =
       item.forms
-      |> Enum.count()
-      |> (&Range.new(0, &1 - 1)).()
-      |> Enum.zip(item.forms)
-      |> Enum.map(fn {key, nested_form} ->
+      |> Enum.with_index()
+      |> Enum.map(fn {nested_form, key} ->
         sub_struct = nested_form.form.new_struct
 
         subparams =
