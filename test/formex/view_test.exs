@@ -1,5 +1,15 @@
+defmodule Formex.ViewTestTagType do
+  use Formex.Type
+
+  def build_form(form) do
+    form
+    |> add(:name, :text_input)
+  end
+end
+
 defmodule Formex.ViewTestType do
   use Formex.Type
+  alias Formex.TestModel.Tag
 
   def build_form(form) do
     form
@@ -12,6 +22,7 @@ defmodule Formex.ViewTestType do
     )
     |> add(:content, :textarea)
     |> add(:visible, :checkbox, required: false)
+    |> add(:tags, Formex.ViewTestTagType, struct_module: Tag)
     |> add(
       :category_id,
       :select,
@@ -38,7 +49,9 @@ defmodule Formex.ViewTest do
   alias Formex.TestModel.Article
 
   test "render view" do
-    form = create_form(ViewTestType, %Article{})
+    tags = Enum.map(1..14, &%{id: &1, name: "tag-#{&1}", formex_id: &1})
+
+    form = create_form(ViewTestType, %Article{tags: tags})
 
     {:safe, form_html} =
       Formex.View.formex_form_for(form, "", fn f ->
@@ -52,6 +65,10 @@ defmodule Formex.ViewTest do
     assert String.match?(form_html, ~r/PHP/)
     assert String.match?(form_html, ~r/Submit form/)
     assert String.match?(form_html, ~r/btn-success/)
+
+    tags_ordered = Enum.map(tags, & &1.name) |> Enum.join(".+")
+    tags_ordered_regex = ~r/#{tags_ordered}/
+    assert String.match?(form_html, tags_ordered_regex)
 
     {:safe, form_html} =
       Formex.View.formex_form_for(form, "", fn f ->

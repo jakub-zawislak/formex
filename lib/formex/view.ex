@@ -190,7 +190,7 @@ defmodule Formex.View do
   end
 
   @spec form_to_params_nested(form :: Form.t(), item :: FormNested.t()) :: Map.t()
-  defp form_to_params_nested(form, item) do
+  defp form_to_params_nested(_form, item) do
     sub_params = form_to_params(item.form)
     sub_struct = item.form.new_struct
 
@@ -206,7 +206,7 @@ defmodule Formex.View do
   end
 
   @spec form_to_params_collection(form :: Form.t(), item :: FormCollection.t()) :: Map.t()
-  defp form_to_params_collection(form, item) do
+  defp form_to_params_collection(_form, item) do
     new_val =
       item.forms
       |> Enum.count()
@@ -227,7 +227,7 @@ defmodule Formex.View do
             |> to_string
           )
 
-        {to_string(key), subparams}
+        {key, subparams}
       end)
       |> Enum.into(%{})
 

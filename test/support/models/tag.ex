@@ -9,5 +9,5 @@
 # end
 
 defmodule Formex.TestModel.Tag do
-  defstruct [:id, :name]
+  defstruct [:id, :name, :formex_id]
 end
