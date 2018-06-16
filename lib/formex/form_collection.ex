@@ -121,6 +121,8 @@ defmodule Formex.FormCollection do
 
     params
     |> Enum.filter(fn {_key, val} -> !val["id"] end)
+    |> Enum.map(fn {key, val} -> {String.to_integer(key), val} end)
+    |> Enum.sort_by(fn {key, _} -> key end, fn key1, key2 -> key1 < key2 end)
     |> Enum.map(fn {_key, subparams} ->
       substruct = struct(submodule, formex_id: subparams["formex_id"])
 

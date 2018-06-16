@@ -46,7 +46,7 @@ defmodule Formex.Builder do
     wrapper
     |> struct(form: form)
     |> BuilderProtocol.create_struct_info()
-    |> BuilderProtocol.create_form()
+    |> BuilderProtocol.create_form() # here is called build_form callback and Form.finish_creating
     |> Map.get(:form)
     |> map_params()
     |> apply_params()
@@ -84,6 +84,8 @@ defmodule Formex.Builder do
                 Enum.map(collection.forms, fn nested ->
                   map_params(nested.form).mapped_params
                 end)
+
+              # IO.inspect collection.forms
 
               subparams =
                 items

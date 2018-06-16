@@ -128,6 +128,35 @@ defmodule Formex.Collection.OneToManyTest do
     assert Enum.at(user.user_addresses, 2).city == "c2"
   end
 
+  test "order of new items in collection" do
+    range = 1..12
+
+    items =
+      range
+      |> Enum.map(fn id ->
+        id_str = to_string(id)
+
+        {id_str, %{"formex_id" => id_str}}
+      end)
+      |> Map.new()
+
+    params = %{
+      "user_addresses" => items
+    }
+
+    form = create_form(UserType, %User{}, params)
+
+    collections = Formex.Form.find(form, :user_addresses).forms
+
+    Enum.zip(range, collections)
+    |> Enum.map(fn {id, item} ->
+      id_str = to_string(id)
+      param_val = Map.get(item.form.params, "formex_id")
+
+      assert id_str == param_val
+    end)
+  end
+
   # test "remove user_address" do
   #   user = get_user(1)
 
