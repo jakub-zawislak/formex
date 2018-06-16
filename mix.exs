@@ -4,7 +4,7 @@ defmodule Formex.Mixfile do
   def project do
     [
       app: :formex,
-      version: "0.6.6",
+      version: "0.6.7",
       elixir: "~> 1.3",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,

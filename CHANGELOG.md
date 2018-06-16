@@ -1,3 +1,7 @@
+## v0.6.7 (2017-06-16)
+* Fixed #17 - when there was more than 9 items in collections, they were ordered
+  1, 10, 11 ..., 2, 20, 21..., 3...
+
 ## v0.6.6 (2017-05-25)
 * Fixed #15 - issue in collections, when `id` of struct was `""` instead of `nil`
 * Changed Validator module to be compatible with `Formex.Ecto` `0.2`
