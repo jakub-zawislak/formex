@@ -14,15 +14,21 @@ defmodule Formex.Form do
     * `:struct_module` - `struct.__struct__`, for example: `App.Article`
     * `:struct_info` - additional info about struct, that can differs between implementations
       of `Formex.BuilderProtocol`
-    * `:items` - list of `Formex.Field` and `Button` structs
-    * `:params` - sent parameters
+    * `:items` - list of `Formex.Field`, `Formex.Button`, `Formex.FormCollection` and
+      `Formex.FormNested` structs
+    * `:params` - sent parameters, passed by `Plug.Conn`
+    * `:mapped_params` - `:params` prepared to create a `:new_struct` or to create a
+      changeset by `Formex.Ecto`
     * `:phoenix_form` - `%Phoenix.HTML.Form{}`
     * `:template` - the module that implements `Formex.Template`, for example:
     `Formex.Template.BootstrapHorizontal`. Can be set via a `Formex.View.formex_form_for` options
+    * `:template_options`
     * `:method` - `:post`, `:put` etc. May be used by `Formex.View`.
     E.g. `Formex.Ecto.Builder` sets here `:put` if we editing `struct`, `:post` otherwise.
     * `:submitted?` - is form submitted? Set by `Formex.Controller.handle_form/1`
     * `:opts` - additional data passed in a controller. See: `Formex.Builder.create_form/5`
+    * `:valid?`
+    * `:errors`
   """
   defstruct type: nil,
             struct: nil,
