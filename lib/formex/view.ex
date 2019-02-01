@@ -249,7 +249,7 @@ defmodule Formex.View do
   end
 
   @doc """
-  Generates a row
+  Generates a row using `formex_label/3` and `formex_input/3`
 
   Example of use:
 
@@ -284,6 +284,23 @@ defmodule Formex.View do
     end
   end
 
+  @doc """
+  Generates an input, used by `formex_row/3`
+
+  Example of use:
+
+      <div>
+        <%= formex_label f, :title %>
+        <%= formex_input f, :title %>
+      </div>
+
+      <%= formex_input f, :some_hidden_field %>
+
+  ## Options
+
+    * `template` - a form template that implements `Formex.Template`, for example:
+      `Formex.Template.BootstrapHorizontal`
+  """
   @spec formex_input(Form.t(), Atom.t(), Keyword.t()) :: Phoenix.HTML.safe()
   def formex_input(form, item_name, options \\ []) do
     item = get_item(form, item_name)
@@ -292,6 +309,21 @@ defmodule Formex.View do
     template.generate_input(form, item)
   end
 
+  @doc """
+  Generates a label, used by `formex_row/3`
+
+  Example of use:
+
+      <div>
+        <%= formex_label f, :title %>
+        <%= formex_input f, :title %>
+      </div>
+
+  ## Options
+
+    * `template` - a form template that implements `Formex.Template`, for example:
+      `Formex.Template.BootstrapHorizontal`
+  """
   @spec formex_label(Form.t(), Atom.t(), Keyword.t()) :: Phoenix.HTML.safe()
   def formex_label(form, item_name, options \\ []) do
     item = get_item(form, item_name)
