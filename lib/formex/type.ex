@@ -31,6 +31,9 @@ defmodule Formex.Type do
   end
   ```
 
+  The `:text_input` and so on are function names from
+  [`Phoenix.HTML.Form`](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html)
+
   ## Nested forms
 
   We have models `User`, and `UserInfo`. The `UserInfo` contains extra information that we don't
@@ -271,7 +274,7 @@ defmodule Formex.Type do
   @doc """
   Adds a form item to the form. May be a field, custom field, button, or subform.
 
-  `type_or_module` is `:text_input` by default.
+  `type_or_module` is `:text_input` by default (so the `Formex.Field.create_field/3` is used).
 
   Behaviour depends on `type_or_module` argument:
     * if it's a module and
@@ -279,7 +282,7 @@ defmodule Formex.Type do
       * implements `Formex.Type`, the `Formex.Form.register/4` is called (it's for
         nested forms and collections of forms)
     * if it's `:submit` or `:reset`, the `Formex.Button.create_button/3` is called
-    * otherwise, the `Formex.Field.create_field/4` is called.
+    * otherwise it's a normal field and the `Formex.Field.create_field/3` is called.
   """
   @spec add(form :: Form.t(), name :: Atom.t(), type_or_module :: Atom.t(), opts :: Map.t()) ::
           Form.t()
