@@ -1,5 +1,33 @@
 # Guides
 
+## Add new items to collection on the backend
+
+You have to generate new collection items with additional `formex_id` values.
+The `formex_id` value should be a string and be unique.
+JS library adds new items in this way. JS generates `formex_id` using UUID.
+
+If you are using Ecto, then you have to preload that association before adding new items.
+
+Example with Ecto case:
+
+```
+user = Repo.get!(User, id)
+|> Repo.preload(:addresses)
+
+user = Map.put(user, :addresses, user.addresses ++ [
+  %App.Comment{
+    country: "default country", # optional
+    formex_id: "1" # required. it may be any unique string
+  },
+  %App.Comment{
+    country: "default country of yet another new item",
+    formex_id: "2"
+  }
+])
+
+form = create_form(App.UserType, user)
+```
+
 ## Using a select picker plugin with ajax search
 
 If you are using a JS plugin for `<select>`
