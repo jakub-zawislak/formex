@@ -123,12 +123,17 @@ defmodule Formex.Type do
   }
   ```
 
+  After modifying `package.json` you have to run `npm install` again.
+
   JavaScript
   ```javascript
   import {Collection} from 'formex'
 
+  Collection.run() // run listening clicks on Add and Delete buttons
+
+  // if you need to do something when user adds or deletes an item:
   Collection.run(function() {
-    // optional callback on collection change
+    // run again your fancy scripts after a new item was added
   })
   ```
 
