@@ -95,7 +95,7 @@ defmodule Formex.Field do
     * `:choice_label_provider` - used along with `:select_without_choices`.
 
       When form is sent but it's displayed again (because of some errors), we have to render
-      <select>` with a single `<option>`, previously chosen by user.
+      `<select>` with a single `<option>`, previously chosen by user.
 
       This option expects a function that receives id and returns some label.
 
